@@ -27,7 +27,7 @@ type pipelineState struct {
 }
 
 func Generate(ctx context.Context, forgeFile string, vars map[string]string) ([]byte, error) {
-	cfg, err := Parse(forgeFile)
+	cfg, err := config.ParseFile(forgeFile)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing pipeline %s: %w", forgeFile, err)
 	}
@@ -193,7 +193,7 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 		if err != nil {
 			return nil, fmt.Errorf("error importing transformer: %w", err)
 		}
-		transformerCfg, err := parse(data)
+		transformerCfg, err := config.Parse(data)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing transformer: %w", err)
 		}
