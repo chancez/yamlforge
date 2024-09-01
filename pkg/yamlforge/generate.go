@@ -9,12 +9,12 @@ import (
 	"html/template"
 	"io"
 	"os"
-	"os/exec"
 	"path"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/chancez/yamlforge/pkg/config"
+	"github.com/chancez/yamlforge/pkg/generator"
 	"github.com/chancez/yamlforge/pkg/reference"
 )
 
@@ -77,78 +77,19 @@ func (state *pipelineState) readFile(filePath string) ([]byte, error) {
 	return os.ReadFile(path.Join(path.Dir(state.forgeFile), filePath))
 }
 
-func (state *pipelineState) handleGenerator(ctx context.Context, generator config.Generator) ([]byte, error) {
+func (state *pipelineState) handleGenerator(ctx context.Context, generatorCfg config.Generator) ([]byte, error) {
+	var gen generator.Generator
 	switch {
-	case generator.File != nil:
-		return state.readFile(generator.File.Path)
-	case generator.Exec != nil:
-		var buf bytes.Buffer
-		cmd := exec.Command(generator.Exec.Command, generator.Exec.Args...)
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = &buf
-		err := cmd.Run()
-		if err != nil {
-			return nil, err
-		}
-		return buf.Bytes(), nil
-	case generator.Helm != nil:
-		var buf bytes.Buffer
-		templateArgs := []string{
-			"template",
-			generator.Helm.ReleaseName,
-			generator.Helm.Chart,
-		}
-		if generator.Helm.Version != "" {
-			templateArgs = append(templateArgs, "--version", generator.Helm.Version)
-		}
-		if generator.Helm.Repo != "" {
-			templateArgs = append(templateArgs, "--repo", generator.Helm.Repo)
-		}
-		if generator.Helm.Namespace != "" {
-			templateArgs = append(templateArgs, "--namespace", generator.Helm.Namespace)
-		}
-		if len(generator.Helm.APIVersions) != 0 {
-			for _, apiVersion := range generator.Helm.APIVersions {
-				templateArgs = append(templateArgs, "--api-versions", apiVersion)
-			}
-		}
-		var refs [][]byte
-		for _, input := range generator.Helm.Values {
-			ref, err := state.referenceStore.GetReference(input)
-			if err != nil {
-				return nil, fmt.Errorf("error getting reference: %w", err)
-			}
-			refs = append(refs, ref)
-		}
-
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "yfg-helm-generator-")
-		if err != nil {
-			return nil, fmt.Errorf("error creating temporary directory: %w", err)
-		}
-		defer func() {
-			os.RemoveAll(tmpDir)
-		}()
-
-		for i, ref := range refs {
-			refPath := path.Join(tmpDir, fmt.Sprintf("ref-%d-values.yaml", i))
-			err = os.WriteFile(refPath, ref, 0400)
-			if err != nil {
-				return nil, fmt.Errorf("error writing helm values to %q: %w", refPath, err)
-			}
-			templateArgs = append(templateArgs, "--values", refPath)
-		}
-
-		cmd := exec.Command("helm", templateArgs...)
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = &buf
-		err = cmd.Run()
-		if err != nil {
-			return nil, err
-		}
-		return buf.Bytes(), nil
+	case generatorCfg.File != nil:
+		gen = generator.NewFile(path.Dir(state.forgeFile), *generatorCfg.File)
+	case generatorCfg.Exec != nil:
+		gen = generator.NewExec(*generatorCfg.Exec)
+	case generatorCfg.Helm != nil:
+		gen = generator.NewHelm(*generatorCfg.Helm, state.referenceStore)
 	default:
 		return nil, errors.New("invalid generator, no generator specified")
 	}
+	return gen.Generate(ctx)
 }
 
 func (state *pipelineState) handleTransformer(ctx context.Context, transformer config.Transformer) ([]byte, error) {
