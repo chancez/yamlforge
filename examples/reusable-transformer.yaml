@@ -1,0 +1,24 @@
+pipeline:
+- name: simple-file
+  generator:
+    file:
+      path: files/test.yaml
+
+- name: add-field
+  transformer:
+    import:
+      path: transformers/add-field.yaml
+      vars:
+        # We're passing the output of the simple-file stage as the
+        # transformer-input var in the add-field transformer
+        - name: transformer-input
+          ref: simple-file
+
+
+# Render the files as YAML
+- name: output
+  output:
+    yaml:
+      input:
+        - ref: add-field
+
