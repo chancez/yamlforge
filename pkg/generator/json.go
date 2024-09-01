@@ -15,18 +15,20 @@ import (
 var _ Generator = (*JSON)(nil)
 
 func init() {
-	Register(config.JSONGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
-		return NewJSON(cfg.(config.JSONGenerator), refStore)
+	Register(config.JSONGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+		return NewJSON(dir, cfg.(config.JSONGenerator), refStore)
 	})
 }
 
 type JSON struct {
+	dir      string
 	cfg      config.JSONGenerator
 	refStore *reference.Store
 }
 
-func NewJSON(cfg config.JSONGenerator, refStore *reference.Store) *JSON {
+func NewJSON(dir string, cfg config.JSONGenerator, refStore *reference.Store) *JSON {
 	return &JSON{
+		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
 	}
@@ -36,7 +38,7 @@ func (y *JSON) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
 	for _, input := range y.cfg.Input {
-		ref, err := y.refStore.GetReference(input)
+		ref, err := y.refStore.GetReference(y.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
 
 	"gopkg.in/yaml.v3"
 
@@ -32,7 +33,7 @@ func (store *Store) AddReference(name string, data []byte) error {
 	return nil
 }
 
-func (store *Store) GetReference(ref config.Reference) ([]byte, error) {
+func (store *Store) GetReference(dir string, ref config.Reference) ([]byte, error) {
 	switch {
 	case ref.Var != nil:
 		varName := *ref.Var
@@ -49,7 +50,7 @@ func (store *Store) GetReference(ref config.Reference) ([]byte, error) {
 		}
 		return res, nil
 	case ref.File != nil:
-		return os.ReadFile(*ref.File)
+		return os.ReadFile(path.Join(dir, *ref.File))
 	case ref.Literal != nil:
 		return yaml.Marshal(ref.Literal)
 	default:

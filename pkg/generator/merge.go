@@ -14,18 +14,20 @@ import (
 var _ Generator = (*Merge)(nil)
 
 func init() {
-	Register(config.MergeGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
-		return NewMerge(cfg.(config.MergeGenerator), refStore)
+	Register(config.MergeGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+		return NewMerge(dir, cfg.(config.MergeGenerator), refStore)
 	})
 }
 
 type Merge struct {
+	dir      string
 	cfg      config.MergeGenerator
 	refStore *reference.Store
 }
 
-func NewMerge(cfg config.MergeGenerator, refStore *reference.Store) *Merge {
+func NewMerge(dir string, cfg config.MergeGenerator, refStore *reference.Store) *Merge {
 	return &Merge{
+		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
 	}
@@ -34,7 +36,7 @@ func NewMerge(cfg config.MergeGenerator, refStore *reference.Store) *Merge {
 func (m *Merge) Generate(_ context.Context) ([]byte, error) {
 	merged := make(map[string]any)
 	for _, input := range m.cfg.Input {
-		ref, err := m.refStore.GetReference(input)
+		ref, err := m.refStore.GetReference(m.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}

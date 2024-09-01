@@ -15,18 +15,20 @@ import (
 var _ Generator = (*Helm)(nil)
 
 func init() {
-	Register(config.HelmGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
-		return NewHelm(cfg.(config.HelmGenerator), refStore)
+	Register(config.HelmGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+		return NewHelm(dir, cfg.(config.HelmGenerator), refStore)
 	})
 }
 
 type Helm struct {
+	dir      string
 	cfg      config.HelmGenerator
 	refStore *reference.Store
 }
 
-func NewHelm(cfg config.HelmGenerator, refStore *reference.Store) *Helm {
+func NewHelm(dir string, cfg config.HelmGenerator, refStore *reference.Store) *Helm {
 	return &Helm{
+		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
 	}
@@ -55,7 +57,7 @@ func (h *Helm) Generate(context.Context) ([]byte, error) {
 	}
 	var refs [][]byte
 	for _, input := range h.cfg.Values {
-		ref, err := h.refStore.GetReference(input)
+		ref, err := h.refStore.GetReference(h.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}

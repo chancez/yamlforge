@@ -13,18 +13,20 @@ import (
 var _ Generator = (*GoTemplate)(nil)
 
 func init() {
-	Register(config.GoTemplateGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
-		return NewGoTemplate(cfg.(config.GoTemplateGenerator), refStore)
+	Register(config.GoTemplateGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+		return NewGoTemplate(dir, cfg.(config.GoTemplateGenerator), refStore)
 	})
 }
 
 type GoTemplate struct {
+	dir      string
 	cfg      config.GoTemplateGenerator
 	refStore *reference.Store
 }
 
-func NewGoTemplate(cfg config.GoTemplateGenerator, refStore *reference.Store) *GoTemplate {
+func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *reference.Store) *GoTemplate {
 	return &GoTemplate{
+		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
 	}
@@ -33,7 +35,7 @@ func NewGoTemplate(cfg config.GoTemplateGenerator, refStore *reference.Store) *G
 func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator")
-	res, err := gt.refStore.GetReference(gt.cfg.Input)
+	res, err := gt.refStore.GetReference(gt.dir, gt.cfg.Input)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
 	}

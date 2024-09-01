@@ -14,18 +14,20 @@ import (
 var _ Generator = (*YAML)(nil)
 
 func init() {
-	Register(config.YAMLGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
-		return NewYAML(cfg.(config.YAMLGenerator), refStore)
+	Register(config.YAMLGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+		return NewYAML(dir, cfg.(config.YAMLGenerator), refStore)
 	})
 }
 
 type YAML struct {
+	dir      string
 	cfg      config.YAMLGenerator
 	refStore *reference.Store
 }
 
-func NewYAML(cfg config.YAMLGenerator, refStore *reference.Store) *YAML {
+func NewYAML(dir string, cfg config.YAMLGenerator, refStore *reference.Store) *YAML {
 	return &YAML{
+		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
 	}
@@ -35,7 +37,7 @@ func (y *YAML) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := yaml.NewEncoder(&out)
 	for _, input := range y.cfg.Input {
-		ref, err := y.refStore.GetReference(input)
+		ref, err := y.refStore.GetReference(y.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
