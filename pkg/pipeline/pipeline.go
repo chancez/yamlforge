@@ -9,11 +9,9 @@ import (
 	"io"
 	"os"
 	"path"
-	"text/template"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/generator"
-	"github.com/chancez/yamlforge/pkg/mapmerge"
 	"github.com/chancez/yamlforge/pkg/reference"
 	"gopkg.in/yaml.v3"
 )
@@ -74,40 +72,9 @@ func (pipeline *Pipeline) handleGenerator(ctx context.Context, generatorCfg conf
 	case generatorCfg.Helm != nil:
 		gen = generator.NewHelm(*generatorCfg.Helm, pipeline.referenceStore)
 	case generatorCfg.Merge != nil:
-		merged := make(map[string]any)
-		for _, input := range generatorCfg.Merge.Input {
-			ref, err := pipeline.referenceStore.GetReference(input)
-			if err != nil {
-				return nil, fmt.Errorf("error getting reference: %w", err)
-			}
-			var m map[string]any
-			err = yaml.Unmarshal(ref, &m)
-			if err != nil {
-				return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
-			}
-			merged = mapmerge.Merge(merged, m)
-		}
-		out, err := yaml.Marshal(merged)
-		if err != nil {
-			return nil, fmt.Errorf("error while marshaling merged results to YAML: %w", err)
-		}
-		return out, nil
+		gen = generator.NewMerge(*generatorCfg.Merge, pipeline.referenceStore)
 	case generatorCfg.GoTemplate != nil:
-		var buf bytes.Buffer
-		tpl := template.New("go-template-generator")
-		res, err := pipeline.referenceStore.GetReference(generatorCfg.GoTemplate.Input)
-		if err != nil {
-			return nil, fmt.Errorf("error getting reference: %w", err)
-		}
-		tpl, err = tpl.Parse(string(res))
-		if err != nil {
-			return nil, fmt.Errorf("error parsing template: %w", err)
-		}
-		err = tpl.Execute(&buf, generatorCfg.GoTemplate.Vars)
-		if err != nil {
-			return nil, fmt.Errorf("error executing template: %w", err)
-		}
-		return buf.Bytes(), nil
+		gen = generator.NewGoTemplate(*generatorCfg.GoTemplate, pipeline.referenceStore)
 	case generatorCfg.Import != nil:
 		data, err := pipeline.readFile(generatorCfg.Import.Path)
 		if err != nil {
