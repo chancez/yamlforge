@@ -4,7 +4,7 @@ pipeline:
     vars:
       clusterName: "my-eks-cluster"
       roleARN: "karpenter-role"
-    input:
+    template:
       inline:
         serviceAccount:
           annotations:

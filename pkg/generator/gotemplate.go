@@ -35,7 +35,7 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *referen
 func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator")
-	res, err := gt.refStore.GetReference(gt.dir, gt.cfg.Input)
+	res, err := gt.refStore.GetReference(gt.dir, gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
 	}

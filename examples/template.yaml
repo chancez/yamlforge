@@ -1,7 +1,7 @@
 pipeline:
 - name: template
   gotemplate:
-    input:
+    template:
       file: files/test.yaml
     vars:
       SomeValue: "dog"

@@ -44,8 +44,8 @@ type MergeGenerator struct {
 }
 
 type GoTemplateGenerator struct {
-	Input Reference      `yaml:"input,omitempty" json:"input,omitempty"`
-	Vars  map[string]any `yaml:"vars,omitempty" json:"vars,omitempty"`
+	Template Reference      `yaml:"template,omitempty" json:"template,omitempty"`
+	Vars     map[string]any `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
 type ImportGenerator struct {
