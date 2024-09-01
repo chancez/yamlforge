@@ -4,9 +4,10 @@ pipeline:
     exec:
       command: '/bin/bash'
       args: ['-c', 'echo {"foo": {"bar": "asdf hjkl"}}']
+
 # Render the result as YAML
 - name: output
-  output:
+  generator:
     yaml:
       input:
         - ref: simple-exec

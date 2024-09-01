@@ -7,7 +7,6 @@ type Config struct {
 type Stage struct {
 	Name      string     `yaml:"name,omitempty" json:"name,omitempty"`
 	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty"`
-	Output    *Output    `yaml:"output,omitempty" json:"output,omitempty"`
 }
 
 type Generator struct {
@@ -17,6 +16,8 @@ type Generator struct {
 	Merge      *MergeGenerator      `yaml:"merge,omitempty" json:"merge,omitempty"`
 	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty"`
 	Import     *ImportGenerator     `yaml:"import,omitempty" json:"import,omitempty"`
+	YAML       *YAMLGenerator       `yaml:"yaml,omitempty" json:"yaml,omitempty"`
+	JSON       *JSONGenerator       `yaml:"json,omitempty" json:"json,omitempty"`
 }
 
 type FileGenerator struct {
@@ -57,16 +58,11 @@ type ImportVariable struct {
 	Reference `yaml:",inline"`
 }
 
-type Output struct {
-	YAML *YAMLOutput `yaml:"yaml,omitempty" json:"yaml,omitempty"`
-	JSON *JSONOutput `yaml:"json,omitempty" json:"json,omitempty"`
-}
-
-type YAMLOutput struct {
+type YAMLGenerator struct {
 	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
 }
 
-type JSONOutput struct {
+type JSONGenerator struct {
 	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
 }
 

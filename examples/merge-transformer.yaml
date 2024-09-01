@@ -16,9 +16,3 @@ pipeline:
       input:
         - ref: simple-file
         - ref: simple-exec
-
-- name: output
-  output:
-    yaml:
-      input:
-        - ref: merged

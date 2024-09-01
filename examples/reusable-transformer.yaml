@@ -13,12 +13,3 @@ pipeline:
         # transformer-input var in the add-field transformer
         - name: transformer-input
           ref: simple-file
-
-
-# Render the files as YAML
-- name: output
-  output:
-    yaml:
-      input:
-        - ref: add-field
-

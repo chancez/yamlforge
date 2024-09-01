@@ -8,9 +8,3 @@ pipeline:
         - var: transformer-input
         - literal:
             new_field: some-value
-- name: output
-  output:
-    yaml:
-      input:
-        - ref: add-field
-

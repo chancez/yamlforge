@@ -26,9 +26,3 @@ pipeline:
       namespace: karpenter
       values:
         - ref: karpenter-values
-- name: output
-  output:
-    yaml:
-      input:
-        - ref: helm
-

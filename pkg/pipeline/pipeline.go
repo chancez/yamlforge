@@ -1,19 +1,15 @@
 package pipeline
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/generator"
 	"github.com/chancez/yamlforge/pkg/reference"
-	"gopkg.in/yaml.v3"
 )
 
 // A pipeline is also a generator
@@ -35,27 +31,24 @@ func NewPipeline(forgeFile string, cfg config.Config, refStore *reference.Store)
 }
 
 func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
-	var buf bytes.Buffer
+	var output []byte
 	for _, stage := range pipeline.config.Pipeline {
-		switch {
-		case stage.Generator != nil:
-			result, err := pipeline.handleGenerator(ctx, *stage.Generator)
-			if err != nil {
-				return nil, fmt.Errorf("error running generator %q: %w", stage.Name, err)
-			}
-			err = pipeline.referenceStore.AddReference(stage.Name, result)
-			if err != nil {
-				return nil, fmt.Errorf("error storing reference for generator %q: %w", stage.Name, err)
-			}
-		case stage.Output != nil:
-			err := pipeline.handleOutput(*stage.Output, &buf)
-			if err != nil {
-				return nil, fmt.Errorf("error running output %q: %w", stage.Name, err)
-			}
+		if stage.Generator == nil {
+			return nil, fmt.Errorf("error in stage %q: generator cannot be empty", stage.Name)
 		}
+		result, err := pipeline.handleGenerator(ctx, *stage.Generator)
+		if err != nil {
+			return nil, fmt.Errorf("error running stage %q: %w", stage.Name, err)
+		}
+		err = pipeline.referenceStore.AddReference(stage.Name, result)
+		if err != nil {
+			return nil, fmt.Errorf("error storing reference for stage %q: %w", stage.Name, err)
+		}
+		// The last stage is the output of a pipeline
+		output = result
 	}
 
-	return buf.Bytes(), nil
+	return output, nil
 }
 
 func (pipeline *Pipeline) readFile(filePath string) ([]byte, error) {
@@ -75,6 +68,10 @@ func (pipeline *Pipeline) handleGenerator(ctx context.Context, generatorCfg conf
 		gen = generator.NewMerge(*generatorCfg.Merge, pipeline.referenceStore)
 	case generatorCfg.GoTemplate != nil:
 		gen = generator.NewGoTemplate(*generatorCfg.GoTemplate, pipeline.referenceStore)
+	case generatorCfg.YAML != nil:
+		gen = generator.NewYAML(*generatorCfg.YAML, pipeline.referenceStore)
+	case generatorCfg.JSON != nil:
+		gen = generator.NewJSON(*generatorCfg.JSON, pipeline.referenceStore)
 	case generatorCfg.Import != nil:
 		data, err := pipeline.readFile(generatorCfg.Import.Path)
 		if err != nil {
@@ -112,64 +109,4 @@ func (pipeline *Pipeline) handleGenerator(ctx context.Context, generatorCfg conf
 		return nil, errors.New("invalid generator, no generator specified")
 	}
 	return gen.Generate(ctx)
-}
-
-func (pipeline *Pipeline) handleOutput(outputConf config.Output, out io.Writer) error {
-	switch {
-	case outputConf.YAML != nil:
-		enc := yaml.NewEncoder(out)
-		for _, input := range outputConf.YAML.Input {
-			ref, err := pipeline.referenceStore.GetReference(input)
-			if err != nil {
-				return fmt.Errorf("error getting reference: %w", err)
-			}
-			// assume that all refs are YAML for now
-			dec := yaml.NewDecoder(bytes.NewBuffer(ref))
-			var tmp map[string]any
-			for {
-				err = dec.Decode(&tmp)
-				if err == io.EOF {
-					break
-				}
-				if err != nil {
-					return fmt.Errorf("error decoding reference output as YAML: %w", err)
-				}
-				err = enc.Encode(tmp)
-				if err != nil {
-					return fmt.Errorf("error writing YAML: %w", err)
-				}
-			}
-		}
-		err := enc.Close()
-		if err != nil {
-			return fmt.Errorf("error writing YAML: %w", err)
-		}
-	case outputConf.JSON != nil:
-		enc := json.NewEncoder(out)
-		for _, input := range outputConf.JSON.Input {
-			ref, err := pipeline.referenceStore.GetReference(input)
-			if err != nil {
-				return fmt.Errorf("error getting reference: %w", err)
-			}
-			// assume that all refs are YAML for now
-			dec := yaml.NewDecoder(bytes.NewBuffer(ref))
-			var tmp map[string]any
-			for {
-				err = dec.Decode(&tmp)
-				if err == io.EOF {
-					break
-				}
-				if err != nil {
-					return fmt.Errorf("error decoding reference output as YAML: %w", err)
-				}
-				err = enc.Encode(tmp)
-				if err != nil {
-					return fmt.Errorf("error writing JSON: %w", err)
-				}
-			}
-		}
-	default:
-		return errors.New("invalid output, must configure an output type")
-	}
-	return nil
 }

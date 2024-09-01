@@ -3,11 +3,3 @@ pipeline:
   generator:
     file:
       path: files/test.yaml
-
-# Render the files as YAML
-- name: output
-  output:
-    yaml:
-      input:
-        - ref: simple-file
-
