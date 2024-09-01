@@ -13,6 +13,12 @@ import (
 
 var _ Generator = (*YAML)(nil)
 
+func init() {
+	Register(config.YAMLGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
+		return NewYAML(cfg.(config.YAMLGenerator), refStore)
+	})
+}
+
 type YAML struct {
 	cfg      config.YAMLGenerator
 	refStore *reference.Store

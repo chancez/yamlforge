@@ -2,7 +2,6 @@ package pipeline
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -51,29 +50,12 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 	return output, nil
 }
 
-func (pipeline *Pipeline) readFile(filePath string) ([]byte, error) {
-	return os.ReadFile(path.Join(path.Dir(pipeline.forgeFile), filePath))
-}
-
 func (pipeline *Pipeline) handleGenerator(ctx context.Context, generatorCfg config.Generator) ([]byte, error) {
 	var gen generator.Generator
-	switch {
-	case generatorCfg.File != nil:
-		gen = generator.NewFile(path.Dir(pipeline.forgeFile), *generatorCfg.File)
-	case generatorCfg.Exec != nil:
-		gen = generator.NewExec(*generatorCfg.Exec)
-	case generatorCfg.Helm != nil:
-		gen = generator.NewHelm(*generatorCfg.Helm, pipeline.referenceStore)
-	case generatorCfg.Merge != nil:
-		gen = generator.NewMerge(*generatorCfg.Merge, pipeline.referenceStore)
-	case generatorCfg.GoTemplate != nil:
-		gen = generator.NewGoTemplate(*generatorCfg.GoTemplate, pipeline.referenceStore)
-	case generatorCfg.YAML != nil:
-		gen = generator.NewYAML(*generatorCfg.YAML, pipeline.referenceStore)
-	case generatorCfg.JSON != nil:
-		gen = generator.NewJSON(*generatorCfg.JSON, pipeline.referenceStore)
-	case generatorCfg.Import != nil:
-		data, err := pipeline.readFile(generatorCfg.Import.Path)
+	// TODO: Move to generator package
+	if generatorCfg.Import != nil {
+		dir := path.Dir(pipeline.forgeFile)
+		data, err := os.ReadFile(path.Join(dir, generatorCfg.Import.Path))
 		if err != nil {
 			return nil, fmt.Errorf("error importing pipeline: %w", err)
 		}
@@ -95,18 +77,18 @@ func (pipeline *Pipeline) handleGenerator(ctx context.Context, generatorCfg conf
 			importVars[varName] = ref
 		}
 
-		subPipeline := Pipeline{
+		gen = &Pipeline{
 			forgeFile:      generatorCfg.Import.Path,
 			config:         subPipelineCfg,
 			referenceStore: reference.NewStore(importVars),
 		}
-		result, err := subPipeline.Generate(ctx)
+	} else {
+		dir := path.Dir(pipeline.forgeFile)
+		var err error
+		gen, err = generator.GlobalRegistry.GetGenerator(dir, pipeline.referenceStore, generatorCfg)
 		if err != nil {
-			return nil, fmt.Errorf("error executing pipeline: %w", err)
+			return nil, fmt.Errorf("error getting generator: %w", err)
 		}
-		return result, nil
-	default:
-		return nil, errors.New("invalid generator, no generator specified")
 	}
 	return gen.Generate(ctx)
 }

@@ -13,6 +13,12 @@ import (
 
 var _ Generator = (*Merge)(nil)
 
+func init() {
+	Register(config.MergeGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
+		return NewMerge(cfg.(config.MergeGenerator), refStore)
+	})
+}
+
 type Merge struct {
 	cfg      config.MergeGenerator
 	refStore *reference.Store

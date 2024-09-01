@@ -14,6 +14,12 @@ import (
 
 var _ Generator = (*JSON)(nil)
 
+func init() {
+	Register(config.JSONGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
+		return NewJSON(cfg.(config.JSONGenerator), refStore)
+	})
+}
+
 type JSON struct {
 	cfg      config.JSONGenerator
 	refStore *reference.Store

@@ -7,14 +7,22 @@ import (
 	"os/exec"
 
 	"github.com/chancez/yamlforge/pkg/config"
+	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Exec)(nil)
+
+func init() {
+	Register(config.ExecGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
+		return NewExec(cfg.(config.ExecGenerator))
+	})
+}
 
 type Exec struct {
 	cfg config.ExecGenerator
 }
 
+// TODO: Use directory as PWD
 func NewExec(cfg config.ExecGenerator) *Exec {
 	return &Exec{
 		cfg: cfg,

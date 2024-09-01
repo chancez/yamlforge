@@ -14,6 +14,12 @@ import (
 
 var _ Generator = (*Helm)(nil)
 
+func init() {
+	Register(config.HelmGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
+		return NewHelm(cfg.(config.HelmGenerator), refStore)
+	})
+}
+
 type Helm struct {
 	cfg      config.HelmGenerator
 	refStore *reference.Store
