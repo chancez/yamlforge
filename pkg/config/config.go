@@ -49,11 +49,11 @@ type GoTemplateGenerator struct {
 }
 
 type ImportGenerator struct {
-	Path string           `yaml:"path,omitempty" json:"path,omitempty"`
-	Vars []ImportVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
+	Path string          `yaml:"path,omitempty" json:"path,omitempty"`
+	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
-type ImportVariable struct {
+type NamedVariable struct {
 	Name      string `yaml:"name,omitempty" json:"name,omitempty"`
 	Reference `yaml:",inline" json:",inline"`
 }
