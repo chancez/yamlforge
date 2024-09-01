@@ -1,4 +1,4 @@
-package yamlforge
+package config
 
 type Config struct {
 	Pipeline []*Stage `yaml:"pipeline" json:"pipeline"`

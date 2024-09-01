@@ -13,6 +13,8 @@ import (
 	"path"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/chancez/yamlforge/pkg/config"
 )
 
 type pipelineState struct {
@@ -42,24 +44,24 @@ func Generate(ctx context.Context, forgeFile string, vars map[string]string) ([]
 	return state.generate(ctx, cfg)
 }
 
-func (state *pipelineState) generate(ctx context.Context, cfg *Config) ([]byte, error) {
+func (state *pipelineState) generate(ctx context.Context, cfg config.Config) ([]byte, error) {
 	var buf bytes.Buffer
 	for _, stage := range cfg.Pipeline {
 		switch {
 		case stage.Generator != nil:
-			result, err := state.handleGenerator(ctx, stage.Generator)
+			result, err := state.handleGenerator(ctx, *stage.Generator)
 			if err != nil {
 				return nil, fmt.Errorf("error running generator %q: %w", stage.Name, err)
 			}
 			state.references[stage.Name] = result
 		case stage.Transformer != nil:
-			result, err := state.handleTransformer(ctx, stage.Transformer)
+			result, err := state.handleTransformer(ctx, *stage.Transformer)
 			if err != nil {
 				return nil, fmt.Errorf("error running transformer %q: %w", stage.Name, err)
 			}
 			state.references[stage.Name] = result
 		case stage.Output != nil:
-			err := state.handleOutput(stage.Output, &buf)
+			err := state.handleOutput(*stage.Output, &buf)
 			if err != nil {
 				return nil, fmt.Errorf("error running output %q: %w", stage.Name, err)
 			}
@@ -73,7 +75,7 @@ func (state *pipelineState) readFile(filePath string) ([]byte, error) {
 	return os.ReadFile(path.Join(path.Dir(state.forgeFile), filePath))
 }
 
-func (state *pipelineState) handleGenerator(ctx context.Context, generator *Generator) ([]byte, error) {
+func (state *pipelineState) handleGenerator(ctx context.Context, generator config.Generator) ([]byte, error) {
 	switch {
 	case generator.File != nil:
 		return state.readFile(generator.File.Path)
@@ -147,7 +149,7 @@ func (state *pipelineState) handleGenerator(ctx context.Context, generator *Gene
 	}
 }
 
-func (state *pipelineState) handleTransformer(ctx context.Context, transformer *Transformer) ([]byte, error) {
+func (state *pipelineState) handleTransformer(ctx context.Context, transformer config.Transformer) ([]byte, error) {
 	switch {
 	case transformer.Merge != nil:
 		merged := make(map[string]any)
@@ -222,7 +224,7 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer *
 	}
 }
 
-func (state *pipelineState) handleOutput(outputConf *Output, out io.Writer) error {
+func (state *pipelineState) handleOutput(outputConf config.Output, out io.Writer) error {
 	switch {
 	case outputConf.YAML != nil:
 		enc := yaml.NewEncoder(out)
@@ -282,7 +284,7 @@ func (state *pipelineState) handleOutput(outputConf *Output, out io.Writer) erro
 	return nil
 }
 
-func (state *pipelineState) getReference(ref Reference) ([]byte, error) {
+func (state *pipelineState) getReference(ref config.Reference) ([]byte, error) {
 	switch {
 	case ref.Var != nil:
 		varName := *ref.Var
@@ -307,30 +309,30 @@ func (state *pipelineState) getReference(ref Reference) ([]byte, error) {
 	}
 }
 
-func Parse(forgeFile string) (*Config, error) {
+func Parse(forgeFile string) (config.Config, error) {
 	data, err := os.ReadFile(forgeFile)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing config: %w", err)
+		return config.Config{}, fmt.Errorf("error parsing config: %w", err)
 	}
 	return parse(data)
 }
 
-func parse(data []byte) (*Config, error) {
-	var cfg Config
+func parse(data []byte) (config.Config, error) {
+	var cfg config.Config
 	err := yaml.Unmarshal(data, &cfg)
 	if err != nil {
-		return nil, fmt.Errorf("error parsing config: %w", err)
+		return config.Config{}, fmt.Errorf("error parsing config: %w", err)
 	}
 
 	stagePositions := make(map[string]int)
 	for pos, stage := range cfg.Pipeline {
 		if stage.Name == "" {
-			return nil, fmt.Errorf("error parsing: pipeline[%d], stage is missing a name", pos)
+			return config.Config{}, fmt.Errorf("error parsing: pipeline[%d], stage is missing a name", pos)
 		}
 		if existingPos, exists := stagePositions[stage.Name]; exists {
-			return nil, fmt.Errorf("error parsing: pipeline[%d], stage %q already exists at pipeline[%d]", pos, stage.Name, existingPos)
+			return config.Config{}, fmt.Errorf("error parsing: pipeline[%d], stage %q already exists at pipeline[%d]", pos, stage.Name, existingPos)
 		}
 		stagePositions[stage.Name] = pos
 	}
-	return &cfg, nil
+	return cfg, nil
 }
