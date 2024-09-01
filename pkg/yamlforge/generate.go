@@ -19,6 +19,7 @@ import (
 
 type pipelineState struct {
 	forgeFile string
+	config    config.Config
 	// map from an stage.Name to it's results
 	references map[string][]byte
 	// map a variable name to it's value
@@ -33,6 +34,7 @@ func Generate(ctx context.Context, forgeFile string, vars map[string]string) ([]
 
 	state := pipelineState{
 		forgeFile:  forgeFile,
+		config:     cfg,
 		references: make(map[string][]byte),
 		vars:       make(map[string][]byte),
 	}
@@ -41,12 +43,12 @@ func Generate(ctx context.Context, forgeFile string, vars map[string]string) ([]
 		state.vars[varName] = []byte(varVal)
 	}
 
-	return state.generate(ctx, cfg)
+	return state.generate(ctx)
 }
 
-func (state *pipelineState) generate(ctx context.Context, cfg config.Config) ([]byte, error) {
+func (state *pipelineState) generate(ctx context.Context) ([]byte, error) {
 	var buf bytes.Buffer
-	for _, stage := range cfg.Pipeline {
+	for _, stage := range state.config.Pipeline {
 		switch {
 		case stage.Generator != nil:
 			result, err := state.handleGenerator(ctx, *stage.Generator)
@@ -211,10 +213,11 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 
 		transformerState := pipelineState{
 			forgeFile:  transformer.Import.Path,
+			config:     transformerCfg,
 			vars:       importVars,
 			references: make(map[string][]byte),
 		}
-		result, err := transformerState.generate(ctx, transformerCfg)
+		result, err := transformerState.generate(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("error executing transformer: %w", err)
 		}
