@@ -5,7 +5,7 @@ pipeline:
       clusterName: "my-eks-cluster"
       roleARN: "karpenter-role"
     input:
-      literal:
+      inline:
         serviceAccount:
           annotations:
             eks.amazonaws.com/role-arn: "{{ .roleARN }}"

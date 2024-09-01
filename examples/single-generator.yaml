@@ -1,6 +1,6 @@
 generator:
   yaml:
     input:
-      - literal:
+      - inline:
           key: value
           foo: bar

@@ -72,8 +72,8 @@ type PipelineGenerator struct {
 }
 
 type Reference struct {
-	Var     *string        `yaml:"var,omitempty" json:"var,omitempty"`
-	Ref     *string        `yaml:"ref,omitempty" json:"ref,omitempty"`
-	File    *string        `yaml:"file,omitempty" json:"file,omitempty"`
-	Literal map[string]any `yaml:"literal,omitempty" json:"literal,omitempty"`
+	Var    *string        `yaml:"var,omitempty" json:"var,omitempty"`
+	Ref    *string        `yaml:"ref,omitempty" json:"ref,omitempty"`
+	File   *string        `yaml:"file,omitempty" json:"file,omitempty"`
+	Inline map[string]any `yaml:"inline,omitempty" json:"inline,omitempty"`
 }

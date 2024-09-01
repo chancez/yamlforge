@@ -5,5 +5,5 @@ pipeline:
       # We expect the input to this transformer to be provided externally,
       # rather than through another pipeline stage
       - var: transformer-input
-      - literal:
+      - inline:
           new_field: some-value
