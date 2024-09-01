@@ -53,6 +53,8 @@ func (store *Store) GetReference(dir string, ref config.Reference) ([]byte, erro
 		return os.ReadFile(path.Join(dir, *ref.File))
 	case ref.Inline != nil:
 		return yaml.Marshal(ref.Inline)
+	case ref.Literal != nil:
+		return []byte(*ref.Literal), nil
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
