@@ -1,0 +1,9 @@
+pipeline:
+- name: template
+  gotemplate:
+    template:
+      literal: |
+        {{ .key }}: {{ .value }}
+    vars:
+      key: "some-key"
+      value: "some-value"
