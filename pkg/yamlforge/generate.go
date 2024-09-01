@@ -209,12 +209,12 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 			importVars[varName] = ref
 		}
 
-		transformerCtx := pipelineState{
+		transformerState := pipelineState{
 			forgeFile:  transformer.Import.Path,
 			vars:       importVars,
 			references: make(map[string][]byte),
 		}
-		result, err := transformerCtx.generate(ctx, transformerCfg)
+		result, err := transformerState.generate(ctx, transformerCfg)
 		if err != nil {
 			return nil, fmt.Errorf("error executing transformer: %w", err)
 		}
