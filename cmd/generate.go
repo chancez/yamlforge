@@ -25,7 +25,11 @@ var generateCmd = &cobra.Command{
 		if len(args) == 1 {
 			forgeFile = args[0]
 		}
-		result, err := yamlforge.Generate(cmd.Context(), forgeFile, genFlags.vars)
+		vars := make(map[string][]byte)
+		for varName, varVal := range genFlags.vars {
+			vars[varName] = []byte(varVal)
+		}
+		result, err := yamlforge.Generate(cmd.Context(), forgeFile, vars)
 		if err != nil {
 			return err
 		}

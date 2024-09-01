@@ -15,32 +15,26 @@ import (
 	"gopkg.in/yaml.v3"
 
 	"github.com/chancez/yamlforge/pkg/config"
+	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 type pipelineState struct {
 	forgeFile string
 	config    config.Config
-	// map from an stage.Name to it's results
-	references map[string][]byte
-	// map a variable name to it's value
-	vars map[string][]byte
+
+	referenceStore *reference.Store
 }
 
-func Generate(ctx context.Context, forgeFile string, vars map[string]string) ([]byte, error) {
+func Generate(ctx context.Context, forgeFile string, vars map[string][]byte) ([]byte, error) {
 	cfg, err := config.ParseFile(forgeFile)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing pipeline %s: %w", forgeFile, err)
 	}
 
 	state := pipelineState{
-		forgeFile:  forgeFile,
-		config:     cfg,
-		references: make(map[string][]byte),
-		vars:       make(map[string][]byte),
-	}
-
-	for varName, varVal := range vars {
-		state.vars[varName] = []byte(varVal)
+		forgeFile:      forgeFile,
+		config:         cfg,
+		referenceStore: reference.NewStore(vars),
 	}
 
 	return state.generate(ctx)
@@ -55,13 +49,19 @@ func (state *pipelineState) generate(ctx context.Context) ([]byte, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error running generator %q: %w", stage.Name, err)
 			}
-			state.references[stage.Name] = result
+			err = state.referenceStore.AddReference(stage.Name, result)
+			if err != nil {
+				return nil, fmt.Errorf("error storing reference for generator %q: %w", stage.Name, err)
+			}
 		case stage.Transformer != nil:
 			result, err := state.handleTransformer(ctx, *stage.Transformer)
 			if err != nil {
 				return nil, fmt.Errorf("error running transformer %q: %w", stage.Name, err)
 			}
-			state.references[stage.Name] = result
+			err = state.referenceStore.AddReference(stage.Name, result)
+			if err != nil {
+				return nil, fmt.Errorf("error storing reference for generator %q: %w", stage.Name, err)
+			}
 		case stage.Output != nil:
 			err := state.handleOutput(*stage.Output, &buf)
 			if err != nil {
@@ -114,7 +114,7 @@ func (state *pipelineState) handleGenerator(ctx context.Context, generator confi
 		}
 		var refs [][]byte
 		for _, input := range generator.Helm.Values {
-			ref, err := state.getReference(input)
+			ref, err := state.referenceStore.GetReference(input)
 			if err != nil {
 				return nil, fmt.Errorf("error getting reference: %w", err)
 			}
@@ -156,7 +156,7 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 	case transformer.Merge != nil:
 		merged := make(map[string]any)
 		for _, input := range transformer.Merge.Input {
-			ref, err := state.getReference(input)
+			ref, err := state.referenceStore.GetReference(input)
 			if err != nil {
 				return nil, fmt.Errorf("error getting reference: %w", err)
 			}
@@ -175,7 +175,7 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 	case transformer.GoTemplate != nil:
 		var buf bytes.Buffer
 		tpl := template.New("go-template-transformer")
-		res, err := state.getReference(transformer.GoTemplate.Input)
+		res, err := state.referenceStore.GetReference(transformer.GoTemplate.Input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
@@ -203,7 +203,7 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 			if importVar.Name == "" {
 				return nil, fmt.Errorf("vars[%d]: import variable name cannot be empty", i)
 			}
-			ref, err := state.getReference(importVar.Reference)
+			ref, err := state.referenceStore.GetReference(importVar.Reference)
 			if err != nil {
 				return nil, fmt.Errorf("variable %q: error getting import variable reference: %w", importVar.Name, err)
 			}
@@ -212,10 +212,9 @@ func (state *pipelineState) handleTransformer(ctx context.Context, transformer c
 		}
 
 		transformerState := pipelineState{
-			forgeFile:  transformer.Import.Path,
-			config:     transformerCfg,
-			vars:       importVars,
-			references: make(map[string][]byte),
+			forgeFile:      transformer.Import.Path,
+			config:         transformerCfg,
+			referenceStore: reference.NewStore(importVars),
 		}
 		result, err := transformerState.generate(ctx)
 		if err != nil {
@@ -232,7 +231,7 @@ func (state *pipelineState) handleOutput(outputConf config.Output, out io.Writer
 	case outputConf.YAML != nil:
 		enc := yaml.NewEncoder(out)
 		for _, input := range outputConf.YAML.Input {
-			ref, err := state.getReference(input)
+			ref, err := state.referenceStore.GetReference(input)
 			if err != nil {
 				return fmt.Errorf("error getting reference: %w", err)
 			}
@@ -260,7 +259,7 @@ func (state *pipelineState) handleOutput(outputConf config.Output, out io.Writer
 	case outputConf.JSON != nil:
 		enc := json.NewEncoder(out)
 		for _, input := range outputConf.JSON.Input {
-			ref, err := state.getReference(input)
+			ref, err := state.referenceStore.GetReference(input)
 			if err != nil {
 				return fmt.Errorf("error getting reference: %w", err)
 			}
@@ -285,57 +284,4 @@ func (state *pipelineState) handleOutput(outputConf config.Output, out io.Writer
 		return errors.New("invalid output, must configure an output type")
 	}
 	return nil
-}
-
-func (state *pipelineState) getReference(ref config.Reference) ([]byte, error) {
-	switch {
-	case ref.Var != nil:
-		varName := *ref.Var
-		res, ok := state.vars[varName]
-		if !ok {
-			return nil, fmt.Errorf("could not find variable %q", varName)
-		}
-		return res, nil
-	case ref.Ref != nil:
-		refName := *ref.Ref
-		res, ok := state.references[refName]
-		if !ok {
-			return nil, fmt.Errorf("could not find reference %q", refName)
-		}
-		return res, nil
-	case ref.File != nil:
-		return os.ReadFile(*ref.File)
-	case ref.Literal != nil:
-		return yaml.Marshal(ref.Literal)
-	default:
-		return nil, errors.New("invalid reference, must specify a reference type")
-	}
-}
-
-func Parse(forgeFile string) (config.Config, error) {
-	data, err := os.ReadFile(forgeFile)
-	if err != nil {
-		return config.Config{}, fmt.Errorf("error parsing config: %w", err)
-	}
-	return parse(data)
-}
-
-func parse(data []byte) (config.Config, error) {
-	var cfg config.Config
-	err := yaml.Unmarshal(data, &cfg)
-	if err != nil {
-		return config.Config{}, fmt.Errorf("error parsing config: %w", err)
-	}
-
-	stagePositions := make(map[string]int)
-	for pos, stage := range cfg.Pipeline {
-		if stage.Name == "" {
-			return config.Config{}, fmt.Errorf("error parsing: pipeline[%d], stage is missing a name", pos)
-		}
-		if existingPos, exists := stagePositions[stage.Name]; exists {
-			return config.Config{}, fmt.Errorf("error parsing: pipeline[%d], stage %q already exists at pipeline[%d]", pos, stage.Name, existingPos)
-		}
-		stagePositions[stage.Name] = pos
-	}
-	return cfg, nil
 }
