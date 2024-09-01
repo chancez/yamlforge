@@ -2,6 +2,7 @@ package generator
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path"
 
@@ -31,5 +32,9 @@ func NewFile(dir string, cfg config.FileGenerator) *File {
 }
 
 func (f *File) Generate(context.Context) ([]byte, error) {
-	return os.ReadFile(path.Join(f.dir, f.cfg.Path))
+	data, err := os.ReadFile(path.Join(f.dir, f.cfg.Path))
+	if err != nil {
+		return nil, fmt.Errorf("error reading %q: %w", f.cfg.Path, err)
+	}
+	return data, nil
 }
