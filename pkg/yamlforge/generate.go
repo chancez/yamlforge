@@ -3,9 +3,10 @@ package yamlforge
 import (
 	"context"
 	"fmt"
+	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/pipeline"
+	"github.com/chancez/yamlforge/pkg/generator"
 	"github.com/chancez/yamlforge/pkg/reference"
 )
 
@@ -16,6 +17,6 @@ func Generate(ctx context.Context, forgeFile string, vars map[string][]byte) ([]
 	}
 
 	refStore := reference.NewStore(vars)
-	state := pipeline.NewPipeline(forgeFile, cfg, refStore)
+	state := generator.NewPipeline(path.Dir(forgeFile), cfg.PipelineGenerator, refStore)
 	return state.Generate(ctx)
 }

@@ -1,7 +1,7 @@
 package config
 
 type Config struct {
-	Pipeline []*Stage `yaml:"pipeline" json:"pipeline"`
+	PipelineGenerator `yaml:",inline"`
 }
 
 type Stage struct {
@@ -64,6 +64,10 @@ type YAMLGenerator struct {
 
 type JSONGenerator struct {
 	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
+}
+
+type PipelineGenerator struct {
+	Pipeline []*Stage `yaml:"pipeline" json:"pipeline"`
 }
 
 type Reference struct {
