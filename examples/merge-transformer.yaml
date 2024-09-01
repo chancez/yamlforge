@@ -11,7 +11,7 @@ pipeline:
       path: files/test.yaml
 
 - name: merged
-  transformer:
+  generator:
     merge:
       input:
         - ref: simple-file

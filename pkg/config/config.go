@@ -5,16 +5,18 @@ type Config struct {
 }
 
 type Stage struct {
-	Name        string       `yaml:"name,omitempty" json:"name,omitempty"`
-	Generator   *Generator   `yaml:"generator,omitempty" json:"generator,omitempty"`
-	Transformer *Transformer `yaml:"transformer,omitempty" json:"transformer,omitempty"`
-	Output      *Output      `yaml:"output,omitempty" json:"output,omitempty"`
+	Name      string     `yaml:"name,omitempty" json:"name,omitempty"`
+	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty"`
+	Output    *Output    `yaml:"output,omitempty" json:"output,omitempty"`
 }
 
 type Generator struct {
-	File *FileGenerator `yaml:"file,omitempty" json:"file,omitempty"`
-	Exec *ExecGenerator `yaml:"exec,omitempty" json:"exec,omitempty"`
-	Helm *HelmGenerator `yaml:"helm,omitempty" json:"helm,omitempty"`
+	File       *FileGenerator       `yaml:"file,omitempty" json:"file,omitempty"`
+	Exec       *ExecGenerator       `yaml:"exec,omitempty" json:"exec,omitempty"`
+	Helm       *HelmGenerator       `yaml:"helm,omitempty" json:"helm,omitempty"`
+	Merge      *MergeGenerator      `yaml:"merge,omitempty" json:"merge,omitempty"`
+	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty"`
+	Import     *ImportGenerator     `yaml:"import,omitempty" json:"import,omitempty"`
 }
 
 type FileGenerator struct {
@@ -36,22 +38,16 @@ type HelmGenerator struct {
 	Values      []Reference `yaml:"values,omitempty" json:"values,omitempty"`
 }
 
-type Transformer struct {
-	Merge      *MergeTransformer      `yaml:"merge,omitempty" json:"merge,omitempty"`
-	GoTemplate *GoTemplateTransformer `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty"`
-	Import     *ImportTransformer     `yaml:"import,omitempty" json:"import,omitempty"`
-}
-
-type MergeTransformer struct {
+type MergeGenerator struct {
 	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
 }
 
-type GoTemplateTransformer struct {
+type GoTemplateGenerator struct {
 	Input Reference      `yaml:"input,omitempty" json:"input,omitempty"`
 	Vars  map[string]any `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
-type ImportTransformer struct {
+type ImportGenerator struct {
 	Path string           `yaml:"path,omitempty" json:"path,omitempty"`
 	Vars []ImportVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
 }

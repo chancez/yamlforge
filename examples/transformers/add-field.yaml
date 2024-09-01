@@ -1,6 +1,6 @@
 pipeline:
 - name: add-field
-  transformer:
+  generator:
     merge:
       input:
         # We expect the input to this transformer to be provided externally,

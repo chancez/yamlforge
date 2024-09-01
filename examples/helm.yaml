@@ -1,6 +1,6 @@
 pipeline:
 - name: karpenter-values
-  transformer:
+  generator:
     gotemplate:
       vars:
         clusterName: "my-eks-cluster"

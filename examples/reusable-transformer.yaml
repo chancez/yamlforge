@@ -5,7 +5,7 @@ pipeline:
       path: files/test.yaml
 
 - name: add-field
-  transformer:
+  generator:
     import:
       path: transformers/add-field.yaml
       vars:

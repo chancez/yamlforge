@@ -49,15 +49,6 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error storing reference for generator %q: %w", stage.Name, err)
 			}
-		case stage.Transformer != nil:
-			result, err := pipeline.handleTransformer(ctx, *stage.Transformer)
-			if err != nil {
-				return nil, fmt.Errorf("error running transformer %q: %w", stage.Name, err)
-			}
-			err = pipeline.referenceStore.AddReference(stage.Name, result)
-			if err != nil {
-				return nil, fmt.Errorf("error storing reference for generator %q: %w", stage.Name, err)
-			}
 		case stage.Output != nil:
 			err := pipeline.handleOutput(*stage.Output, &buf)
 			if err != nil {
@@ -82,17 +73,9 @@ func (pipeline *Pipeline) handleGenerator(ctx context.Context, generatorCfg conf
 		gen = generator.NewExec(*generatorCfg.Exec)
 	case generatorCfg.Helm != nil:
 		gen = generator.NewHelm(*generatorCfg.Helm, pipeline.referenceStore)
-	default:
-		return nil, errors.New("invalid generator, no generator specified")
-	}
-	return gen.Generate(ctx)
-}
-
-func (pipeline *Pipeline) handleTransformer(ctx context.Context, transformer config.Transformer) ([]byte, error) {
-	switch {
-	case transformer.Merge != nil:
+	case generatorCfg.Merge != nil:
 		merged := make(map[string]any)
-		for _, input := range transformer.Merge.Input {
+		for _, input := range generatorCfg.Merge.Input {
 			ref, err := pipeline.referenceStore.GetReference(input)
 			if err != nil {
 				return nil, fmt.Errorf("error getting reference: %w", err)
@@ -109,10 +92,10 @@ func (pipeline *Pipeline) handleTransformer(ctx context.Context, transformer con
 			return nil, fmt.Errorf("error while marshaling merged results to YAML: %w", err)
 		}
 		return out, nil
-	case transformer.GoTemplate != nil:
+	case generatorCfg.GoTemplate != nil:
 		var buf bytes.Buffer
-		tpl := template.New("go-template-transformer")
-		res, err := pipeline.referenceStore.GetReference(transformer.GoTemplate.Input)
+		tpl := template.New("go-template-generator")
+		res, err := pipeline.referenceStore.GetReference(generatorCfg.GoTemplate.Input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
@@ -120,23 +103,23 @@ func (pipeline *Pipeline) handleTransformer(ctx context.Context, transformer con
 		if err != nil {
 			return nil, fmt.Errorf("error parsing template: %w", err)
 		}
-		err = tpl.Execute(&buf, transformer.GoTemplate.Vars)
+		err = tpl.Execute(&buf, generatorCfg.GoTemplate.Vars)
 		if err != nil {
 			return nil, fmt.Errorf("error executing template: %w", err)
 		}
 		return buf.Bytes(), nil
-	case transformer.Import != nil:
-		data, err := pipeline.readFile(transformer.Import.Path)
+	case generatorCfg.Import != nil:
+		data, err := pipeline.readFile(generatorCfg.Import.Path)
 		if err != nil {
-			return nil, fmt.Errorf("error importing transformer: %w", err)
+			return nil, fmt.Errorf("error importing pipeline: %w", err)
 		}
-		transformerCfg, err := config.Parse(data)
+		subPipelineCfg, err := config.Parse(data)
 		if err != nil {
-			return nil, fmt.Errorf("error parsing transformer: %w", err)
+			return nil, fmt.Errorf("error parsing pipeline: %w", err)
 		}
 
 		importVars := make(map[string][]byte)
-		for i, importVar := range transformer.Import.Vars {
+		for i, importVar := range generatorCfg.Import.Vars {
 			if importVar.Name == "" {
 				return nil, fmt.Errorf("vars[%d]: import variable name cannot be empty", i)
 			}
@@ -148,19 +131,20 @@ func (pipeline *Pipeline) handleTransformer(ctx context.Context, transformer con
 			importVars[varName] = ref
 		}
 
-		transformerpipeline := Pipeline{
-			forgeFile:      transformer.Import.Path,
-			config:         transformerCfg,
+		subPipeline := Pipeline{
+			forgeFile:      generatorCfg.Import.Path,
+			config:         subPipelineCfg,
 			referenceStore: reference.NewStore(importVars),
 		}
-		result, err := transformerpipeline.Generate(ctx)
+		result, err := subPipeline.Generate(ctx)
 		if err != nil {
-			return nil, fmt.Errorf("error executing transformer: %w", err)
+			return nil, fmt.Errorf("error executing pipeline: %w", err)
 		}
 		return result, nil
 	default:
-		return nil, errors.New("invalid transformer, no transformer specified")
+		return nil, errors.New("invalid generator, no generator specified")
 	}
+	return gen.Generate(ctx)
 }
 
 func (pipeline *Pipeline) handleOutput(outputConf config.Output, out io.Writer) error {
