@@ -67,7 +67,8 @@ type JSONGenerator struct {
 }
 
 type PipelineGenerator struct {
-	Pipeline []*Stage `yaml:"pipeline" json:"pipeline"`
+	Pipeline  []*Stage   `yaml:"pipeline,omitempty" json:"pipeline,omitempty"`
+	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty"`
 }
 
 type Reference struct {

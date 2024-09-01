@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -20,6 +21,10 @@ func Parse(data []byte) (Config, error) {
 	err := yaml.Unmarshal(data, &cfg)
 	if err != nil {
 		return Config{}, fmt.Errorf("error parsing config: %w", err)
+	}
+
+	if cfg.Generator != nil && len(cfg.Pipeline) != 0 {
+		return Config{}, errors.New("cannot set both 'pipeline' and 'generator' options")
 	}
 
 	stagePositions := make(map[string]int)

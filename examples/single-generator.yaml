@@ -1,0 +1,6 @@
+generator:
+  yaml:
+    input:
+      - literal:
+          key: value
+          foo: bar
