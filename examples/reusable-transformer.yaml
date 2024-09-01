@@ -1,15 +1,13 @@
 pipeline:
 - name: simple-file
-  generator:
-    file:
-      path: files/test.yaml
+  file:
+    path: files/test.yaml
 
 - name: add-field
-  generator:
-    import:
-      path: transformers/add-field.yaml
-      vars:
-        # We're passing the output of the simple-file stage as the
-        # transformer-input var in the add-field transformer
-        - name: transformer-input
-          ref: simple-file
+  import:
+    path: transformers/add-field.yaml
+    vars:
+      # We're passing the output of the simple-file stage as the
+      # transformer-input var in the add-field transformer
+      - name: transformer-input
+        ref: simple-file

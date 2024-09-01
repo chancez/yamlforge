@@ -1,28 +1,26 @@
 pipeline:
 - name: karpenter-values
-  generator:
-    gotemplate:
-      vars:
-        clusterName: "my-eks-cluster"
-        roleARN: "karpenter-role"
-      input:
-        literal:
-          serviceAccount:
-            annotations:
-              eks.amazonaws.com/role-arn: "{{ .roleARN }}"
-          settings:
-            aws:
-              clusterName: "{{ .clusterName }}"
-              clusterEndpoint: "{{ .clusterEndpoint }}"
-              defaultInstanceProfile: KarpenterNodeInstanceProfile-{{ .clusterName }}
-              interruptionQueueName: "{{ .clusterName }}"
+  gotemplate:
+    vars:
+      clusterName: "my-eks-cluster"
+      roleARN: "karpenter-role"
+    input:
+      literal:
+        serviceAccount:
+          annotations:
+            eks.amazonaws.com/role-arn: "{{ .roleARN }}"
+        settings:
+          aws:
+            clusterName: "{{ .clusterName }}"
+            clusterEndpoint: "{{ .clusterEndpoint }}"
+            defaultInstanceProfile: KarpenterNodeInstanceProfile-{{ .clusterName }}
+            interruptionQueueName: "{{ .clusterName }}"
 
 - name: helm
-  generator:
-    helm:
-      chart: oci://public.ecr.aws/karpenter/karpenter
-      version: 1.0.0
-      releaseName: karpenter
-      namespace: karpenter
-      values:
-        - ref: karpenter-values
+  helm:
+    chart: oci://public.ecr.aws/karpenter/karpenter
+    version: 1.0.0
+    releaseName: karpenter
+    namespace: karpenter
+    values:
+      - ref: karpenter-values

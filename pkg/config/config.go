@@ -1,12 +1,12 @@
 package config
 
 type Config struct {
-	PipelineGenerator `yaml:",inline"`
+	PipelineGenerator `yaml:",inline" json:",inline"`
 }
 
 type Stage struct {
 	Name      string     `yaml:"name,omitempty" json:"name,omitempty"`
-	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty"`
+	Generator *Generator `yaml:",inline" json:",inline"`
 }
 
 type Generator struct {
@@ -55,7 +55,7 @@ type ImportGenerator struct {
 
 type ImportVariable struct {
 	Name      string `yaml:"name,omitempty" json:"name,omitempty"`
-	Reference `yaml:",inline"`
+	Reference `yaml:",inline" json:",inline"`
 }
 
 type YAMLGenerator struct {

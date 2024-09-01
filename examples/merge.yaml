@@ -1,18 +1,15 @@
 pipeline:
 - name: simple-exec
-  generator:
-    exec:
-      command: '/bin/bash'
-      args: ['-c', 'echo {"foo": {"bar": "asdf hjkl"}}']
+  exec:
+    command: '/bin/bash'
+    args: ['-c', 'echo {"foo": {"bar": "asdf hjkl"}}']
 
 - name: simple-file
-  generator:
-    file:
-      path: files/test.yaml
+  file:
+    path: files/test.yaml
 
 - name: merged
-  generator:
-    merge:
-      input:
-        - ref: simple-file
-        - ref: simple-exec
+  merge:
+    input:
+      - ref: simple-file
+      - ref: simple-exec

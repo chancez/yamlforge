@@ -1,10 +1,9 @@
 pipeline:
 - name: add-field
-  generator:
-    merge:
-      input:
-        # We expect the input to this transformer to be provided externally,
-        # rather than through another pipeline stage
-        - var: transformer-input
-        - literal:
-            new_field: some-value
+  merge:
+    input:
+      # We expect the input to this transformer to be provided externally,
+      # rather than through another pipeline stage
+      - var: transformer-input
+      - literal:
+          new_field: some-value
