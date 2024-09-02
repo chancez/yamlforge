@@ -13,7 +13,7 @@ import (
 var _ Generator = (*Import)(nil)
 
 func init() {
-	Register(config.ImportGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("import", config.ImportGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
 		return NewImport(dir, cfg.(config.ImportGenerator), refStore)
 	})
 }

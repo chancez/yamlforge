@@ -15,7 +15,7 @@ import (
 var _ Generator = (*JSON)(nil)
 
 func init() {
-	Register(config.JSONGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("json", config.JSONGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
 		return NewJSON(dir, cfg.(config.JSONGenerator), refStore)
 	})
 }

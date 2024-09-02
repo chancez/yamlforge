@@ -17,16 +17,18 @@ type Registry struct {
 	typeToFactory map[reflect.Type]GeneratorFactory
 }
 
+type NewGeneratorFunc func(dir string, refStore *reference.Store, cfg any) Generator
+
 type GeneratorFactory struct {
 	name string
-	new  func(dir string, refStore *reference.Store, cfg any) Generator
+	new  NewGeneratorFunc
 }
 
 func NewRegistry() *Registry {
 	return &Registry{typeToFactory: make(map[reflect.Type]GeneratorFactory)}
 }
 
-func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generatorCfg config.Generator) (Generator, error) {
+func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generatorCfg config.Generator) (string, Generator, error) {
 	v := reflect.ValueOf(generatorCfg)
 
 	setFields := 0
@@ -43,10 +45,10 @@ func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generat
 		}
 	}
 	if setFields == 0 {
-		return nil, fmt.Errorf("generator not configured")
+		return "", nil, fmt.Errorf("generator not configured")
 	}
 	if setFields > 1 {
-		return nil, fmt.Errorf("multiple generators configured")
+		return "", nil, fmt.Errorf("multiple generators configured")
 	}
 
 	cfgType := reflect.TypeOf(cfg)
@@ -55,19 +57,23 @@ func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generat
 		panic(fmt.Sprintf("cannot find factory for %s", cfgType))
 	}
 
-	return factory.new(dir, refStore, cfg), nil
+	return factory.name, factory.new(dir, refStore, cfg), nil
 }
 
-func (reg *Registry) Register(name string, cfgType any, newGenerator GeneratorFactory) {
+func (reg *Registry) Register(name string, cfgType any, newGenerator NewGeneratorFunc) {
 	ty := reflect.TypeOf(cfgType)
 	if _, exists := reg.typeToFactory[ty]; exists {
 		panic(fmt.Sprintf("duplicate generator registered for %q", ty.String()))
 	}
-	reg.typeToFactory[ty] = newGenerator
+	factory := GeneratorFactory{
+		name: name,
+		new:  newGenerator,
+	}
+	reg.typeToFactory[ty] = factory
 }
 
 var GlobalRegistry = NewRegistry()
 
-func Register(name string, cfgType any, newGenerator GeneratorFactory) {
+func Register(name string, cfgType any, newGenerator NewGeneratorFunc) {
 	GlobalRegistry.Register(name, cfgType, newGenerator)
 }

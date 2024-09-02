@@ -13,7 +13,7 @@ import (
 var _ Generator = (*File)(nil)
 
 func init() {
-	Register(config.FileGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("file", config.FileGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
 		return NewFile(dir, cfg.(config.FileGenerator))
 	})
 }

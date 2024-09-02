@@ -14,7 +14,7 @@ import (
 var _ Generator = (*YAML)(nil)
 
 func init() {
-	Register(config.YAMLGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("yaml", config.YAMLGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
 		return NewYAML(dir, cfg.(config.YAMLGenerator), refStore)
 	})
 }

@@ -14,7 +14,7 @@ import (
 var _ Generator = (*Merge)(nil)
 
 func init() {
-	Register(config.MergeGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("merge", config.MergeGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
 		return NewMerge(dir, cfg.(config.MergeGenerator), refStore)
 	})
 }

@@ -12,7 +12,7 @@ import (
 var _ Generator = (*Pipeline)(nil)
 
 func init() {
-	Register(config.PipelineGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("pipeline", config.PipelineGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
 		return NewPipeline(dir, cfg.(config.PipelineGenerator), refStore)
 	})
 }
@@ -61,13 +61,13 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 }
 
 func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) ([]byte, error) {
-	gen, err := GlobalRegistry.GetGenerator(pipeline.dir, pipeline.refStore, generatorCfg)
+	name, gen, err := GlobalRegistry.GetGenerator(pipeline.dir, pipeline.refStore, generatorCfg)
 	if err != nil {
 		return nil, fmt.Errorf("error getting generator: %w", err)
 	}
 	result, err := gen.Generate(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error executing generator: %w", err)
+		return nil, fmt.Errorf("error executing %q generator: %w", name, err)
 	}
 	return result, nil
 }
