@@ -43,7 +43,26 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error parsing template: %w", err)
 	}
-	err = tpl.Execute(&buf, gt.cfg.Vars)
+
+	vars := make(map[string]any)
+	for name, val := range gt.cfg.Vars {
+		if name == "" {
+			return nil, fmt.Errorf("vars: variable name cannot be empty")
+		}
+		vars[name] = val
+	}
+	for name, ref := range gt.cfg.RefVars {
+		if name == "" {
+			return nil, fmt.Errorf("refVars: variable name cannot be empty")
+		}
+		refVal, err := gt.refStore.GetReference(gt.dir, ref)
+		if err != nil {
+			return nil, fmt.Errorf("variable %q: error getting import variable reference: %w", name, err)
+		}
+		vars[name] = string(refVal)
+	}
+
+	err = tpl.Execute(&buf, vars)
 	if err != nil {
 		return nil, fmt.Errorf("error executing template: %w", err)
 	}
