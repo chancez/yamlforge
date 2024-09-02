@@ -1,0 +1,18 @@
+pipeline:
+- name: simple-file
+  file:
+    path: files/test.yaml
+# convert to JSON for JQ
+- name: json
+  json:
+    input:
+      - ref: simple-file
+- name: jq
+  jq:
+    expr: '.foo'
+    input:
+      ref: json
+- name: yaml
+  yaml:
+    input:
+      - ref: jq

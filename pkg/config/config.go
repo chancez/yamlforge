@@ -16,6 +16,7 @@ type Generator struct {
 	Merge      *MergeGenerator      `yaml:"merge,omitempty" json:"merge,omitempty"`
 	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty"`
 	Import     *ImportGenerator     `yaml:"import,omitempty" json:"import,omitempty"`
+	JQ         *JQGenerator         `yaml:"jq,omitempty" json:"jq,omitempty"`
 	YAML       *YAMLGenerator       `yaml:"yaml,omitempty" json:"yaml,omitempty"`
 	JSON       *JSONGenerator       `yaml:"json,omitempty" json:"json,omitempty"`
 }
@@ -57,6 +58,13 @@ type ImportGenerator struct {
 type NamedVariable struct {
 	Name      string `yaml:"name,omitempty" json:"name,omitempty"`
 	Reference `yaml:",inline" json:",inline"`
+}
+
+type JQGenerator struct {
+	Expr     string     `yaml:"expr,omitempty" json:"expr,omitempty"`
+	ExprFile string     `yaml:"exprFile,omitempty" json:"exprFile,omitempty"`
+	Input    *Reference `yaml:"input,omitempty" json:"input,omitempty"`
+	Slurp    bool       `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
 type YAMLGenerator struct {
