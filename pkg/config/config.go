@@ -32,13 +32,13 @@ type ExecGenerator struct {
 }
 
 type HelmGenerator struct {
-	ReleaseName string      `yaml:"releaseName,omitempty" json:"releaseName,omitempty"`
-	Chart       string      `yaml:"chart,omitempty" json:"chart,omitempty"`
-	Version     string      `yaml:"version,omitempty" json:"version,omitempty"`
-	Repo        string      `yaml:"repo,omitempty" json:"repo,omitempty"`
-	Namespace   string      `yaml:"namespace,omitempty" json:"namespace,omitempty"`
-	APIVersions []string    `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
-	Values      []Reference `yaml:"values,omitempty" json:"values,omitempty"`
+	ReleaseName string   `yaml:"releaseName,omitempty" json:"releaseName,omitempty"`
+	Chart       string   `yaml:"chart,omitempty" json:"chart,omitempty"`
+	Version     string   `yaml:"version,omitempty" json:"version,omitempty"`
+	Repo        string   `yaml:"repo,omitempty" json:"repo,omitempty"`
+	Namespace   string   `yaml:"namespace,omitempty" json:"namespace,omitempty"`
+	APIVersions []string `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
+	Values      []Value  `yaml:"values,omitempty" json:"values,omitempty"`
 }
 
 type KustomizeGenerator struct {
@@ -48,13 +48,13 @@ type KustomizeGenerator struct {
 }
 
 type MergeGenerator struct {
-	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
+	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
 }
 
 type GoTemplateGenerator struct {
-	Template *Reference           `yaml:"template,omitempty" json:"template,omitempty"`
-	Vars     map[string]any       `yaml:"vars,omitempty" json:"vars,omitempty"`
-	RefVars  map[string]Reference `yaml:"refVars,omitempty" json:"refVars,omitempty"`
+	Template *Value           `yaml:"template,omitempty" json:"template,omitempty"`
+	Vars     map[string]any   `yaml:"vars,omitempty" json:"vars,omitempty"`
+	RefVars  map[string]Value `yaml:"refVars,omitempty" json:"refVars,omitempty"`
 }
 
 type ImportGenerator struct {
@@ -63,23 +63,23 @@ type ImportGenerator struct {
 }
 
 type NamedVariable struct {
-	Name      string `yaml:"name,omitempty" json:"name,omitempty"`
-	Reference `yaml:",inline" json:",inline"`
+	Name  string `yaml:"name,omitempty" json:"name,omitempty"`
+	Value `yaml:",inline" json:",inline"`
 }
 
 type JQGenerator struct {
-	Expr     string     `yaml:"expr,omitempty" json:"expr,omitempty"`
-	ExprFile string     `yaml:"exprFile,omitempty" json:"exprFile,omitempty"`
-	Input    *Reference `yaml:"input,omitempty" json:"input,omitempty"`
-	Slurp    bool       `yaml:"slurp,omitempty" json:"slurp,omitempty"`
+	Expr     string `yaml:"expr,omitempty" json:"expr,omitempty"`
+	ExprFile string `yaml:"exprFile,omitempty" json:"exprFile,omitempty"`
+	Input    *Value `yaml:"input,omitempty" json:"input,omitempty"`
+	Slurp    bool   `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
 type YAMLGenerator struct {
-	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
+	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
 }
 
 type JSONGenerator struct {
-	Input []Reference `yaml:"input,omitempty" json:"input,omitempty"`
+	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
 }
 
 type PipelineGenerator struct {
@@ -87,7 +87,7 @@ type PipelineGenerator struct {
 	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty"`
 }
 
-type Reference struct {
+type Value struct {
 	Var     *string        `yaml:"var,omitempty" json:"var,omitempty"`
 	Ref     *string        `yaml:"ref,omitempty" json:"ref,omitempty"`
 	File    *string        `yaml:"file,omitempty" json:"file,omitempty"`

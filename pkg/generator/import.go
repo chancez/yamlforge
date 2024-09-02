@@ -51,7 +51,7 @@ func (imp *Import) Generate(ctx context.Context) ([]byte, error) {
 		if importVar.Name == "" {
 			return nil, fmt.Errorf("vars[%d]: import variable name cannot be empty", i)
 		}
-		ref, err := imp.refStore.GetReference(imp.dir, importVar.Reference)
+		ref, err := imp.refStore.GetReference(imp.dir, importVar.Value)
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting import variable reference: %w", importVar.Name, err)
 		}

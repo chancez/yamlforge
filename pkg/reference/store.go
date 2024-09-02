@@ -33,7 +33,7 @@ func (store *Store) AddReference(name string, data []byte) error {
 	return nil
 }
 
-func (store *Store) GetReference(dir string, ref config.Reference) ([]byte, error) {
+func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
 	switch {
 	case ref.Var != nil:
 		varName := *ref.Var
