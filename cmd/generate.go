@@ -5,8 +5,11 @@ package cmd
 
 import (
 	"fmt"
+	"path"
 
-	"github.com/chancez/yamlforge/pkg/yamlforge"
+	"github.com/chancez/yamlforge/pkg/config"
+	"github.com/chancez/yamlforge/pkg/generator"
+	"github.com/chancez/yamlforge/pkg/reference"
 	"github.com/spf13/cobra"
 )
 
@@ -29,10 +32,19 @@ var generateCmd = &cobra.Command{
 		for varName, varVal := range genFlags.vars {
 			vars[varName] = []byte(varVal)
 		}
-		result, err := yamlforge.Generate(cmd.Context(), forgeFile, vars)
+
+		cfg, err := config.ParseFile(forgeFile)
+		if err != nil {
+			return fmt.Errorf("error parsing pipeline %s: %w", forgeFile, err)
+		}
+
+		refStore := reference.NewStore(vars)
+		state := generator.NewPipeline(path.Dir(forgeFile), cfg.PipelineGenerator, refStore)
+		result, err := state.Generate(cmd.Context())
 		if err != nil {
 			return err
 		}
+
 		fmt.Println(string(result))
 		return nil
 	},
