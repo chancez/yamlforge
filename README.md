@@ -37,4 +37,4 @@ the values based on other configuration options.
 
 Using the `gotemplate` generator with the `helm` generator in yamlforge enables you do this.
 
-For an example take a look at `examples/helm-templated-values.yaml`.
+For an example take a look at [`examples/helm-templated-values.yaml`](examples/helm-templated-values.yaml).
