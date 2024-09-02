@@ -34,11 +34,11 @@ func NewJSON(dir string, cfg config.JSONGenerator, refStore *reference.Store) *J
 	}
 }
 
-func (y *JSON) Generate(context.Context) ([]byte, error) {
+func (j *JSON) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
-	for _, input := range y.cfg.Input {
-		ref, err := y.refStore.GetReference(y.dir, input)
+	for _, input := range j.cfg.Input {
+		ref, err := j.refStore.GetReference(j.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
