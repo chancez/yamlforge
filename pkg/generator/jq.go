@@ -15,7 +15,7 @@ import (
 var _ Generator = (*JQ)(nil)
 
 func init() {
-	Register("jq", config.JQGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("jq", config.JQGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
 		return NewJQ(dir, cfg.(config.JQGenerator), refStore)
 	})
 }

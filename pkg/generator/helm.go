@@ -15,7 +15,7 @@ import (
 var _ Generator = (*Helm)(nil)
 
 func init() {
-	Register("helm", config.HelmGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("helm", config.HelmGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
 		return NewHelm(dir, cfg.(config.HelmGenerator), refStore)
 	})
 }

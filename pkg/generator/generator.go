@@ -17,7 +17,7 @@ type Registry struct {
 	typeToFactory map[reflect.Type]GeneratorFactory
 }
 
-type NewGeneratorFunc func(dir string, refStore *reference.Store, cfg any) Generator
+type NewGeneratorFunc func(dir string, cfg any, refStore *reference.Store) Generator
 
 type GeneratorFactory struct {
 	name string
@@ -57,7 +57,7 @@ func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generat
 		panic(fmt.Sprintf("cannot find factory for %s", cfgType))
 	}
 
-	return factory.name, factory.new(dir, refStore, cfg), nil
+	return factory.name, factory.new(dir, cfg, refStore), nil
 }
 
 func (reg *Registry) Register(name string, cfgType any, newGenerator NewGeneratorFunc) {

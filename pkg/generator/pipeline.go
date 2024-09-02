@@ -12,7 +12,7 @@ import (
 var _ Generator = (*Pipeline)(nil)
 
 func init() {
-	Register("pipeline", config.PipelineGenerator{}, func(dir string, refStore *reference.Store, cfg any) Generator {
+	Register("pipeline", config.PipelineGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
 		return NewPipeline(dir, cfg.(config.PipelineGenerator), refStore)
 	})
 }

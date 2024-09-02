@@ -13,7 +13,7 @@ import (
 var _ Generator = (*Exec)(nil)
 
 func init() {
-	Register("exec", config.ExecGenerator{}, func(_ string, refStore *reference.Store, cfg any) Generator {
+	Register("exec", config.ExecGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
 		return NewExec(cfg.(config.ExecGenerator))
 	})
 }
