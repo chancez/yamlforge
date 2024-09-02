@@ -9,7 +9,7 @@ pipeline:
       value:
         var: value
     template:
-      inline:
+      value:
         "{{ .field }}": "{{ .value }}"
 - name: add-field
   merge:

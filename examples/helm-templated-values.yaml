@@ -5,7 +5,7 @@ pipeline:
       eks:
         file: files/eks-vars.yaml
     template:
-      inline:
+      value:
         serviceAccount:
           annotations:
             eks.amazonaws.com/role-arn: "{{ .eks.roleARN }}"

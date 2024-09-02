@@ -34,6 +34,9 @@ func (store *Store) AddReference(name string, data []byte) error {
 }
 
 func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
+	return store.getReference(dir, ref)
+}
+func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 	switch {
 	case ref.Var != nil:
 		varName := *ref.Var
@@ -51,10 +54,14 @@ func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
 		return res, nil
 	case ref.File != nil:
 		return os.ReadFile(path.Join(dir, *ref.File))
-	case ref.Inline != nil:
-		return yaml.Marshal(ref.Inline)
-	case ref.Literal != nil:
-		return []byte(*ref.Literal), nil
+	case ref.Value != nil:
+		switch val := (*ref.Value).(type) {
+		case string:
+			return []byte(val), nil
+		case []byte:
+			return val, nil
+		}
+		return yaml.Marshal(*ref.Value)
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}

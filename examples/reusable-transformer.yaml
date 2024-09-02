@@ -18,8 +18,8 @@ pipeline:
       # The add-field generator takes an input variable "field" as the field to
       # add
       - name: field
-        literal: "some-new-key"
+        value: "some-new-key"
       # The add-field generator takes an input variable "value" as the value of
       # the field to add
       - name: value
-        literal: "hello world"
+        value: "hello world"

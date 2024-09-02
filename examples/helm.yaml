@@ -6,7 +6,7 @@ pipeline:
     releaseName: karpenter
     namespace: karpenter
     values:
-      - inline:
+      - value:
           serviceAccount:
             annotations:
               eks.amazonaws.com/role-arn: karpenter-role

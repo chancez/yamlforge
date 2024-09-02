@@ -2,7 +2,7 @@ pipeline:
 - name: template
   gotemplate:
     template:
-      literal: |
+      value: |
         {{ .key }}: {{ .value }}
     vars:
       key: "some-key"

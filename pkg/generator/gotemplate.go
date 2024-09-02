@@ -40,11 +40,11 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	}
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator")
-	res, err := gt.refStore.GetReference(gt.dir, *gt.cfg.Template)
+	refValue, err := gt.refStore.GetReference(gt.dir, *gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
 	}
-	tpl, err = tpl.Parse(string(res))
+	tpl, err = tpl.Parse(string(refValue))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing template: %w", err)
 	}

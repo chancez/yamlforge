@@ -4,6 +4,6 @@
 generator:
   yaml:
     input:
-      - inline:
+      - value:
           key: value
           foo: bar
