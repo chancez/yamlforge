@@ -40,12 +40,21 @@ func (m *Merge) Generate(_ context.Context) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
-		var item map[string]any
+		var item any
 		err = yaml.Unmarshal(ref, &item)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
 		}
-		merged = mapmerge.Merge(merged, item)
+		itemMap, ok := item.(map[string]any)
+		if !ok {
+			// Provide a snippet of the data being merged
+			refStr := string(ref)
+			if len(refStr) > 20 {
+				refStr = refStr[0:20]
+			}
+			return nil, fmt.Errorf("unable to merge non-map values from %q", refStr)
+		}
+		merged = mapmerge.Merge(merged, itemMap)
 	}
 	out, err := yaml.Marshal(merged)
 	if err != nil {
