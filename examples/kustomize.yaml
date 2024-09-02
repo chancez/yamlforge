@@ -1,0 +1,4 @@
+pipeline:
+- name: kustomize
+  kustomize:
+    url: https://github.com/kubernetes-sigs/kustomize.git/examples/helloWorld?ref=v1.0.6

@@ -13,6 +13,7 @@ type Generator struct {
 	File       *FileGenerator       `yaml:"file,omitempty" json:"file,omitempty"`
 	Exec       *ExecGenerator       `yaml:"exec,omitempty" json:"exec,omitempty"`
 	Helm       *HelmGenerator       `yaml:"helm,omitempty" json:"helm,omitempty"`
+	Kustomize  *KustomizeGenerator  `yaml:"kustomize,omitempty" json:"kustomize,omitempty"`
 	Merge      *MergeGenerator      `yaml:"merge,omitempty" json:"merge,omitempty"`
 	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty"`
 	Import     *ImportGenerator     `yaml:"import,omitempty" json:"import,omitempty"`
@@ -38,6 +39,12 @@ type HelmGenerator struct {
 	Namespace   string      `yaml:"namespace,omitempty" json:"namespace,omitempty"`
 	APIVersions []string    `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
 	Values      []Reference `yaml:"values,omitempty" json:"values,omitempty"`
+}
+
+type KustomizeGenerator struct {
+	Dir        string `yaml:"dir,omitempty" json:"dir,omitempty"`
+	URL        string `yaml:"url,omitempty" json:"url,omitempty"`
+	EnableHelm bool   `yaml:"enableHelm,omitempty" json:"enableHelm,omitempty"`
 }
 
 type MergeGenerator struct {
