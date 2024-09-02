@@ -1,21 +1,4 @@
 pipeline:
-- name: karpenter-values
-  gotemplate:
-    vars:
-      clusterName: "my-eks-cluster"
-      roleARN: "karpenter-role"
-    template:
-      inline:
-        serviceAccount:
-          annotations:
-            eks.amazonaws.com/role-arn: "{{ .roleARN }}"
-        settings:
-          aws:
-            clusterName: "{{ .clusterName }}"
-            clusterEndpoint: "{{ .clusterEndpoint }}"
-            defaultInstanceProfile: KarpenterNodeInstanceProfile-{{ .clusterName }}
-            interruptionQueueName: "{{ .clusterName }}"
-
 - name: helm
   helm:
     chart: oci://public.ecr.aws/karpenter/karpenter
@@ -23,4 +6,13 @@ pipeline:
     releaseName: karpenter
     namespace: karpenter
     values:
-      - ref: karpenter-values
+      - inline:
+          serviceAccount:
+            annotations:
+              eks.amazonaws.com/role-arn: karpenter-role
+          settings:
+            aws:
+              clusterName: my-eks-cluster
+              clusterEndpoint: https://1234567890ABCDEF1234567890ABCDEF.xx0.region.eks.amazonaws.com
+              defaultInstanceProfile: KarpenterNodeInstanceProfile-my-eks-cluster
+              interruptionQueueName: my-eks-cluster
