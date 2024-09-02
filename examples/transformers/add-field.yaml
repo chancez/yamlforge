@@ -9,9 +9,8 @@ pipeline:
       value:
         var: value
     template:
-      # We use a literal because we're defining the key dynamically
-      literal: |
-        {{ .field }}: {{ .value }}
+      inline:
+        "{{ .field }}": "{{ .value }}"
 - name: add-field
   merge:
     input:
