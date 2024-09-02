@@ -45,6 +45,9 @@ func (imp *Import) Generate(ctx context.Context) ([]byte, error) {
 
 	importVars := make(map[string][]byte)
 	for i, importVar := range imp.cfg.Vars {
+		if importVar == nil {
+			return nil, fmt.Errorf("vars[%d]: import variable must be specified", i)
+		}
 		if importVar.Name == "" {
 			return nil, fmt.Errorf("vars[%d]: import variable name cannot be empty", i)
 		}
