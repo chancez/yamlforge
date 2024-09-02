@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -18,7 +19,9 @@ func ParseFile(forgeFile string) (Config, error) {
 
 func Parse(data []byte) (Config, error) {
 	var cfg Config
-	err := yaml.Unmarshal(data, &cfg)
+	dec := yaml.NewDecoder(bytes.NewBuffer(data))
+	dec.KnownFields(true)
+	err := dec.Decode(&cfg)
 	if err != nil {
 		return Config{}, fmt.Errorf("error parsing config: %w", err)
 	}
