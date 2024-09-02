@@ -42,10 +42,9 @@ func (y *JSON) Generate(context.Context) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
-		// assume that all refs are JSON for now
 		dec := yaml.NewDecoder(bytes.NewBuffer(ref))
-		var tmp map[string]any
 		for {
+			var tmp any
 			err = dec.Decode(&tmp)
 			if err == io.EOF {
 				break
