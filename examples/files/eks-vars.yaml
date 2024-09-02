@@ -1,0 +1,3 @@
+clusterName: "my-eks-cluster"
+roleARN: "karpenter-role"
+clusterEndpoint: https://1234567890ABCDEF1234567890ABCDEF.xx0.region.eks.amazonaws.com

@@ -9,6 +9,7 @@ import (
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
+	"gopkg.in/yaml.v3"
 )
 
 var _ Generator = (*GoTemplate)(nil)
@@ -63,7 +64,12 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting import variable reference: %w", name, err)
 		}
-		vars[name] = string(refVal)
+		var tmp any
+		err = yaml.Unmarshal(refVal, &tmp)
+		if err != nil {
+			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
+		}
+		vars[name] = tmp
 	}
 
 	err = tpl.Execute(&buf, vars)

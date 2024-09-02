@@ -1,21 +1,18 @@
 pipeline:
 - name: karpenter-values
   gotemplate:
-    vars:
-      clusterName: "my-eks-cluster"
-      roleARN: "karpenter-role"
-      clusterEndpoint: https://1234567890ABCDEF1234567890ABCDEF.xx0.region.eks.amazonaws.com
+    refVars:
+      eks:
+        file: files/eks-vars.yaml
     template:
       inline:
         serviceAccount:
           annotations:
-            eks.amazonaws.com/role-arn: "{{ .roleARN }}"
+            eks.amazonaws.com/role-arn: "{{ .eks.roleARN }}"
         settings:
-          aws:
-            clusterName: "{{ .clusterName }}"
-            clusterEndpoint: "{{ .clusterEndpoint }}"
-            defaultInstanceProfile: KarpenterNodeInstanceProfile-{{ .clusterName }}
-            interruptionQueueName: "{{ .clusterName }}"
+          clusterName: "{{ .eks.clusterName }}"
+          clusterEndpoint: "{{ .eks.clusterEndpoint }}"
+          interruptionQueue: "{{ .eks.clusterName }}"
 
 - name: helm
   helm:

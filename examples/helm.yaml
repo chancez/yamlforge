@@ -11,8 +11,6 @@ pipeline:
             annotations:
               eks.amazonaws.com/role-arn: karpenter-role
           settings:
-            aws:
-              clusterName: my-eks-cluster
-              clusterEndpoint: https://1234567890ABCDEF1234567890ABCDEF.xx0.region.eks.amazonaws.com
-              defaultInstanceProfile: KarpenterNodeInstanceProfile-my-eks-cluster
-              interruptionQueueName: my-eks-cluster
+            clusterName: my-eks-cluster
+            clusterEndpoint: https://1234567890ABCDEF1234567890ABCDEF.xx0.region.eks.amazonaws.com
+            interruptionQueue: my-eks-cluster
