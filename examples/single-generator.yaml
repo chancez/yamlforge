@@ -1,3 +1,6 @@
+# Pipelines are optional of you only have 1 generator.
+# Define a top level generator the same way you would in a pipeline, but
+# without a name, and under the generator config key:
 generator:
   yaml:
     input:

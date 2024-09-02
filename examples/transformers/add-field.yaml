@@ -1,9 +1,21 @@
 pipeline:
+# Create a new field using the gotemplate generator
+- name: new-field
+  gotemplate:
+    # User defined inputs
+    refVars:
+      field:
+        var: field
+      value:
+        var: value
+    template:
+      # We use a literal because we're defining the key dynamically
+      literal: |
+        {{ .field }}: {{ .value }}
 - name: add-field
   merge:
     input:
       # We expect the input to this transformer to be provided externally,
       # rather than through another pipeline stage
-      - var: transformer-input
-      - inline:
-          new_field: some-value
+      - var: input-object
+      - ref: new-field

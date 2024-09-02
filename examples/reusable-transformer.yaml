@@ -1,13 +1,25 @@
+# Generators can be re-used.
+# The generator defined in transformers/add-field will add the new field based
+# on vars provided.
 pipeline:
 - name: simple-file
   file:
     path: files/test.yaml
 
+# You can import other generators for re-use.
 - name: add-field
   import:
     path: transformers/add-field.yaml
     vars:
       # We're passing the output of the simple-file stage as the
       # transformer-input var in the add-field transformer
-      - name: transformer-input
+      - name: input-object
         ref: simple-file
+      # The add-field generator takes an input variable "field" as the field to
+      # add
+      - name: field
+        literal: "some-new-key"
+      # The add-field generator takes an input variable "value" as the value of
+      # the field to add
+      - name: value
+        literal: "hello world"

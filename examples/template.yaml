@@ -1,5 +1,4 @@
-pipeline:
-- name: template
+generator:
   gotemplate:
     template:
       file: files/test.yaml
