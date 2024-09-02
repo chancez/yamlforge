@@ -13,10 +13,13 @@ type Generator interface {
 	Generate(context.Context) ([]byte, error)
 }
 
-type GeneratorFactory func(dir string, refStore *reference.Store, cfg any) Generator
-
 type Registry struct {
 	typeToFactory map[reflect.Type]GeneratorFactory
+}
+
+type GeneratorFactory struct {
+	name string
+	new  func(dir string, refStore *reference.Store, cfg any) Generator
 }
 
 func NewRegistry() *Registry {
@@ -52,10 +55,10 @@ func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generat
 		panic(fmt.Sprintf("cannot find factory for %s", cfgType))
 	}
 
-	return factory(dir, refStore, cfg), nil
+	return factory.new(dir, refStore, cfg), nil
 }
 
-func (reg *Registry) Register(cfgType any, newGenerator GeneratorFactory) {
+func (reg *Registry) Register(name string, cfgType any, newGenerator GeneratorFactory) {
 	ty := reflect.TypeOf(cfgType)
 	if _, exists := reg.typeToFactory[ty]; exists {
 		panic(fmt.Sprintf("duplicate generator registered for %q", ty.String()))
@@ -65,6 +68,6 @@ func (reg *Registry) Register(cfgType any, newGenerator GeneratorFactory) {
 
 var GlobalRegistry = NewRegistry()
 
-func Register(cfgType any, newGenerator GeneratorFactory) {
-	GlobalRegistry.Register(cfgType, newGenerator)
+func Register(name string, cfgType any, newGenerator GeneratorFactory) {
+	GlobalRegistry.Register(name, cfgType, newGenerator)
 }
