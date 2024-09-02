@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"text/template"
 
@@ -33,9 +34,12 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *referen
 }
 
 func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
+	if gt.cfg.Template == nil {
+		return nil, errors.New("template is required")
+	}
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator")
-	res, err := gt.refStore.GetReference(gt.dir, gt.cfg.Template)
+	res, err := gt.refStore.GetReference(gt.dir, *gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
 	}
