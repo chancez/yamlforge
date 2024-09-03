@@ -12,7 +12,7 @@ import (
 )
 
 type Store struct {
-	// map from an stage.Name to it's results
+	// map from an generator.Name to it's results
 	references map[string][]byte
 	// map a variable name to it's value
 	vars map[string][]byte

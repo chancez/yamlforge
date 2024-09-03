@@ -4,22 +4,18 @@ type Config struct {
 	PipelineGenerator `yaml:",inline" json:",inline"`
 }
 
-type Stage struct {
-	Name       string `yaml:"name" json:"name"`
-	*Generator `yaml:",inline" json:",inline"`
-}
-
 type Generator struct {
-	File       *FileGenerator       `yaml:"file,omitempty" json:"file,omitempty"`
-	Exec       *ExecGenerator       `yaml:"exec,omitempty" json:"exec,omitempty"`
-	Helm       *HelmGenerator       `yaml:"helm,omitempty" json:"helm,omitempty"`
-	Kustomize  *KustomizeGenerator  `yaml:"kustomize,omitempty" json:"kustomize,omitempty"`
-	Merge      *MergeGenerator      `yaml:"merge,omitempty" json:"merge,omitempty"`
-	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty"`
-	Import     *ImportGenerator     `yaml:"import,omitempty" json:"import,omitempty"`
-	JQ         *JQGenerator         `yaml:"jq,omitempty" json:"jq,omitempty"`
-	YAML       *YAMLGenerator       `yaml:"yaml,omitempty" json:"yaml,omitempty"`
-	JSON       *JSONGenerator       `yaml:"json,omitempty" json:"json,omitempty"`
+	Name       string               `yaml:"name" json:"name"`
+	File       *FileGenerator       `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
+	Exec       *ExecGenerator       `yaml:"exec,omitempty" json:"exec,omitempty" jsonschema:"oneof_required=exec"`
+	Helm       *HelmGenerator       `yaml:"helm,omitempty" json:"helm,omitempty" jsonschema:"oneof_required=helm"`
+	Kustomize  *KustomizeGenerator  `yaml:"kustomize,omitempty" json:"kustomize,omitempty" jsonschema:"oneof_required=kustomize"`
+	Merge      *MergeGenerator      `yaml:"merge,omitempty" json:"merge,omitempty" jsonschema:"oneof_required=merge"`
+	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty" jsonschema:"oneof_required=gotemplate"`
+	Import     *ImportGenerator     `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
+	JQ         *JQGenerator         `yaml:"jq,omitempty" json:"jq,omitempty" jsonschema:"oneof_required=jq"`
+	YAML       *YAMLGenerator       `yaml:"yaml,omitempty" json:"yaml,omitempty" jsonschema:"oneof_required=yaml"`
+	JSON       *JSONGenerator       `yaml:"json,omitempty" json:"json,omitempty" jsonschema:"oneof_required=json"`
 }
 
 type FileGenerator struct {
@@ -32,8 +28,8 @@ type ExecGenerator struct {
 }
 
 type HelmGenerator struct {
-	ReleaseName string   `yaml:"releaseName,omitempty" json:"releaseName,omitempty"`
-	Chart       string   `yaml:"chart,omitempty" json:"chart,omitempty"`
+	ReleaseName string   `yaml:"releaseName,omitempty" json:"releaseName"`
+	Chart       string   `yaml:"chart,omitempty" json:"chart"`
 	Version     string   `yaml:"version,omitempty" json:"version,omitempty"`
 	Repo        string   `yaml:"repo,omitempty" json:"repo,omitempty"`
 	Namespace   string   `yaml:"namespace,omitempty" json:"namespace,omitempty"`
@@ -42,12 +38,13 @@ type HelmGenerator struct {
 }
 
 type KustomizeGenerator struct {
-	Dir        string `yaml:"dir,omitempty" json:"dir,omitempty"`
-	URL        string `yaml:"url,omitempty" json:"url,omitempty"`
+	Dir        string `yaml:"dir,omitempty" json:"dir,omitempty" jsonschema:"oneof_required=dir"`
+	URL        string `yaml:"url,omitempty" json:"url,omitempty"  jsonschema:"oneof_required=url"`
 	EnableHelm bool   `yaml:"enableHelm,omitempty" json:"enableHelm,omitempty"`
 }
 
 type MergeGenerator struct {
+	Name  string  `yaml:"name" json:"name"`
 	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
 }
 
@@ -63,33 +60,33 @@ type ImportGenerator struct {
 }
 
 type NamedVariable struct {
-	Name  string `yaml:"name,omitempty" json:"name,omitempty"`
+	Name  string `yaml:"name,omitempty" json:"name"`
 	Value `yaml:",inline" json:",inline"`
 }
 
 type JQGenerator struct {
-	Expr     string `yaml:"expr,omitempty" json:"expr,omitempty"`
-	ExprFile string `yaml:"exprFile,omitempty" json:"exprFile,omitempty"`
-	Input    *Value `yaml:"input,omitempty" json:"input,omitempty"`
+	Expr     string `yaml:"expr,omitempty" json:"expr,omitempty" jsonschema:"oneof_required=expr"`
+	ExprFile string `yaml:"exprFile,omitempty" json:"exprFile,omitempty" jsonschema:"oneof_required=exprFile"`
+	Input    *Value `yaml:"input,omitempty" json:"input"`
 	Slurp    bool   `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
 type YAMLGenerator struct {
-	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
+	Input []Value `yaml:"input,omitempty" json:"input"`
 }
 
 type JSONGenerator struct {
-	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
+	Input []Value `yaml:"input,omitempty" json:"input"`
 }
 
 type PipelineGenerator struct {
-	Pipeline  []*Stage   `yaml:"pipeline,omitempty" json:"pipeline,omitempty"`
-	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty"`
+	Pipeline  []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
+	Generator *Generator  `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
 }
 
 type Value struct {
-	Var   *string `yaml:"var,omitempty" json:"var,omitempty"`
-	Ref   *string `yaml:"ref,omitempty" json:"ref,omitempty"`
-	File  *string `yaml:"file,omitempty" json:"file,omitempty"`
-	Value *any    `yaml:"value,omitempty" json:"value,omitempty"`
+	Var   *string `yaml:"var,omitempty" json:"var,omitempty" jsonschema:"oneof_required=var"`
+	Ref   *string `yaml:"ref,omitempty" json:"ref,omitempty" jsonschema:"oneof_required=ref"`
+	File  *string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
+	Value *any    `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
 }

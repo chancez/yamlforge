@@ -41,17 +41,14 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 	}
 
 	var output []byte
-	for _, stage := range pipeline.cfg.Pipeline {
-		if stage.Generator == nil {
-			return nil, fmt.Errorf("error in stage %q: generator cannot be empty", stage.Name)
-		}
-		result, err := pipeline.executeGenerator(ctx, *stage.Generator)
+	for _, gen := range pipeline.cfg.Pipeline {
+		result, err := pipeline.executeGenerator(ctx, gen)
 		if err != nil {
-			return nil, fmt.Errorf("error running stage %q: %w", stage.Name, err)
+			return nil, fmt.Errorf("error running stage %q: %w", gen.Name, err)
 		}
-		err = pipeline.refStore.AddReference(stage.Name, result)
+		err = pipeline.refStore.AddReference(gen.Name, result)
 		if err != nil {
-			return nil, fmt.Errorf("error storing reference for stage %q: %w", stage.Name, err)
+			return nil, fmt.Errorf("error storing reference for stage %q: %w", gen.Name, err)
 		}
 		// The last stage is the output of a pipeline
 		output = result

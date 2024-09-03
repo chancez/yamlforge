@@ -34,9 +34,13 @@ func (reg *Registry) GetGenerator(dir string, refStore *reference.Store, generat
 	setFields := 0
 	var cfg any
 	for i := 0; i < v.NumField(); i++ {
+		fieldName := v.Type().Field(i).Name
+		if fieldName == "Name" {
+			continue
+		}
 		field := v.Field(i)
 		if field.Kind() != reflect.Pointer {
-			panic(fmt.Sprintf("expected config.Generator field %q to be a pointer, got: %q", field.Type().Name(), field.Kind().String()))
+			panic(fmt.Sprintf("expected config.Generator field %q to be a pointer, got: %q", fieldName, field.Kind().String()))
 		}
 		if !field.IsNil() {
 			setFields++
