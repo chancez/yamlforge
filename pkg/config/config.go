@@ -7,9 +7,13 @@ type Config struct {
 	PipelineGenerator `yaml:",inline" json:",inline"`
 }
 
+// Generators execute some logic and produce output. Only one type of generator can be specified.
 type Generator struct {
-	Name       string               `yaml:"name" json:"name"`
-	File       *FileGenerator       `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
+	// Name is the name of this generator which other generators can reference this generator's output by.
+	Name string `yaml:"name" json:"name"`
+	// File is a generator which reads files at the specified path and returns their output.
+	File *FileGenerator `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
+	// Exec is a generator which execs the command specified and returns the stdout of the program.
 	Exec       *ExecGenerator       `yaml:"exec,omitempty" json:"exec,omitempty" jsonschema:"oneof_required=exec"`
 	Helm       *HelmGenerator       `yaml:"helm,omitempty" json:"helm,omitempty" jsonschema:"oneof_required=helm"`
 	Kustomize  *KustomizeGenerator  `yaml:"kustomize,omitempty" json:"kustomize,omitempty" jsonschema:"oneof_required=kustomize"`
@@ -21,13 +25,18 @@ type Generator struct {
 	JSON       *JSONGenerator       `yaml:"json,omitempty" json:"json,omitempty" jsonschema:"oneof_required=json"`
 }
 
+// FileGenerator is a generator which reads files at the specified path and returns their output.
 type FileGenerator struct {
+	// Path is the path relative to this pipeline file to read.
 	Path string `yaml:"path,omitempty" json:"path,omitempty"`
 }
 
+// ExecGenerator execs the command specified and returns the stdout of the program.
 type ExecGenerator struct {
-	Command string   `yaml:"command,omitempty" json:"command,omitempty"`
-	Args    []string `yaml:"args,omitempty" json:"args,omitempty"`
+	// Command is the command to execute.
+	Command string `yaml:"command,omitempty" json:"command,omitempty"`
+	// Args are the arguments to the command.
+	Args []string `yaml:"args,omitempty" json:"args,omitempty"`
 }
 
 type HelmGenerator struct {
@@ -83,7 +92,6 @@ type JSONGenerator struct {
 }
 
 // PipelineGenerator is a generator which executes other generators.
-// Currently it is only available through the top level configuration.
 type PipelineGenerator struct {
 	// Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs.
 	Pipeline []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`

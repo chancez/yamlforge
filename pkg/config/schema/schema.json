@@ -38,26 +38,31 @@
     "ExecGenerator": {
       "properties": {
         "command": {
-          "type": "string"
+          "type": "string",
+          "description": "Command is the command to execute."
         },
         "args": {
           "items": {
             "type": "string"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Args are the arguments to the command."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "ExecGenerator execs the command specified and returns the stdout of the program."
     },
     "FileGenerator": {
       "properties": {
         "path": {
-          "type": "string"
+          "type": "string",
+          "description": "Path is the path relative to this pipeline file to read."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "FileGenerator is a generator which reads files at the specified path and returns their output."
     },
     "Generator": {
       "oneOf": [
@@ -124,13 +129,16 @@
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name is the name of this generator which other generators can reference this generator's output by."
         },
         "file": {
-          "$ref": "#/$defs/FileGenerator"
+          "$ref": "#/$defs/FileGenerator",
+          "description": "File is a generator which reads files at the specified path and returns their output."
         },
         "exec": {
-          "$ref": "#/$defs/ExecGenerator"
+          "$ref": "#/$defs/ExecGenerator",
+          "description": "Exec is a generator which execs the command specified and returns the stdout of the program."
         },
         "helm": {
           "$ref": "#/$defs/HelmGenerator"
@@ -161,7 +169,8 @@
       "type": "object",
       "required": [
         "name"
-      ]
+      ],
+      "description": "Generators execute some logic and produce output."
     },
     "GoTemplateGenerator": {
       "properties": {
