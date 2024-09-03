@@ -118,14 +118,26 @@ Examples:
 		}
 
 		if props.Len() != 0 {
+
 			log("FIELDS:")
 			for pair := props.Oldest(); pair != nil; pair = pair.Next() {
 				name := pair.Key
 				schema := pair.Value
 				desc := schema.Description
 				ty := schemaTypeString(schema)
-
-				log("  %s\t<%s>", name, ty)
+				required := false
+				for _, req := range fieldSchema.Required {
+					if req != name {
+						continue
+					}
+					required = true
+					break
+				}
+				if required {
+					log("  %s\t<%s> -required-", name, ty)
+				} else {
+					log("  %s\t<%s>", name, ty)
+				}
 				if desc != "" {
 					logDescription(desc)
 				}
