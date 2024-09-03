@@ -7,19 +7,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/invopop/jsonschema"
 	"github.com/spf13/cobra"
 
-	"github.com/chancez/yamlforge/pkg/config"
+	"github.com/chancez/yamlforge/pkg/config/schema"
 )
 
-// jsonSchemaCmd represents the jsonSchema command
 var jsonSchemaCmd = &cobra.Command{
 	Use:   "json-schema",
 	Short: "Print the JSON schema for the forge configuration file.",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		schema := jsonschema.Reflect(&config.Config{})
-		data, err := json.MarshalIndent(schema, "", "  ")
+		data, err := json.MarshalIndent(schema.Schema, "", "  ")
 		if err != nil {
 			return err
 		}

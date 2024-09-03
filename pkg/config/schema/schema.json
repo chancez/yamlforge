@@ -1,0 +1,439 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/chancez/yamlforge/pkg/config/config",
+  "$ref": "#/$defs/Config",
+  "$defs": {
+    "Config": {
+      "oneOf": [
+        {
+          "required": [
+            "pipeline"
+          ],
+          "title": "pipeline"
+        },
+        {
+          "required": [
+            "generator"
+          ],
+          "title": "generator"
+        }
+      ],
+      "properties": {
+        "pipeline": {
+          "items": {
+            "$ref": "#/$defs/Generator"
+          },
+          "type": "array",
+          "description": "Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs."
+        },
+        "generator": {
+          "$ref": "#/$defs/Generator",
+          "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "Config defines a yamlforge configuration."
+    },
+    "ExecGenerator": {
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "args": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FileGenerator": {
+      "properties": {
+        "path": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Generator": {
+      "oneOf": [
+        {
+          "required": [
+            "file"
+          ],
+          "title": "file"
+        },
+        {
+          "required": [
+            "exec"
+          ],
+          "title": "exec"
+        },
+        {
+          "required": [
+            "helm"
+          ],
+          "title": "helm"
+        },
+        {
+          "required": [
+            "kustomize"
+          ],
+          "title": "kustomize"
+        },
+        {
+          "required": [
+            "merge"
+          ],
+          "title": "merge"
+        },
+        {
+          "required": [
+            "gotemplate"
+          ],
+          "title": "gotemplate"
+        },
+        {
+          "required": [
+            "import"
+          ],
+          "title": "import"
+        },
+        {
+          "required": [
+            "jq"
+          ],
+          "title": "jq"
+        },
+        {
+          "required": [
+            "yaml"
+          ],
+          "title": "yaml"
+        },
+        {
+          "required": [
+            "json"
+          ],
+          "title": "json"
+        }
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "file": {
+          "$ref": "#/$defs/FileGenerator"
+        },
+        "exec": {
+          "$ref": "#/$defs/ExecGenerator"
+        },
+        "helm": {
+          "$ref": "#/$defs/HelmGenerator"
+        },
+        "kustomize": {
+          "$ref": "#/$defs/KustomizeGenerator"
+        },
+        "merge": {
+          "$ref": "#/$defs/MergeGenerator"
+        },
+        "gotemplate": {
+          "$ref": "#/$defs/GoTemplateGenerator"
+        },
+        "import": {
+          "$ref": "#/$defs/ImportGenerator"
+        },
+        "jq": {
+          "$ref": "#/$defs/JQGenerator"
+        },
+        "yaml": {
+          "$ref": "#/$defs/YAMLGenerator"
+        },
+        "json": {
+          "$ref": "#/$defs/JSONGenerator"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "GoTemplateGenerator": {
+      "properties": {
+        "template": {
+          "$ref": "#/$defs/Value"
+        },
+        "vars": {
+          "type": "object"
+        },
+        "refVars": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "HelmGenerator": {
+      "properties": {
+        "releaseName": {
+          "type": "string"
+        },
+        "chart": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "repo": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "apiVersions": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "releaseName",
+        "chart"
+      ]
+    },
+    "ImportGenerator": {
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "vars": {
+          "items": {
+            "$ref": "#/$defs/NamedVariable"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "JQGenerator": {
+      "oneOf": [
+        {
+          "required": [
+            "expr"
+          ],
+          "title": "expr"
+        },
+        {
+          "required": [
+            "exprFile"
+          ],
+          "title": "exprFile"
+        }
+      ],
+      "properties": {
+        "expr": {
+          "type": "string"
+        },
+        "exprFile": {
+          "type": "string"
+        },
+        "input": {
+          "$ref": "#/$defs/Value"
+        },
+        "slurp": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "input"
+      ]
+    },
+    "JSONGenerator": {
+      "properties": {
+        "input": {
+          "items": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "input"
+      ]
+    },
+    "KustomizeGenerator": {
+      "oneOf": [
+        {
+          "required": [
+            "dir"
+          ],
+          "title": "dir"
+        },
+        {
+          "required": [
+            "url"
+          ],
+          "title": "url"
+        }
+      ],
+      "properties": {
+        "dir": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "enableHelm": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MergeGenerator": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "input": {
+          "items": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "NamedVariable": {
+      "oneOf": [
+        {
+          "required": [
+            "var"
+          ],
+          "title": "var"
+        },
+        {
+          "required": [
+            "ref"
+          ],
+          "title": "ref"
+        },
+        {
+          "required": [
+            "file"
+          ],
+          "title": "file"
+        },
+        {
+          "required": [
+            "value"
+          ],
+          "title": "value"
+        }
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "var": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "value": true
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "Value": {
+      "oneOf": [
+        {
+          "required": [
+            "var"
+          ],
+          "title": "var"
+        },
+        {
+          "required": [
+            "ref"
+          ],
+          "title": "ref"
+        },
+        {
+          "required": [
+            "file"
+          ],
+          "title": "file"
+        },
+        {
+          "required": [
+            "value"
+          ],
+          "title": "value"
+        }
+      ],
+      "properties": {
+        "var": {
+          "type": "string"
+        },
+        "ref": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        },
+        "value": true
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "YAMLGenerator": {
+      "properties": {
+        "input": {
+          "items": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "input"
+      ]
+    }
+  }
+}

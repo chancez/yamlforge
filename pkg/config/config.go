@@ -1,5 +1,8 @@
 package config
 
+// Config defines a yamlforge configuration.
+// It allows defining pipelines of generators that run in sequence and produce
+// an (typically YAML) output.
 type Config struct {
 	PipelineGenerator `yaml:",inline" json:",inline"`
 }
@@ -79,9 +82,13 @@ type JSONGenerator struct {
 	Input []Value `yaml:"input,omitempty" json:"input"`
 }
 
+// PipelineGenerator is a generator which executes other generators.
+// Currently it is only available through the top level configuration.
 type PipelineGenerator struct {
-	Pipeline  []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
-	Generator *Generator  `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
+	// Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs.
+	Pipeline []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
+	// Generator is a single generator, for simple use-cases that do not require a full pipeline.
+	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
 }
 
 type Value struct {
