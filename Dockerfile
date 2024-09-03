@@ -10,7 +10,7 @@ RUN ./scripts/install_kustomize.sh $TARGETARCH /usr/bin
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg \
-     GOOS=$TARGETOS GOARCH=$TARGETARCH CGO_ENABLED=1 make
+     GOOS=$TARGETOS GOARCH=$TARGETARCH make
 
 FROM debian:bookworm
 
