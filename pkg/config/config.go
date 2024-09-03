@@ -5,8 +5,8 @@ type Config struct {
 }
 
 type Stage struct {
-	Name      string     `yaml:"name,omitempty" json:"name,omitempty"`
-	Generator *Generator `yaml:",inline" json:",inline"`
+	Name       string `yaml:"name" json:"name"`
+	*Generator `yaml:",inline" json:",inline"`
 }
 
 type Generator struct {
