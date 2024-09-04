@@ -1,6 +1,3 @@
-//go:build ignore
-// +build ignore
-
 // This program generates schema.json
 package main
 
@@ -15,8 +12,10 @@ import (
 )
 
 func getJSONSchema() (*jsonschema.Schema, error) {
-	reflector := &jsonschema.Reflector{}
-	if err := reflector.AddGoComments("github.com/chancez/yamlforge", "./"); err != nil {
+	reflector := &jsonschema.Reflector{
+		CommentMap: make(map[string]string),
+	}
+	if err := ExtractGoComments("github.com/chancez/yamlforge", "./", reflector.CommentMap); err != nil {
 		return nil, fmt.Errorf("error extracting go comments: %w", err)
 	}
 	return reflector.Reflect(&config.Config{}), nil

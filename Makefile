@@ -13,7 +13,7 @@ yfg: schema
 	$(GO) build --ldflags='$(GO_LINKER_FLAGS)' $(GO_BUILD_FLAGS) -o yfg .
 
 schema:
-	$(GO) run tools/gen-jsonschema/main.go pkg/config/schema/schema.json
+	$(GO) run ./tools/gen-jsonschema pkg/config/schema/schema.json
 
 .PHONY: test
 test:

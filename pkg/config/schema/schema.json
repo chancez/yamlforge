@@ -178,7 +178,7 @@
       "required": [
         "name"
       ],
-      "description": "Generators execute some logic and produce output."
+      "description": "Generators execute some logic and produce output. Only one type of generator can be specified."
     },
     "GoTemplateGenerator": {
       "properties": {

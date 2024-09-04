@@ -1,13 +1,12 @@
 package config
 
 // Config defines a yamlforge configuration.
-// It allows defining pipelines of generators that run in sequence and produce
-// an (typically YAML) output.
 type Config struct {
 	PipelineGenerator `yaml:",inline" json:",inline"`
 }
 
-// Generators execute some logic and produce output. Only one type of generator can be specified.
+// Generators execute some logic and produce output.
+// Only one type of generator can be specified.
 type Generator struct {
 	// Name is the name of this generator which other generators can reference this generator's output by.
 	Name string `yaml:"name" json:"name"`
