@@ -47,9 +47,10 @@ Examples:
 			return fmt.Errorf("invalid type: %s", ty)
 		}
 
-		props := typeSchema.Properties
 		fieldSchema := typeSchema
 		var fieldName string
+		var fieldDescription string
+		var fieldType string
 		if len(fields) != 0 {
 			// Lookup the field the user specified
 			for _, field := range fields {
@@ -60,25 +61,28 @@ Examples:
 					}
 
 					foundField = true
-					fieldSchema = pair.Value
 					fieldName = pair.Key
-					for {
-						// Resolve refs if they exist
-						for fieldSchema.Ref != "" {
+					fieldSchema = pair.Value
+					fieldDescription = fieldSchema.Description
+					fieldType = schemaTypeString(fieldSchema)
+
+					// Now lookup the definition for this field if needed.
+					// Resolve refs if they exist
+					for fieldSchema.Ref != "" || fieldSchema.Items != nil {
+						if fieldSchema.Ref != "" {
 							var err error
-							fieldName, fieldSchema, err = getDefinition(fieldSchema.Ref)
+							_, fieldSchema, err = getDefinition(fieldSchema.Ref)
 							if err != nil {
 								return err
 							}
 						}
-						// If it's a list then lookup the inner type of the list
+
+						// If it's a list then lookup the inner type of the list is what we
+						// need to lookup the fields.
 						if fieldSchema.Items != nil {
 							fieldSchema = fieldSchema.Items
-						} else {
-							break
 						}
 					}
-					props = fieldSchema.Properties
 					break
 				}
 				if !foundField {
@@ -111,12 +115,12 @@ Examples:
 		}
 
 		if fieldSchema != nil && fieldSchema != typeSchema {
-			ty := schemaTypeString(fieldSchema)
-			log("FIELD: %s <%s>", fieldName, ty)
-			logDescription(fieldSchema.Description)
+			log("FIELD: %s <%s>", fieldName, fieldType)
+			logDescription(fieldDescription)
 			log("")
 		}
 
+		props := fieldSchema.Properties
 		if props.Len() != 0 {
 			log("FIELDS:")
 			for pair := props.Oldest(); pair != nil; pair = pair.Next() {
