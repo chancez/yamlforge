@@ -5,12 +5,13 @@ IMAGE_TAG := main
 DOCKER_FLAGS ?=
 TEST_FLAGS ?=
 TEST_PACKAGES ?= ./...
+VERSION ?= $(shell git describe --tags --always)
 
 all: yfg
 
 .PHONY: yfg
 yfg: schema
-	$(GO) build --ldflags='$(GO_LINKER_FLAGS)' $(GO_BUILD_FLAGS) -o yfg .
+	$(GO) build -ldflags="-X 'github.com/chancez/yamlforge/cmd.Version=$(VERSION)' $(GO_LINKER_FLAGS)" $(GO_BUILD_FLAGS) -o yfg .
 
 schema:
 	$(GO) run ./tools/gen-jsonschema pkg/config/schema/schema.json
