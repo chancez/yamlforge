@@ -6,11 +6,19 @@ yamlforge is a tool to produce YAML (or JSON) using pipelines.
 
 Take a look at our examples in the `examples/` directory for comprehensive examples.
 
-Configuration is currently not very well documented beyond the examples, but you can refer to the [config package](https://github.com/chancez/yamlforge/blob/main/pkg/config/config.go) to see what options are available.
+Here's an example that renders a Helm chart using dynamically rendered `values.yaml`:
 
 ```
 yfg generate ./examples/helm-templated-values.yaml
 ```
+
+You use `yfg explain` to get details on the different fields available:
+
+```
+yfg explain config
+```
+
+Or you can use `yfg json-schema` to print the [JSON Schema](https://json-schema.org) for yamlforge configurations.
 
 ## Concepts
 
