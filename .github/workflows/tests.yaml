@@ -1,0 +1,35 @@
+name: Run static checks and unit tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+    - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.event.after }}
+  cancel-in-progress: true
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4.1.7
+    - uses: actions/setup-go@v5.0.2
+      with:
+        go-version-file: 'go.mod'
+    - name: Run static checks
+      uses: golangci/golangci-lint-action@v6.0.1
+    - name: Check module vendoring
+      run: |
+        go mod tidy
+        go mod vendor
+        go mod verify
+        git status
+        test -z "$(git status --porcelain)" || (echo "please run 'go mod tidy && go mod vendor', and submit your changes"; exit 1)
+    - name: Run unit tests
+      run: make test
+    - name: Build
+      run: make yfg
