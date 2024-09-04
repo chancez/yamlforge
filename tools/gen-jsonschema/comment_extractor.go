@@ -91,7 +91,7 @@ func ExtractGoComments(base, path string, commentMap map[string]string) error {
 						// Don't use the Synopsis which only contains the first
 						// line/sentence, use the entire comment.
 						// txt = doc.Synopsis(txt)
-						commentMap[fmt.Sprintf("%s.%s", pkg, typ)] = strings.TrimSpace(txt)
+						commentMap[fmt.Sprintf("%s.%s", pkg, typ)] = strings.TrimSpace(strings.ReplaceAll(txt, "\n", " "))
 					}
 				case *ast.Field:
 					txt := x.Doc.Text()
