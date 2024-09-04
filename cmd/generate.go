@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
@@ -46,7 +45,7 @@ var generateCmd = &cobra.Command{
 			return err
 		}
 
-		_, err = io.WriteString(cmd.OutOrStdout(), string(result))
+		_, err = cmd.OutOrStdout().Write(result)
 		if err != nil {
 			return fmt.Errorf("error writing output: %w", err)
 		}

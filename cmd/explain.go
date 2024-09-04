@@ -94,14 +94,18 @@ Examples:
 		var buf bytes.Buffer
 		log := func(format string, a ...any) {
 			if format != "" {
+				//nolint:errcheck
 				io.WriteString(&buf, fmt.Sprintf(format, a...))
 			}
+			//nolint:errcheck
 			io.WriteString(&buf, "\n")
 		}
 
 		logDescription := func(s string) {
 			wrapLength := 79
+			//nolint:errcheck
 			io.WriteString(&buf, WrapAndIndent(s, wrapLength, 4))
+			//nolint:errcheck
 			io.WriteString(&buf, "\n")
 		}
 

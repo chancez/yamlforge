@@ -49,6 +49,7 @@ import (
 // only. Field comments, which tend to be much shorter, will include everything.
 func ExtractGoComments(base, path string, commentMap map[string]string) error {
 	fset := token.NewFileSet()
+	//nolint:staticcheck
 	dict := make(map[string][]*ast.Package)
 	err := filepath.Walk(path, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
