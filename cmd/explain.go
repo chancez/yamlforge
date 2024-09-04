@@ -118,7 +118,6 @@ Examples:
 		}
 
 		if props.Len() != 0 {
-
 			log("FIELDS:")
 			for pair := props.Oldest(); pair != nil; pair = pair.Next() {
 				name := pair.Key

@@ -62,7 +62,7 @@
       },
       "additionalProperties": false,
       "type": "object",
-      "description": "FileGenerator is a generator which reads files at the specified path and returns their output."
+      "description": "FileGenerator reads files at the specified path and returns their output."
     },
     "Generator": {
       "oneOf": [
@@ -141,28 +141,36 @@
           "description": "Exec is a generator which execs the command specified and returns the stdout of the program."
         },
         "helm": {
-          "$ref": "#/$defs/HelmGenerator"
+          "$ref": "#/$defs/HelmGenerator",
+          "description": "Helm is a generator which runs 'helm template' to render a Helm chart and returns the output."
         },
         "kustomize": {
-          "$ref": "#/$defs/KustomizeGenerator"
+          "$ref": "#/$defs/KustomizeGenerator",
+          "description": "Kustomize is a generator which runs 'kustomize build' to render a Kustomization and returns the output."
         },
         "merge": {
-          "$ref": "#/$defs/MergeGenerator"
+          "$ref": "#/$defs/MergeGenerator",
+          "description": "Merge is a generator which takes multiple inputs containing object-like data and deeply merges them together and returns the merged output."
         },
         "gotemplate": {
-          "$ref": "#/$defs/GoTemplateGenerator"
+          "$ref": "#/$defs/GoTemplateGenerator",
+          "description": "GoTemplate is a generator which renders Go 'text/template' templates and returns the output."
         },
         "import": {
-          "$ref": "#/$defs/ImportGenerator"
+          "$ref": "#/$defs/ImportGenerator",
+          "description": "Import is a generator which imports pipelines from another file and returns the output."
         },
         "jq": {
-          "$ref": "#/$defs/JQGenerator"
+          "$ref": "#/$defs/JQGenerator",
+          "description": "JQ is a generator which executes 'jq' and returns the output."
         },
         "yaml": {
-          "$ref": "#/$defs/YAMLGenerator"
+          "$ref": "#/$defs/YAMLGenerator",
+          "description": "YAML is a generator which returns it's inputs as YAML."
         },
         "json": {
-          "$ref": "#/$defs/JSONGenerator"
+          "$ref": "#/$defs/JSONGenerator",
+          "description": "JSON is a generator which returns it's inputs as JSON."
         }
       },
       "additionalProperties": false,
@@ -175,49 +183,60 @@
     "GoTemplateGenerator": {
       "properties": {
         "template": {
-          "$ref": "#/$defs/Value"
+          "$ref": "#/$defs/Value",
+          "description": "Template is the template to render."
         },
         "vars": {
-          "type": "object"
+          "type": "object",
+          "description": "Vars are input variables to the template."
         },
         "refVars": {
           "additionalProperties": {
             "$ref": "#/$defs/Value"
           },
-          "type": "object"
+          "type": "object",
+          "description": "RefVars are input variables to the template allowing references to other generator outputs or files."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "GoTemplateGenerator renders Go 'text/template' templates and returns the output."
     },
     "HelmGenerator": {
       "properties": {
         "releaseName": {
-          "type": "string"
+          "type": "string",
+          "description": "ReleaseName is the release name."
         },
         "chart": {
-          "type": "string"
+          "type": "string",
+          "description": "Chart is the Helm chart to install. Prefix with oci:// to use a chart stored in an OCI registry."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version is the version of the helm chart to install."
         },
         "repo": {
-          "type": "string"
+          "type": "string",
+          "description": "Repo is the repository to install the Helm chart from."
         },
         "namespace": {
-          "type": "string"
+          "type": "string",
+          "description": "Namespace is the Kubernetes namespace to use when rendering resources."
         },
         "apiVersions": {
           "items": {
             "type": "string"
           },
-          "type": "array"
+          "type": "array",
+          "description": "APIVersions are Kubernetes api versions used for Capabilities.APIVersions."
         },
         "values": {
           "items": {
             "$ref": "#/$defs/Value"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Values are the Helm values used as configuration for the Helm chart."
         }
       },
       "additionalProperties": false,
@@ -225,22 +244,29 @@
       "required": [
         "releaseName",
         "chart"
-      ]
+      ],
+      "description": "HelmGenerator runs 'helm template' to render a Helm chart and returns the output."
     },
     "ImportGenerator": {
       "properties": {
         "path": {
-          "type": "string"
+          "type": "string",
+          "description": "Path is the path to the manifest to import."
         },
         "vars": {
           "items": {
             "$ref": "#/$defs/NamedVariable"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Vars defines variables that the imported pipeline expects."
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "path"
+      ],
+      "description": "ImportGenerator imports pipelines from another file and returns the output."
     },
     "JQGenerator": {
       "oneOf": [
@@ -259,23 +285,28 @@
       ],
       "properties": {
         "expr": {
-          "type": "string"
+          "type": "string",
+          "description": "Expr is the jq expression to evaluate. Cannot be specified in combination with ExprFile."
         },
         "exprFile": {
-          "type": "string"
+          "type": "string",
+          "description": "ExprFile is a path to a file relative to the manifest containing the jq expression to evaluate. Cannot be specified in combination with Expr."
         },
         "input": {
-          "$ref": "#/$defs/Value"
+          "$ref": "#/$defs/Value",
+          "description": "Input is the JSON input for jq to execute the expression over."
         },
         "slurp": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Slurp configures jq to read all inputs into an array and use it as a single input value."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "input"
-      ]
+      ],
+      "description": "JQGenerator executes 'jq' and returns the output."
     },
     "JSONGenerator": {
       "properties": {
@@ -283,14 +314,16 @@
           "items": {
             "$ref": "#/$defs/Value"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "input"
-      ]
+      ],
+      "description": "JSONGenerator returns it's inputs as JSON."
     },
     "KustomizeGenerator": {
       "oneOf": [
@@ -309,35 +342,35 @@
       ],
       "properties": {
         "dir": {
-          "type": "string"
+          "type": "string",
+          "description": "Dir is the path to a directory containing 'kustomization.yaml' relative to the manifest."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "URL is a git repository URL with a path suffix containing a 'kustomization.yaml'."
         },
         "enableHelm": {
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "MergeGenerator": {
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "input": {
-          "items": {
-            "$ref": "#/$defs/Value"
-          },
-          "type": "array"
+          "type": "boolean",
+          "description": "EnableHelm enables use of the Helm chart inflator generator."
         }
       },
       "additionalProperties": false,
       "type": "object",
-      "required": [
-        "name"
-      ]
+      "description": "KustomizeGenerator runs 'kustomize build' to render a Kustomization and returns the output."
+    },
+    "MergeGenerator": {
+      "properties": {
+        "input": {
+          "items": {
+            "$ref": "#/$defs/Value"
+          },
+          "type": "array",
+          "description": "Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output."
     },
     "NamedVariable": {
       "oneOf": [
@@ -371,21 +404,27 @@
           "type": "string"
         },
         "var": {
-          "type": "string"
+          "type": "string",
+          "description": "Var allows defining variables that can be externally provided to a pipeline."
         },
         "ref": {
-          "type": "string"
+          "type": "string",
+          "description": "Ref takes the name of a previous stage in the pipeline and returns the output of that stage."
         },
         "file": {
-          "type": "string"
+          "type": "string",
+          "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
         },
-        "value": true
+        "value": {
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+        }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "name"
-      ]
+      ],
+      "description": "NamedVariable is named Value that can be referenced by imported pipelines using the var attribute of a value."
     },
     "Value": {
       "oneOf": [
@@ -416,18 +455,24 @@
       ],
       "properties": {
         "var": {
-          "type": "string"
+          "type": "string",
+          "description": "Var allows defining variables that can be externally provided to a pipeline."
         },
         "ref": {
-          "type": "string"
+          "type": "string",
+          "description": "Ref takes the name of a previous stage in the pipeline and returns the output of that stage."
         },
         "file": {
-          "type": "string"
+          "type": "string",
+          "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
         },
-        "value": true
+        "value": {
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+        }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "description": "Value provides inputs to generators."
     },
     "YAMLGenerator": {
       "properties": {
@@ -435,14 +480,16 @@
           "items": {
             "$ref": "#/$defs/Value"
           },
-          "type": "array"
+          "type": "array",
+          "description": "Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "input"
-      ]
+      ],
+      "description": "YAMLGenerator returns it's inputs as YAML."
     }
   }
 }
