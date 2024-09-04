@@ -19,7 +19,7 @@ func TestExamples(t *testing.T) {
 		expected string
 	}{
 		{
-			file: "file.yaml",
+			file: "file.yfg.yaml",
 			expected: trim(`
 foo:
   bar: baz
@@ -30,14 +30,14 @@ foo:
 `),
 		},
 		{
-			file: "exec.yaml",
+			file: "exec.yfg.yaml",
 			expected: trim(`
 foo:
     bar: asdf hjkl
 `),
 		},
 		{
-			file: "jq.yaml",
+			file: "jq.yfg.yaml",
 			expected: trim(`
 another_key: |
     {{ .SomeValue }}
@@ -47,7 +47,7 @@ key: |
 `),
 		},
 		{
-			file: "merge.yaml",
+			file: "merge.yfg.yaml",
 			expected: trim(`
 foo:
     another_key: |
@@ -58,7 +58,7 @@ foo:
 `),
 		},
 		{
-			file: "template.yaml",
+			file: "template.yfg.yaml",
 			expected: trim(`
 foo:
   bar: baz
@@ -69,20 +69,20 @@ foo:
 `),
 		},
 		{
-			file: "template-literal.yaml",
+			file: "template-literal.yfg.yaml",
 			expected: trim(`
 some-key: some-value
 `),
 		},
 		{
-			file: "single-generator.yaml",
+			file: "single-generator.yfg.yaml",
 			expected: trim(`
 foo: bar
 key: value
 `),
 		},
 		{
-			file: "reusable-transformer.yaml",
+			file: "reusable-transformer.yfg.yaml",
 			expected: trim(`
 foo:
     another_key: |
