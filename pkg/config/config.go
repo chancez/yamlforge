@@ -22,8 +22,8 @@ type Generator struct {
 	Merge *MergeGenerator `yaml:"merge,omitempty" json:"merge,omitempty" jsonschema:"oneof_required=merge"`
 	// GoTemplate is a generator which renders Go 'text/template' templates and returns the output.
 	GoTemplate *GoTemplateGenerator `yaml:"gotemplate,omitempty" json:"gotemplate,omitempty" jsonschema:"oneof_required=gotemplate"`
-	// Import is a generator which imports pipelines from another file and returns the output.
-	Import *ImportGenerator `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
+	// Pipeline executes other pipelines or generators and returns the output.
+	Pipeline *PipelineGenerator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
 	// JQ is a generator which executes 'jq' and returns the output.
 	JQ *JQGenerator `yaml:"jq,omitempty" json:"jq,omitempty" jsonschema:"oneof_required=jq"`
 	// CELFilter is a generator which filters results using a CEL expression and returns the unfilted results.
@@ -94,20 +94,6 @@ type GoTemplateGenerator struct {
 	RefVars map[string]Value `yaml:"refVars,omitempty" json:"refVars,omitempty"`
 }
 
-// ImportGenerator imports pipelines from another file and returns the output.
-type ImportGenerator struct {
-	// Path is the path to the manifest to import.
-	Path string `yaml:"path" json:"path"`
-	// Vars defines variables that the imported pipeline expects.
-	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
-}
-
-// NamedVariable is named Value that can be referenced by imported pipelines using the var attribute of a value.
-type NamedVariable struct {
-	Name  string `yaml:"name" json:"name"`
-	Value `yaml:",inline" json:",inline"`
-}
-
 // JQGenerator executes 'jq' and returns the output.
 type JQGenerator struct {
 	// Expr is the jq expression to evaluate. Cannot be specified in combination with ExprFile.
@@ -153,6 +139,16 @@ type PipelineGenerator struct {
 	Pipeline []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
 	// Generator is a single generator, for simple use-cases that do not require a full pipeline.
 	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
+	// Path is the file path of a manifest to import.
+	Path string `yaml:"path,omitempty" json:"path,omitempty" jsonschema:"oneof_required=path"`
+	// Vars defines variables that the pipeline expects.
+	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
+}
+
+// NamedVariable is named Value that can be referenced by pipelines using the var attribute of a value.
+type NamedVariable struct {
+	Name  string `yaml:"name" json:"name"`
+	Value `yaml:",inline" json:",inline"`
 }
 
 // Value provides inputs to generators.

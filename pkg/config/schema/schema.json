@@ -39,6 +39,12 @@
             "generator"
           ],
           "title": "generator"
+        },
+        {
+          "required": [
+            "path"
+          ],
+          "title": "path"
         }
       ],
       "properties": {
@@ -52,6 +58,17 @@
         "generator": {
           "$ref": "#/$defs/Generator",
           "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
+        },
+        "path": {
+          "type": "string",
+          "description": "Path is the file path of a manifest to import."
+        },
+        "vars": {
+          "items": {
+            "$ref": "#/$defs/NamedVariable"
+          },
+          "type": "array",
+          "description": "Vars defines variables that the pipeline expects."
         }
       },
       "additionalProperties": false,
@@ -133,9 +150,9 @@
         },
         {
           "required": [
-            "import"
+            "pipeline"
           ],
-          "title": "import"
+          "title": "pipeline"
         },
         {
           "required": [
@@ -191,9 +208,9 @@
           "$ref": "#/$defs/GoTemplateGenerator",
           "description": "GoTemplate is a generator which renders Go 'text/template' templates and returns the output."
         },
-        "import": {
-          "$ref": "#/$defs/ImportGenerator",
-          "description": "Import is a generator which imports pipelines from another file and returns the output."
+        "pipeline": {
+          "$ref": "#/$defs/PipelineGenerator",
+          "description": "Pipeline executes other pipelines or generators and returns the output."
         },
         "jq": {
           "$ref": "#/$defs/JQGenerator",
@@ -292,27 +309,6 @@
         "chart"
       ],
       "description": "HelmGenerator runs 'helm template' to render a Helm chart and returns the output."
-    },
-    "ImportGenerator": {
-      "properties": {
-        "path": {
-          "type": "string",
-          "description": "Path is the path to the manifest to import."
-        },
-        "vars": {
-          "items": {
-            "$ref": "#/$defs/NamedVariable"
-          },
-          "type": "array",
-          "description": "Vars defines variables that the imported pipeline expects."
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "path"
-      ],
-      "description": "ImportGenerator imports pipelines from another file and returns the output."
     },
     "JQGenerator": {
       "oneOf": [
@@ -477,7 +473,7 @@
       "required": [
         "name"
       ],
-      "description": "NamedVariable is named Value that can be referenced by imported pipelines using the var attribute of a value."
+      "description": "NamedVariable is named Value that can be referenced by pipelines using the var attribute of a value."
     },
     "ParsedValue": {
       "oneOf": [
@@ -537,6 +533,55 @@
         "format"
       ],
       "description": "ParsedValue provides parsed values to generators."
+    },
+    "PipelineGenerator": {
+      "oneOf": [
+        {
+          "required": [
+            "pipeline"
+          ],
+          "title": "pipeline"
+        },
+        {
+          "required": [
+            "generator"
+          ],
+          "title": "generator"
+        },
+        {
+          "required": [
+            "path"
+          ],
+          "title": "path"
+        }
+      ],
+      "properties": {
+        "pipeline": {
+          "items": {
+            "$ref": "#/$defs/Generator"
+          },
+          "type": "array",
+          "description": "Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs."
+        },
+        "generator": {
+          "$ref": "#/$defs/Generator",
+          "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
+        },
+        "path": {
+          "type": "string",
+          "description": "Path is the file path of a manifest to import."
+        },
+        "vars": {
+          "items": {
+            "$ref": "#/$defs/NamedVariable"
+          },
+          "type": "array",
+          "description": "Vars defines variables that the pipeline expects."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "PipelineGenerator executes other generators in a pipeline or singular context."
     },
     "Value": {
       "oneOf": [

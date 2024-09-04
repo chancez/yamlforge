@@ -75,7 +75,7 @@ func validateGenerators(generatorCfg Generator) error {
 	if generatorCfg.GoTemplate != nil {
 		count++
 	}
-	if generatorCfg.Import != nil {
+	if generatorCfg.Pipeline != nil {
 		count++
 	}
 	if generatorCfg.JQ != nil {

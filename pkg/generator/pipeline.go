@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+	"path"
+	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
@@ -26,8 +29,25 @@ func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *reference.S
 }
 
 func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
-	if pipeline.cfg.Generator != nil && len(pipeline.cfg.Pipeline) != 0 {
-		return nil, errors.New("cannot set both 'pipeline' and 'generator' options")
+	var valuesSet []string
+	if pipeline.cfg.Generator != nil {
+		valuesSet = append(valuesSet, "generator")
+	}
+	if len(pipeline.cfg.Pipeline) != 0 {
+		valuesSet = append(valuesSet, "pipeline")
+	}
+	if len(pipeline.cfg.Path) != 0 {
+		valuesSet = append(valuesSet, "path")
+	}
+	if len(valuesSet) == 0 {
+		return nil, errors.New("must configure a pipeline, generator or path")
+	}
+	if len(valuesSet) > 1 {
+		return nil, fmt.Errorf("invalid configuration, cannot combine %s", strings.Join(valuesSet, ","))
+	}
+
+	if pipeline.cfg.Path != "" {
+		return pipeline.executeImport(ctx)
 	}
 
 	if pipeline.cfg.Generator != nil {
@@ -49,6 +69,34 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 	}
 
 	return output, nil
+}
+
+func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
+	data, err := os.ReadFile(path.Join(pipeline.dir, pipeline.cfg.Path))
+	if err != nil {
+		return nil, fmt.Errorf("error importing pipeline: %w", err)
+	}
+	subPipelineCfg, err := config.Parse(data)
+	if err != nil {
+		return nil, fmt.Errorf("error parsing pipeline: %w", err)
+	}
+
+	pipelineVars := make(map[string][]byte)
+	for i, pipelineVar := range pipeline.cfg.Vars {
+		if pipelineVar.Name == "" {
+			return nil, fmt.Errorf("vars[%d]: pipeline variable name cannot be empty", i)
+		}
+		ref, err := pipeline.refStore.GetReference(pipeline.dir, pipelineVar.Value)
+		if err != nil {
+			return nil, fmt.Errorf("variable %q: error getting pipeline variable reference: %w", pipelineVar.Name, err)
+		}
+		varName := pipelineVar.Name
+		pipelineVars[varName] = ref
+	}
+
+	newStore := reference.NewStore(pipelineVars)
+	subPipeline := NewPipeline(path.Dir(pipeline.cfg.Path), subPipelineCfg.PipelineGenerator, newStore)
+	return subPipeline.Generate(ctx)
 }
 
 func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) ([]byte, error) {
@@ -87,9 +135,9 @@ func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, G
 	case generatorCfg.GoTemplate != nil:
 		name = "gotemplate"
 		gen = NewGoTemplate(pipeline.dir, *generatorCfg.GoTemplate, pipeline.refStore)
-	case generatorCfg.Import != nil:
-		name = "import"
-		gen = NewImport(pipeline.dir, *generatorCfg.Import, pipeline.refStore)
+	case generatorCfg.Pipeline != nil:
+		name = "pipeline"
+		gen = NewPipeline(pipeline.dir, *generatorCfg.Pipeline, pipeline.refStore)
 	case generatorCfg.JQ != nil:
 		name = "jq"
 		gen = NewJQ(pipeline.dir, *generatorCfg.JQ, pipeline.refStore)
