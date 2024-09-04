@@ -7,7 +7,9 @@ TEST_FLAGS ?=
 TEST_PACKAGES ?= ./...
 VERSION ?= $(shell git describe --tags --always)
 
-all: yfg
+default: yfg
+
+all: check test yfg
 
 .PHONY: yfg
 yfg: schema
@@ -19,6 +21,10 @@ schema:
 .PHONY: test
 test:
 	$(GO) test $(TEST_FLAGS) $(TEST_PACKAGES)
+
+.PHONY: check
+check:
+	golangci-lint run
 
 .PHONY: image
 image:
