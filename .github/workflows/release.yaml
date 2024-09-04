@@ -1,0 +1,34 @@
+name: Create a release
+
+on:
+  push:
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.7
+      - name: Generate artifacts
+        run: make release
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.1.4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: true
+          prerelease: false
+      - name: Upload artifacts
+        id: upload-release-artifacts
+        uses: skx/github-action-publish-binaries@44887b225ceca96efd8a912d39c09ad70312af31
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          releaseId: ${{ steps.create_release.outputs.id }}
+          args: 'yfg-*'
