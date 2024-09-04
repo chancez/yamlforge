@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
@@ -45,12 +46,15 @@ var generateCmd = &cobra.Command{
 			return err
 		}
 
-		fmt.Println(string(result))
+		_, err = io.WriteString(cmd.OutOrStdout(), string(result))
+		if err != nil {
+			return fmt.Errorf("error writing output: %w", err)
+		}
 		return nil
 	},
 }
 
 func init() {
 	generateCmd.Flags().StringToStringVar(&genFlags.vars, "vars", nil, "Provide vars to the pipeline")
-	rootCmd.AddCommand(generateCmd)
+	RootCmd.AddCommand(generateCmd)
 }

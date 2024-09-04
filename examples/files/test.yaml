@@ -4,4 +4,3 @@ foo:
     some value
   another_key: |
     {{ .SomeValue }}
-

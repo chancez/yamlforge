@@ -3,13 +3,21 @@ GO_LINKER_FLAGS ?=
 GO_BUILD_FLAGS ?=
 IMAGE_TAG := main
 DOCKER_FLAGS ?=
+TEST_FLAGS ?=
+TEST_PACKAGES ?= ./...
 
 all: yfg
 
 .PHONY: yfg
-yfg:
-	$(GO) run tools/gen-jsonschema/main.go pkg/config/schema/schema.json
+yfg: schema
 	$(GO) build --ldflags='$(GO_LINKER_FLAGS)' $(GO_BUILD_FLAGS) -o yfg .
+
+schema:
+	$(GO) run tools/gen-jsonschema/main.go pkg/config/schema/schema.json
+
+.PHONY: test
+test:
+	$(GO) test $(TEST_FLAGS) $(TEST_PACKAGES)
 
 .PHONY: image
 image:

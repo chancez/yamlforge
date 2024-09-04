@@ -26,5 +26,5 @@ var jsonSchemaCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(jsonSchemaCmd)
+	RootCmd.AddCommand(jsonSchemaCmd)
 }

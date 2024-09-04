@@ -151,7 +151,7 @@ Examples:
 }
 
 func init() {
-	rootCmd.AddCommand(explainCmd)
+	RootCmd.AddCommand(explainCmd)
 }
 
 func schemaTypeString(schema *jsonschema.Schema) string {
