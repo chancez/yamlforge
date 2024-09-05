@@ -200,6 +200,9 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "template"
+      ],
       "description": "GoTemplateGenerator renders Go 'text/template' templates and returns the output."
     },
     "HelmGenerator": {

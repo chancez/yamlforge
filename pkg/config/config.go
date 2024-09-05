@@ -83,7 +83,7 @@ type MergeGenerator struct {
 // GoTemplateGenerator renders Go 'text/template' templates and returns the output.
 type GoTemplateGenerator struct {
 	// Template is the template to render.
-	Template *Value `yaml:"template,omitempty" json:"template,omitempty"`
+	Template Value `yaml:"template" json:"template"`
 	// Vars are input variables to the template.
 	Vars map[string]any `yaml:"vars,omitempty" json:"vars,omitempty"`
 	// RefVars are input variables to the template allowing references to other generator outputs or files.
@@ -95,7 +95,7 @@ type ImportGenerator struct {
 	// Path is the path to the manifest to import.
 	Path string `yaml:"path" json:"path"`
 	// Vars defines variables that the imported pipeline expects.
-	Vars []*NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
+	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
 // NamedVariable is named Value that can be referenced by imported pipelines using the var attribute of a value.
@@ -139,11 +139,11 @@ type PipelineGenerator struct {
 // Value provides inputs to generators.
 type Value struct {
 	// Var allows defining variables that can be externally provided to a pipeline.
-	Var *string `yaml:"var,omitempty" json:"var,omitempty" jsonschema:"oneof_required=var"`
+	Var string `yaml:"var,omitempty" json:"var,omitempty" jsonschema:"oneof_required=var"`
 	// Ref takes the name of a previous stage in the pipeline and returns the output of that stage.
-	Ref *string `yaml:"ref,omitempty" json:"ref,omitempty" jsonschema:"oneof_required=ref"`
+	Ref string `yaml:"ref,omitempty" json:"ref,omitempty" jsonschema:"oneof_required=ref"`
 	// File takes a path relative to this pipeline file to read and returns the content of the file specified.
-	File *string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
+	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object).
-	Value *any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
 }

@@ -38,30 +38,30 @@ func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
 }
 func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 	switch {
-	case ref.Var != nil:
-		varName := *ref.Var
+	case ref.Var != "":
+		varName := ref.Var
 		res, ok := store.vars[varName]
 		if !ok {
 			return nil, fmt.Errorf("could not find variable %q", varName)
 		}
 		return []byte(res), nil
-	case ref.Ref != nil:
-		refName := *ref.Ref
+	case ref.Ref != "":
+		refName := ref.Ref
 		res, ok := store.references[refName]
 		if !ok {
 			return nil, fmt.Errorf("could not find reference %q", refName)
 		}
 		return res, nil
-	case ref.File != nil:
-		return os.ReadFile(path.Join(dir, *ref.File))
+	case ref.File != "":
+		return os.ReadFile(path.Join(dir, ref.File))
 	case ref.Value != nil:
-		switch val := (*ref.Value).(type) {
+		switch val := (ref.Value).(type) {
 		case string:
 			return []byte(val), nil
 		case []byte:
 			return val, nil
 		}
-		return yaml.Marshal(*ref.Value)
+		return yaml.Marshal(ref.Value)
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
