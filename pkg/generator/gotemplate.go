@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
 	"gopkg.in/yaml.v3"
@@ -39,7 +40,7 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 		return nil, errors.New("template is required")
 	}
 	var buf bytes.Buffer
-	tpl := template.New("go-template-generator")
+	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap())
 	refValue, err := gt.refStore.GetReference(gt.dir, *gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
