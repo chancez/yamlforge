@@ -1,0 +1,82 @@
+pipeline:
+- name: fetch-ami-id
+  exec:
+    command: /bin/bash
+    args:
+      - -c
+      - |
+          aws ssm get-parameter --name /aws/service/eks/optimized-ami/1.30/amazon-linux-2/recommended --output json --query 'Parameter.Value'
+
+- name: extract-ami-id
+  jq:
+    input:
+      ref: fetch-ami-id
+    expr: '. | fromjson | .image_id'
+
+- name: karpenter-values
+  gotemplate:
+    refVars:
+      eks:
+        file: files/eks-vars.yaml
+    template:
+      value:
+        serviceAccount:
+          annotations:
+            eks.amazonaws.com/role-arn: "{{ .eks.roleARN }}"
+        settings:
+          clusterName: "{{ .eks.clusterName }}"
+          clusterEndpoint: "{{ .eks.clusterEndpoint }}"
+          interruptionQueue: "{{ .eks.clusterName }}"
+
+- name: helm
+  helm:
+    chart: oci://public.ecr.aws/karpenter/karpenter
+    version: 1.0.0
+    releaseName: karpenter
+    namespace: karpenter
+    values:
+      - ref: karpenter-values
+
+- name: karpenter-node-pool
+  gotemplate:
+    refVars:
+      eks:
+        file: files/eks-vars.yaml
+      amiID:
+        ref: extract-ami-id
+    template:
+      value: |
+        apiVersion: karpenter.sh/v1
+        kind: NodePool
+        metadata:
+          name: default
+        spec:
+          template:
+            spec:
+              nodeClassRef:
+                group: karpenter.k8s.aws
+                kind: EC2NodeClass
+                name: default
+        ---
+        apiVersion: karpenter.k8s.aws/v1
+        kind: EC2NodeClass
+        metadata:
+          name: default
+        spec:
+          role: "{{ .eks.nodeClassRole }}"
+          amiSelectorTerms:
+            - id: "{{ .amiID }}"
+          securityGroupSelectorTerms:
+            - tags:
+                karpenter.sh/discovery: "{{ .eks.clusterName }}"
+          subnetSelectorTerms:
+            - tags:
+                karpenter.sh/discovery: "{{ .eks.clusterName }}"
+          tags:
+            managed-by: karpenter
+
+- name: output
+  yaml:
+    input:
+      - ref: helm
+      - ref: karpenter-node-pool

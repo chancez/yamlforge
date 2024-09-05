@@ -1,3 +1,4 @@
-clusterName: "my-eks-cluster"
-roleARN: "karpenter-role"
+clusterName: my-eks-cluster
+roleARN: arn:aws:iam::123456789:role/karpenter-controller-my-eks-cluster
 clusterEndpoint: https://1234567890ABCDEF1234567890ABCDEF.xx0.region.eks.amazonaws.com
+nodeClassRole: karpenter-node-my-eks-cluster
