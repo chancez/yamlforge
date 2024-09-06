@@ -36,6 +36,9 @@ func NewYAML(dir string, cfg config.YAMLGenerator, refStore *reference.Store) *Y
 func (y *YAML) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := yaml.NewEncoder(&out)
+	if y.cfg.Indent != 0 {
+		enc.SetIndent(y.cfg.Indent)
+	}
 	for _, input := range y.cfg.Input {
 		ref, err := y.refStore.GetReference(y.dir, input)
 		if err != nil {

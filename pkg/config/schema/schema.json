@@ -362,6 +362,10 @@
           },
           "type": "array",
           "description": "Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned."
+        },
+        "indent": {
+          "type": "integer",
+          "description": "Indent defines the indent level to use for the output."
         }
       },
       "additionalProperties": false,
@@ -590,6 +594,10 @@
           },
           "type": "array",
           "description": "Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned."
+        },
+        "indent": {
+          "type": "integer",
+          "description": "Indent defines the indent level to use for the output."
         }
       },
       "additionalProperties": false,

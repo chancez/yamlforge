@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
@@ -37,6 +38,9 @@ func NewJSON(dir string, cfg config.JSONGenerator, refStore *reference.Store) *J
 func (j *JSON) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
+	if j.cfg.Indent != 0 {
+		enc.SetIndent("", strings.Repeat(" ", j.cfg.Indent))
+	}
 	for _, input := range j.cfg.Input {
 		ref, err := j.refStore.GetReference(j.dir, input)
 		if err != nil {

@@ -135,12 +135,16 @@ type CELFilterGenerator struct {
 type YAMLGenerator struct {
 	// Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned.
 	Input []Value `yaml:"input" json:"input"`
+	// Indent defines the indent level to use for the output.
+	Indent int `yaml:"indent,omitempty" json:"indent,omitempty"`
 }
 
 // JSONGenerator returns it's inputs as JSON.
 type JSONGenerator struct {
 	// Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned.
 	Input []Value `yaml:"input" json:"input"`
+	// Indent defines the indent level to use for the output.
+	Indent int `yaml:"indent,omitempty" json:"indent,omitempty"`
 }
 
 // PipelineGenerator executes other generators in a pipeline or singular context.
