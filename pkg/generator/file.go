@@ -7,16 +7,9 @@ import (
 	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*File)(nil)
-
-func init() {
-	Register("file", config.FileGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
-		return NewFile(dir, cfg.(config.FileGenerator))
-	})
-}
 
 type File struct {
 	// Path lookups are relative to the dir specified.

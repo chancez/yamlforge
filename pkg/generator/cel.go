@@ -21,12 +21,6 @@ var (
 	goBoolType = reflect.TypeOf(false)
 )
 
-func init() {
-	Register("celfilter", config.CELFilterGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
-		return NewCELFilter(dir, cfg.(config.CELFilterGenerator), refStore)
-	})
-}
-
 type CELFilter struct {
 	dir      string
 	cfg      config.CELFilterGenerator

@@ -14,12 +14,6 @@ import (
 
 var _ Generator = (*Kustomize)(nil)
 
-func init() {
-	Register("kustomize", config.KustomizeGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
-		return NewKustomize(dir, cfg.(config.KustomizeGenerator), refStore)
-	})
-}
-
 type Kustomize struct {
 	dir      string
 	cfg      config.KustomizeGenerator

@@ -7,16 +7,9 @@ import (
 	"os/exec"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Exec)(nil)
-
-func init() {
-	Register("exec", config.ExecGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
-		return NewExec(dir, cfg.(config.ExecGenerator))
-	})
-}
 
 type Exec struct {
 	dir string

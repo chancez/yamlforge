@@ -14,12 +14,6 @@ import (
 
 var _ Generator = (*GoTemplate)(nil)
 
-func init() {
-	Register("gotemplate", config.GoTemplateGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
-		return NewGoTemplate(dir, cfg.(config.GoTemplateGenerator), refStore)
-	})
-}
-
 type GoTemplate struct {
 	dir      string
 	cfg      config.GoTemplateGenerator

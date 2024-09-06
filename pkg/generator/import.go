@@ -12,12 +12,6 @@ import (
 
 var _ Generator = (*Import)(nil)
 
-func init() {
-	Register("import", config.ImportGenerator{}, func(dir string, cfg any, refStore *reference.Store) Generator {
-		return NewImport(dir, cfg.(config.ImportGenerator), refStore)
-	})
-}
-
 type Import struct {
 	// Path lookups are relative to the dir specified.
 	dir      string
