@@ -30,15 +30,26 @@ func Parse(data []byte) (Config, error) {
 		return Config{}, errors.New("cannot set both 'pipeline' and 'generator' options")
 	}
 
-	stagePositions := make(map[string]int)
-	for pos, stage := range cfg.Pipeline {
-		if stage.Name == "" {
-			return Config{}, fmt.Errorf("error parsing: pipeline[%d], stage is missing a name", pos)
+	if cfg.Generator != nil {
+		err := validateGenerators(*cfg.Generator)
+		if err != nil {
+			return Config{}, fmt.Errorf("error parsing: %w", err)
 		}
-		if existingPos, exists := stagePositions[stage.Name]; exists {
-			return Config{}, fmt.Errorf("error parsing: pipeline[%d], stage %q already exists at pipeline[%d]", pos, stage.Name, existingPos)
+	}
+
+	generatorPositions := make(map[string]int)
+	for pos, gen := range cfg.Pipeline {
+		if gen.Name == "" {
+			return Config{}, fmt.Errorf("error parsing: pipeline[%d], generator is missing a name", pos)
 		}
-		stagePositions[stage.Name] = pos
+		if existingPos, exists := generatorPositions[gen.Name]; exists {
+			return Config{}, fmt.Errorf("error parsing: pipeline[%d], generator %q already exists at pipeline[%d]", pos, gen.Name, existingPos)
+		}
+		err := validateGenerators(gen)
+		if err != nil {
+			return Config{}, fmt.Errorf("error parsing: pipeline[%d] %s: %w", pos, gen.Name, err)
+		}
+		generatorPositions[gen.Name] = pos
 	}
 
 	return cfg, nil
