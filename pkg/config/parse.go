@@ -57,44 +57,43 @@ func Parse(data []byte) (Config, error) {
 
 func validateGenerators(generatorCfg Generator) error {
 	count := 0
-	switch {
-	case generatorCfg.File != nil:
+	if generatorCfg.File != nil {
 		count++
-		fallthrough
-	case generatorCfg.Exec != nil:
+	}
+	if generatorCfg.Exec != nil {
 		count++
-		fallthrough
-	case generatorCfg.Helm != nil:
+	}
+	if generatorCfg.Helm != nil {
 		count++
-		fallthrough
-	case generatorCfg.Kustomize != nil:
+	}
+	if generatorCfg.Kustomize != nil {
 		count++
-		fallthrough
-	case generatorCfg.Merge != nil:
+	}
+	if generatorCfg.Merge != nil {
 		count++
-		fallthrough
-	case generatorCfg.GoTemplate != nil:
+	}
+	if generatorCfg.GoTemplate != nil {
 		count++
-		fallthrough
-	case generatorCfg.Import != nil:
+	}
+	if generatorCfg.Import != nil {
 		count++
-		fallthrough
-	case generatorCfg.JQ != nil:
+	}
+	if generatorCfg.JQ != nil {
 		count++
-		fallthrough
-	case generatorCfg.CELFilter != nil:
+	}
+	if generatorCfg.CELFilter != nil {
 		count++
-		fallthrough
-	case generatorCfg.YAML != nil:
+	}
+	if generatorCfg.YAML != nil {
 		count++
-		fallthrough
-	case generatorCfg.JSON != nil:
+	}
+	if generatorCfg.JSON != nil {
 		count++
 	}
 	if count == 0 {
 		return fmt.Errorf("generator not configured")
 	}
-	if count > 0 {
+	if count > 1 {
 		return fmt.Errorf("invalid configuration, cannot specify multiple generators in the same generator config")
 	}
 	return nil
