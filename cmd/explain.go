@@ -56,7 +56,7 @@ Examples:
 			for _, field := range fields {
 				foundField := false
 				for pair := fieldSchema.Properties.Oldest(); pair != nil; pair = pair.Next() {
-					if strings.ToLower(pair.Key) != field {
+					if !strings.EqualFold(pair.Key, field) {
 						continue
 					}
 
