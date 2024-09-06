@@ -58,6 +58,8 @@ type HelmGenerator struct {
 	Repo string `yaml:"repo,omitempty" json:"repo,omitempty"`
 	// Namespace is the Kubernetes namespace to use when rendering resources.
 	Namespace string `yaml:"namespace,omitempty" json:"namespace,omitempty"`
+	// IncludeCRDs specifies if CRDs are included in the templated output
+	IncludeCRDs bool `yaml:"includeCRDs,omitempty" json:"includeCRDs,omitempty"`
 	// APIVersions are Kubernetes api versions used for Capabilities.APIVersions.
 	APIVersions []string `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
 	// Values are the Helm values used as configuration for the Helm chart.

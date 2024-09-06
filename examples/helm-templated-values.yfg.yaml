@@ -20,5 +20,6 @@ pipeline:
     version: 1.0.0
     releaseName: karpenter
     namespace: karpenter
+    includeCRDs: true
     values:
       - ref: karpenter-values

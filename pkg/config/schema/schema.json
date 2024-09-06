@@ -116,6 +116,12 @@
         },
         {
           "required": [
+            "celFilter"
+          ],
+          "title": "celFilter"
+        },
+        {
+          "required": [
             "yaml"
           ],
           "title": "yaml"
@@ -226,6 +232,10 @@
         "namespace": {
           "type": "string",
           "description": "Namespace is the Kubernetes namespace to use when rendering resources."
+        },
+        "includeCRDs": {
+          "type": "boolean",
+          "description": "IncludeCRDs specifies if CRDs are included in the templated output"
         },
         "apiVersions": {
           "items": {

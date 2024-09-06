@@ -50,6 +50,9 @@ func (h *Helm) Generate(context.Context) ([]byte, error) {
 	if h.cfg.Namespace != "" {
 		templateArgs = append(templateArgs, "--namespace", h.cfg.Namespace)
 	}
+	if h.cfg.IncludeCRDs {
+		templateArgs = append(templateArgs, "--include-crds")
+	}
 	if len(h.cfg.APIVersions) != 0 {
 		for _, apiVersion := range h.cfg.APIVersions {
 			templateArgs = append(templateArgs, "--api-versions", apiVersion)
