@@ -27,27 +27,27 @@ func Parse(data []byte) (Config, error) {
 	}
 
 	if cfg.Generator != nil && len(cfg.Pipeline) != 0 {
-		return Config{}, errors.New("cannot set both 'pipeline' and 'generator' options")
+		return Config{}, errors.New("validation error: cannot set both 'pipeline' and 'generator' options")
 	}
 
 	if cfg.Generator != nil {
 		err := validateGenerators(*cfg.Generator)
 		if err != nil {
-			return Config{}, fmt.Errorf("error parsing: %w", err)
+			return Config{}, fmt.Errorf("validation error: %w", err)
 		}
 	}
 
 	generatorPositions := make(map[string]int)
 	for pos, gen := range cfg.Pipeline {
 		if gen.Name == "" {
-			return Config{}, fmt.Errorf("error parsing: pipeline[%d], generator is missing a name", pos)
+			return Config{}, fmt.Errorf("validation error: pipeline[%d], generator is missing a name", pos)
 		}
 		if existingPos, exists := generatorPositions[gen.Name]; exists {
-			return Config{}, fmt.Errorf("error parsing: pipeline[%d], generator %q already exists at pipeline[%d]", pos, gen.Name, existingPos)
+			return Config{}, fmt.Errorf("validation error: pipeline[%d], generator %q already exists at pipeline[%d]", pos, gen.Name, existingPos)
 		}
 		err := validateGenerators(gen)
 		if err != nil {
-			return Config{}, fmt.Errorf("error parsing: pipeline[%d] %s: %w", pos, gen.Name, err)
+			return Config{}, fmt.Errorf("validation error: pipeline[%d] %s: %w", pos, gen.Name, err)
 		}
 		generatorPositions[gen.Name] = pos
 	}
