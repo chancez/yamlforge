@@ -26,6 +26,8 @@ type Generator struct {
 	Import *ImportGenerator `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
 	// JQ is a generator which executes 'jq' and returns the output.
 	JQ *JQGenerator `yaml:"jq,omitempty" json:"jq,omitempty" jsonschema:"oneof_required=jq"`
+	// CELFilter is a generator which filters results using a CEL expression and returns the unfilted results.
+	CELFilter *CELFilterGenerator `yaml:"celFilter,omitempty" json:"celFilter,omitempty" jsonschema:"oneof_required=celFilter"`
 	// YAML is a generator which returns it's inputs as YAML.
 	YAML *YAMLGenerator `yaml:"yaml,omitempty" json:"yaml,omitempty" jsonschema:"oneof_required=yaml"`
 	// JSON is a generator which returns it's inputs as JSON.
@@ -118,6 +120,17 @@ type JQGenerator struct {
 	Slurp bool `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
+// CELFilterGenerator evaluates a CEL expression and returns a filtered result from it's inputs
+type CELFilterGenerator struct {
+	// Input values are parsed then filtered using the configure CEL expression.
+	Input ParsedValue `yaml:"input" json:"input"`
+	// Expr is a CEL expression evaluated with the input set to the variable 'val'.
+	// If it returns true, the object is returned by the generator.
+	Expr string `yaml:"expr" json:"expr"`
+	// If Discard is true, instead of keeping the result, it will be discarded.
+	Discard bool `yaml:"discard,omitempty" json:"discard,omitempty"`
+}
+
 // YAMLGenerator returns it's inputs as YAML.
 type YAMLGenerator struct {
 	// Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned.
@@ -148,4 +161,11 @@ type Value struct {
 	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object).
 	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+}
+
+// ParsedValue provides parsed values to generators.
+type ParsedValue struct {
+	// Format defines the format to parse the retrieved value as. Valid options are yaml or json.
+	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json"`
+	Value  `yaml:",inline" json:",inline"`
 }
