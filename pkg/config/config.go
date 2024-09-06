@@ -37,13 +37,13 @@ type Generator struct {
 // FileGenerator reads files at the specified path and returns their output.
 type FileGenerator struct {
 	// Path is the path relative to this pipeline file to read.
-	Path string `yaml:"path,omitempty" json:"path,omitempty"`
+	Path string `yaml:"path" json:"path"`
 }
 
 // ExecGenerator execs the command specified and returns the stdout of the program.
 type ExecGenerator struct {
 	// Command is the command to execute.
-	Command string `yaml:"command,omitempty" json:"command,omitempty"`
+	Command string `yaml:"command" json:"command"`
 	// Args are the arguments to the command.
 	Args []string `yaml:"args,omitempty" json:"args,omitempty"`
 }
@@ -51,9 +51,9 @@ type ExecGenerator struct {
 // HelmGenerator runs 'helm template' to render a Helm chart and returns the output.
 type HelmGenerator struct {
 	// ReleaseName is the release name.
-	ReleaseName string `yaml:"releaseName,omitempty" json:"releaseName"`
+	ReleaseName string `yaml:"releaseName" json:"releaseName"`
 	// Chart is the Helm chart to install. Prefix with oci:// to use a chart stored in an OCI registry.
-	Chart string `yaml:"chart,omitempty" json:"chart"`
+	Chart string `yaml:"chart" json:"chart"`
 	// Version is the version of the helm chart to install.
 	Version string `yaml:"version,omitempty" json:"version,omitempty"`
 	// Repo is the repository to install the Helm chart from.
@@ -81,7 +81,7 @@ type KustomizeGenerator struct {
 // MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output.
 type MergeGenerator struct {
 	// Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs.
-	Input []Value `yaml:"input,omitempty" json:"input,omitempty"`
+	Input []Value `yaml:"input" json:"input"`
 }
 
 // GoTemplateGenerator renders Go 'text/template' templates and returns the output.
@@ -104,7 +104,7 @@ type ImportGenerator struct {
 
 // NamedVariable is named Value that can be referenced by imported pipelines using the var attribute of a value.
 type NamedVariable struct {
-	Name  string `yaml:"name,omitempty" json:"name"`
+	Name  string `yaml:"name" json:"name"`
 	Value `yaml:",inline" json:",inline"`
 }
 
@@ -134,13 +134,13 @@ type CELFilterGenerator struct {
 // YAMLGenerator returns it's inputs as YAML.
 type YAMLGenerator struct {
 	// Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned.
-	Input []Value `yaml:"input,omitempty" json:"input"`
+	Input []Value `yaml:"input" json:"input"`
 }
 
 // JSONGenerator returns it's inputs as JSON.
 type JSONGenerator struct {
 	// Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned.
-	Input []Value `yaml:"input,omitempty" json:"input"`
+	Input []Value `yaml:"input" json:"input"`
 }
 
 // PipelineGenerator executes other generators in a pipeline or singular context.

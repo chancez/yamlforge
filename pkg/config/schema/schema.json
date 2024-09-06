@@ -74,6 +74,9 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "command"
+      ],
       "description": "ExecGenerator execs the command specified and returns the stdout of the program."
     },
     "FileGenerator": {
@@ -85,6 +88,9 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "path"
+      ],
       "description": "FileGenerator reads files at the specified path and returns their output."
     },
     "Generator": {
@@ -410,6 +416,9 @@
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "input"
+      ],
       "description": "MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output."
     },
     "NamedVariable": {
