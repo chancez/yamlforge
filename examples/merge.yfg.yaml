@@ -1,15 +1,17 @@
 pipeline:
-- name: simple-exec
-  exec:
-    command: '/bin/bash'
-    args: ['-c', 'echo {"foo": {"bar": "asdf hjkl"}}']
-
-- name: simple-file
+- name: service
   file:
-    path: files/test.yaml
+    path: files/service.yaml
+
+- name: k8s-namespace
+  yaml:
+    input:
+      - value:
+          metadata:
+            namespace: example
 
 - name: merged
   merge:
     input:
-      - ref: simple-file
-      - ref: simple-exec
+      - ref: service
+      - ref: k8s-namespace

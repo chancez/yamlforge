@@ -52,12 +52,23 @@ MyApp
 		{
 			file: "merge.yfg.yaml",
 			expected: trim(`
-foo:
-    another_key: |
-        {{ .SomeValue }}
-    bar: asdf hjkl
-    key: |
-        some value
+apiVersion: v1
+kind: Service
+metadata:
+    name: my-service
+    namespace: example
+spec:
+    ports:
+        - name: grpc
+          port: 80
+          protocol: TCP
+          targetPort: 9376
+        - name: metrics
+          port: 9999
+          protocol: TCP
+          targetPort: 9999
+    selector:
+        app.kubernetes.io/name: MyApp
 `),
 		},
 		{
