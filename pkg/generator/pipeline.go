@@ -106,64 +106,64 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 }
 
 func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) ([]byte, error) {
-	name, gen, err := pipeline.getGenerator(generatorCfg)
+	kind, gen, err := pipeline.getGenerator(generatorCfg)
 	if err != nil {
 		return nil, fmt.Errorf("error getting generator: %w", err)
 	}
 	result, err := gen.Generate(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("error executing %q generator: %w", name, err)
+		return nil, fmt.Errorf("error executing %q generator: %w", kind, err)
 	}
 	if pipeline.debug {
-		fmt.Printf("[DEBUG]:\n%s\n", string(result))
+		fmt.Printf("[DEBUG (generator: %q) - name: %q]:\n%s\n\n", kind, generatorCfg.Name, string(result))
 	}
 	return result, nil
 }
 
 func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, Generator, error) {
 	var (
-		name string
+		kind string
 		gen  Generator
 	)
 	switch {
 	case generatorCfg.File != nil:
-		name = "file"
+		kind = "file"
 		gen = NewFile(pipeline.dir, *generatorCfg.File)
 	case generatorCfg.Value != nil:
-		name = "value"
+		kind = "value"
 		gen = NewValue(pipeline.dir, *generatorCfg.Value, pipeline.refStore)
 	case generatorCfg.Exec != nil:
-		name = "exec"
+		kind = "exec"
 		gen = NewExec(pipeline.dir, *generatorCfg.Exec)
 	case generatorCfg.Helm != nil:
-		name = "helm"
+		kind = "helm"
 		gen = NewHelm(pipeline.dir, *generatorCfg.Helm, pipeline.refStore)
 	case generatorCfg.Kustomize != nil:
-		name = "kustomize"
+		kind = "kustomize"
 		gen = NewKustomize(pipeline.dir, *generatorCfg.Kustomize, pipeline.refStore)
 	case generatorCfg.Merge != nil:
-		name = "merge"
+		kind = "merge"
 		gen = NewMerge(pipeline.dir, *generatorCfg.Merge, pipeline.refStore)
 	case generatorCfg.GoTemplate != nil:
-		name = "gotemplate"
+		kind = "gotemplate"
 		gen = NewGoTemplate(pipeline.dir, *generatorCfg.GoTemplate, pipeline.refStore)
 	case generatorCfg.Pipeline != nil:
-		name = "pipeline"
+		kind = "pipeline"
 		gen = NewPipeline(pipeline.dir, *generatorCfg.Pipeline, pipeline.refStore, pipeline.debug)
 	case generatorCfg.JQ != nil:
-		name = "jq"
+		kind = "jq"
 		gen = NewJQ(pipeline.dir, *generatorCfg.JQ, pipeline.refStore)
 	case generatorCfg.CELFilter != nil:
-		name = "celfilter"
+		kind = "celfilter"
 		gen = NewCELFilter(pipeline.dir, *generatorCfg.CELFilter, pipeline.refStore)
 	case generatorCfg.YAML != nil:
-		name = "yaml"
+		kind = "yaml"
 		gen = NewYAML(pipeline.dir, *generatorCfg.YAML, pipeline.refStore)
 	case generatorCfg.JSON != nil:
-		name = "json"
+		kind = "json"
 		gen = NewJSON(pipeline.dir, *generatorCfg.JSON, pipeline.refStore)
 	default:
 		return "", nil, fmt.Errorf("generator not configured")
 	}
-	return name, gen, nil
+	return kind, gen, nil
 }
