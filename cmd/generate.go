@@ -14,7 +14,8 @@ import (
 )
 
 type GenerateFlags struct {
-	vars map[string]string
+	vars  map[string]string
+	debug bool
 }
 
 var genFlags GenerateFlags
@@ -39,7 +40,7 @@ var generateCmd = &cobra.Command{
 		}
 
 		refStore := reference.NewStore(vars)
-		state := generator.NewPipeline(path.Dir(forgeFile), cfg.PipelineGenerator, refStore)
+		state := generator.NewPipeline(path.Dir(forgeFile), cfg.PipelineGenerator, refStore, genFlags.debug)
 		result, err := state.Generate(cmd.Context())
 		if err != nil {
 			return err
@@ -55,5 +56,6 @@ var generateCmd = &cobra.Command{
 
 func init() {
 	generateCmd.Flags().StringToStringVar(&genFlags.vars, "vars", nil, "Provide vars to the pipeline")
+	generateCmd.Flags().BoolVar(&genFlags.debug, "debug", false, "If true, log each stage as it executes")
 	RootCmd.AddCommand(generateCmd)
 }

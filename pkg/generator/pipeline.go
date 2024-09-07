@@ -17,13 +17,15 @@ type Pipeline struct {
 	dir      string
 	cfg      config.PipelineGenerator
 	refStore *reference.Store
+	debug    bool
 }
 
-func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *reference.Store) *Pipeline {
+func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *reference.Store, debug bool) *Pipeline {
 	return &Pipeline{
 		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
+		debug:    debug,
 	}
 }
 
@@ -99,7 +101,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 	}
 
 	newStore := reference.NewStore(pipelineVars)
-	subPipeline := NewPipeline(dir, subPipelineCfg.PipelineGenerator, newStore)
+	subPipeline := NewPipeline(dir, subPipelineCfg.PipelineGenerator, newStore, pipeline.debug)
 	return subPipeline.Generate(ctx)
 }
 
@@ -111,6 +113,9 @@ func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg con
 	result, err := gen.Generate(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error executing %q generator: %w", name, err)
+	}
+	if pipeline.debug {
+		fmt.Printf("[DEBUG]:\n%s\n", string(result))
 	}
 	return result, nil
 }
@@ -141,7 +146,7 @@ func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, G
 		gen = NewGoTemplate(pipeline.dir, *generatorCfg.GoTemplate, pipeline.refStore)
 	case generatorCfg.Pipeline != nil:
 		name = "pipeline"
-		gen = NewPipeline(pipeline.dir, *generatorCfg.Pipeline, pipeline.refStore)
+		gen = NewPipeline(pipeline.dir, *generatorCfg.Pipeline, pipeline.refStore, pipeline.debug)
 	case generatorCfg.JQ != nil:
 		name = "jq"
 		gen = NewJQ(pipeline.dir, *generatorCfg.JQ, pipeline.refStore)
