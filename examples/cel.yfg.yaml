@@ -3,6 +3,6 @@ pipeline:
   cel:
     input:
       format: yaml
-      file: files/test.yaml
-    expr: 'val.foo.bar'
+      file: files/service.yaml
+    expr: 'val.spec.selector["app.kubernetes.io/name"]'
 
