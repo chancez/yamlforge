@@ -1,15 +1,15 @@
 pipeline:
-- name: simple-file
+- name: service
   file:
-    path: files/test.yaml
+    path: files/service.yaml
 # convert to JSON for JQ
 - name: json
   json:
     input:
-      - ref: simple-file
+      - ref: service
 - name: jq
   jq:
-    expr: '.foo'
+    expr: '{metricsPort: (.spec.ports[] | select(.name=="metrics") | .port)}'
     input:
       ref: json
 - name: yaml

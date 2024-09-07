@@ -40,11 +40,7 @@ foo:
 		{
 			file: "jq.yfg.yaml",
 			expected: trim(`
-another_key: |
-    {{ .SomeValue }}
-bar: baz
-key: |
-    some value
+metricsPort: 9999
 `),
 		},
 		{
