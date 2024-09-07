@@ -84,7 +84,7 @@ func validateGenerators(generatorCfg Generator) error {
 	if generatorCfg.JQ != nil {
 		count++
 	}
-	if generatorCfg.CELFilter != nil {
+	if generatorCfg.CEL != nil {
 		count++
 	}
 	if generatorCfg.YAML != nil {

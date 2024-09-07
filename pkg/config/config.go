@@ -28,8 +28,8 @@ type Generator struct {
 	Pipeline *PipelineGenerator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
 	// JQ is a generator which executes 'jq' and returns the output.
 	JQ *JQGenerator `yaml:"jq,omitempty" json:"jq,omitempty" jsonschema:"oneof_required=jq"`
-	// CELFilter is a generator which filters results using a CEL expression and returns the unfilted results.
-	CELFilter *CELFilterGenerator `yaml:"celFilter,omitempty" json:"celFilter,omitempty" jsonschema:"oneof_required=celFilter"`
+	// CEL is a generator which evaluates a CEL expression against the input.
+	CEL *CELGenerator `yaml:"cel,omitempty" json:"cel,omitempty" jsonschema:"oneof_required=cel"`
 	// YAML is a generator which returns it's inputs as YAML.
 	YAML *YAMLGenerator `yaml:"yaml,omitempty" json:"yaml,omitempty" jsonschema:"oneof_required=yaml"`
 	// JSON is a generator which returns it's inputs as JSON.
@@ -114,15 +114,16 @@ type JQGenerator struct {
 	Slurp bool `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
-// CELFilterGenerator evaluates a CEL expression and returns a filtered result from it's inputs
-type CELFilterGenerator struct {
-	// Input values are parsed then filtered using the configure CEL expression.
+// CELGenerator evaluates a CEL expression and returns the result of the expression.
+type CELGenerator struct {
+	// Input values are parsed then evaluated against the configure CEL expression.
 	Input ParsedValue `yaml:"input" json:"input"`
 	// Expr is a CEL expression evaluated with the input set to the variable 'val'.
-	// If it returns true, the object is returned by the generator.
 	Expr string `yaml:"expr" json:"expr"`
-	// If Discard is true, instead of keeping the result, it will be discarded.
-	Discard bool `yaml:"discard,omitempty" json:"discard,omitempty"`
+	// When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept.
+	Filter bool `yaml:"filter,omitempty" json:"filter,omitempty"`
+	// If Filter and InvertFilter is true, instead of keeping the result, it will be discarded.
+	InvertFilter bool `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
 }
 
 // YAMLGenerator returns it's inputs as YAML.

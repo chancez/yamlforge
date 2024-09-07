@@ -3,19 +3,23 @@
   "$id": "https://github.com/chancez/yamlforge/pkg/config/config",
   "$ref": "#/$defs/Config",
   "$defs": {
-    "CELFilterGenerator": {
+    "CELGenerator": {
       "properties": {
         "input": {
           "$ref": "#/$defs/ParsedValue",
-          "description": "Input values are parsed then filtered using the configure CEL expression."
+          "description": "Input values are parsed then evaluated against the configure CEL expression."
         },
         "expr": {
           "type": "string",
-          "description": "Expr is a CEL expression evaluated with the input set to the variable 'val'.\nIf it returns true, the object is returned by the generator."
+          "description": "Expr is a CEL expression evaluated with the input set to the variable 'val'."
         },
-        "discard": {
+        "filter": {
           "type": "boolean",
-          "description": "If Discard is true, instead of keeping the result, it will be discarded."
+          "description": "When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept."
+        },
+        "invertFilter": {
+          "type": "boolean",
+          "description": "If Filter and InvertFilter is true, instead of keeping the result, it will be discarded."
         }
       },
       "additionalProperties": false,
@@ -24,7 +28,7 @@
         "input",
         "expr"
       ],
-      "description": "CELFilterGenerator evaluates a CEL expression and returns a filtered result from it's inputs"
+      "description": "CELGenerator evaluates a CEL expression and returns the result of the expression."
     },
     "Config": {
       "oneOf": [
@@ -168,9 +172,9 @@
         },
         {
           "required": [
-            "celFilter"
+            "cel"
           ],
-          "title": "celFilter"
+          "title": "cel"
         },
         {
           "required": [
@@ -226,9 +230,9 @@
           "$ref": "#/$defs/JQGenerator",
           "description": "JQ is a generator which executes 'jq' and returns the output."
         },
-        "celFilter": {
-          "$ref": "#/$defs/CELFilterGenerator",
-          "description": "CELFilter is a generator which filters results using a CEL expression and returns the unfilted results."
+        "cel": {
+          "$ref": "#/$defs/CELGenerator",
+          "description": "CEL is a generator which evaluates a CEL expression against the input."
         },
         "yaml": {
           "$ref": "#/$defs/YAMLGenerator",

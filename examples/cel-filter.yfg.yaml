@@ -6,11 +6,12 @@ pipeline:
 
 # Only return the resources rendered by helm where kind is CustomResourceDefinition
 - name: filter
-  celFilter:
+  cel:
     input:
       ref: helm
       format: "yaml"
     expr: |
       // Need Check kind field exists, some empty YAML documents get output from helm template
       has(val.kind) && val.kind == "CustomResourceDefinition"
-    # discard: true
+    filter: true
+    # invertFilter: true

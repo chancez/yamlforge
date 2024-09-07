@@ -153,9 +153,9 @@ func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, G
 	case generatorCfg.JQ != nil:
 		kind = "jq"
 		gen = NewJQ(pipeline.dir, *generatorCfg.JQ, pipeline.refStore)
-	case generatorCfg.CELFilter != nil:
-		kind = "celfilter"
-		gen = NewCELFilter(pipeline.dir, *generatorCfg.CELFilter, pipeline.refStore)
+	case generatorCfg.CEL != nil:
+		kind = "cel"
+		gen = NewCEL(pipeline.dir, *generatorCfg.CEL, pipeline.refStore)
 	case generatorCfg.YAML != nil:
 		kind = "yaml"
 		gen = NewYAML(pipeline.dir, *generatorCfg.YAML, pipeline.refStore)

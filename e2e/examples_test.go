@@ -47,6 +47,12 @@ key: |
 `),
 		},
 		{
+			file: "cel.yfg.yaml",
+			expected: trim(`
+baz
+`),
+		},
+		{
 			file: "merge.yfg.yaml",
 			expected: trim(`
 foo:

@@ -1,0 +1,8 @@
+pipeline:
+- name: simple-cel-extractor
+  cel:
+    input:
+      format: yaml
+      file: files/test.yaml
+    expr: 'val.foo.bar'
+

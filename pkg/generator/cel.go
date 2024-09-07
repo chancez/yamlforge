@@ -15,20 +15,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var _ Generator = (*CELFilter)(nil)
+var _ Generator = (*CEL)(nil)
 
 var (
 	goBoolType = reflect.TypeOf(false)
 )
 
-type CELFilter struct {
+type CEL struct {
 	dir      string
-	cfg      config.CELFilterGenerator
+	cfg      config.CELGenerator
 	refStore *reference.Store
 }
 
-func NewCELFilter(dir string, cfg config.CELFilterGenerator, refStore *reference.Store) *CELFilter {
-	return &CELFilter{
+func NewCEL(dir string, cfg config.CELGenerator, refStore *reference.Store) *CEL {
+	return &CEL{
 		dir:      dir,
 		cfg:      cfg,
 		refStore: refStore,
@@ -43,7 +43,7 @@ type encoder interface {
 	Encode(any) error
 }
 
-func (c *CELFilter) Generate(ctx context.Context) ([]byte, error) {
+func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 	ref, err := c.refStore.GetReference(c.dir, c.cfg.Input.Value)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
@@ -80,7 +80,8 @@ func (c *CELFilter) Generate(ctx context.Context) ([]byte, error) {
 	if iss != nil && iss.Err() != nil {
 		return nil, fmt.Errorf("CEL type-check error: %s", iss.Err())
 	}
-	if checked.OutputType() != cel.BoolType {
+
+	if c.cfg.Filter && checked.OutputType() != cel.BoolType {
 		return nil, fmt.Errorf("CEL expression has invalid result type: got %q, wanted %q", checked.OutputType(), cel.BoolType)
 	}
 
@@ -106,17 +107,21 @@ func (c *CELFilter) Generate(ctx context.Context) ([]byte, error) {
 			return nil, fmt.Errorf("error evaluating CEL program: %s", err)
 		}
 
-		v, err := out.ConvertToNative(goBoolType)
-		if err != nil {
-			return nil, fmt.Errorf("error converting CEL result to boolean: %s", err)
-		}
-		matched := v.(bool)
+		toEncode := out.Value()
+		if c.cfg.Filter {
+			toEncode = val
+			v, err := out.ConvertToNative(goBoolType)
+			if err != nil {
+				return nil, fmt.Errorf("error converting CEL result to boolean: %s", err)
+			}
+			matched := v.(bool)
 
-		if matched == c.cfg.Discard {
-			continue
+			if matched == c.cfg.InvertFilter {
+				continue
+			}
 		}
 
-		err = enc.Encode(val)
+		err = enc.Encode(toEncode)
 		if err != nil {
 			return nil, fmt.Errorf("error encoding result at %s: %w", c.cfg.Input.Format, err)
 		}
