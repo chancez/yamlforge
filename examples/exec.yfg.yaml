@@ -1,12 +1,5 @@
 pipeline:
 - name: simple-exec
   exec:
-    command: '/bin/bash'
-    args: ['-c', 'echo {"foo": {"bar": "asdf hjkl"}}']
-
-# Render the result as YAML
-- name: output
-  yaml:
-    input:
-      - ref: simple-exec
-
+    command: 'sed'
+    args: ['-e', 's/listen.*;/listen 443 ssl;/', 'files/nginx.conf']

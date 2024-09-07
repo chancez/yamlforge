@@ -33,8 +33,13 @@ server {
 		{
 			file: "exec.yfg.yaml",
 			expected: trim(`
-foo:
-    bar: asdf hjkl
+server {
+    listen 443 ssl;
+    root /data/up1;
+
+    location / {
+    }
+}
 `),
 		},
 		{
