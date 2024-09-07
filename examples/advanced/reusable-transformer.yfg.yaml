@@ -2,25 +2,25 @@
 # The generator defined in transformers/add-field will add the new field based
 # on vars provided.
 pipeline:
-- name: simple-file
+- name: service
   file:
-    path: ../files/test.yaml
+    path: ../files/service.yaml
 
 # You can import other generators for re-use.
 - name: add-field
   pipeline:
     import:
-      file: ../transformers/add-field.yaml
+      file: ../transformers/add-annotation.yaml
     vars:
-      # We're passing the output of the simple-file stage as the
+      # We're passing the output of the -file stage as the
       # transformer-input var in the add-field transformer
       - name: input-object
-        ref: simple-file
+        ref: service
       # The add-field generator takes an input variable "field" as the field to
       # add
-      - name: field
-        value: "some-new-key"
+      - name: annotation
+        value: "service.beta.kubernetes.io/aws-load-balancer-type"
       # The add-field generator takes an input variable "value" as the value of
       # the field to add
       - name: value
-        value: "hello world"
+        value: "nlb"

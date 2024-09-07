@@ -101,13 +101,24 @@ key: value
 		{
 			file: "advanced/reusable-transformer.yfg.yaml",
 			expected: trim(`
-foo:
-    another_key: |
-        {{ .SomeValue }}
-    bar: baz
-    key: |
-        some value
-some-new-key: hello world
+apiVersion: v1
+kind: Service
+metadata:
+    annotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    name: my-service
+spec:
+    ports:
+        - name: grpc
+          port: 80
+          protocol: TCP
+          targetPort: 9376
+        - name: metrics
+          port: 9999
+          protocol: TCP
+          targetPort: 9999
+    selector:
+        app.kubernetes.io/name: MyApp
 `),
 		},
 	}

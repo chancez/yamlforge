@@ -1,20 +1,22 @@
 pipeline:
-# Create a new field using the gotemplate generator
-- name: new-field
+# Create a new annotation using the gotemplate generator
+- name: new-annotation
   gotemplate:
     # User defined inputs
     refVars:
-      field:
-        var: field
+      annotation:
+        var: annotation
       value:
         var: value
     template:
       value:
-        "{{ .field }}": "{{ .value }}"
-- name: add-field
+        metadata:
+          annotations:
+            "{{ .annotation }}": "{{ .value }}"
+- name: add-annotation
   merge:
     input:
       # We expect the input to this transformer to be provided externally,
       # rather than through another pipeline stage
       - var: input-object
-      - ref: new-field
+      - ref: new-annotation
