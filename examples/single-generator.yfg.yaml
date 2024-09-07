@@ -2,8 +2,10 @@
 # Define a top level generator the same way you would in a pipeline, but
 # without a name, and under the generator config key:
 generator:
-  yaml:
-    input:
-      - value:
-          key: value
-          foo: bar
+  name: "example"
+  gotemplate:
+    template:
+      file: files/app-template.yaml
+    vars:
+      version: "v2.0.0"
+      environment: dev

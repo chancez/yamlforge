@@ -94,8 +94,9 @@ server {
 		{
 			file: "single-generator.yfg.yaml",
 			expected: trim(`
-foo: bar
-key: value
+app:
+  version: 'v2.0.0'
+  environment: 'dev'
 `),
 		},
 		{
