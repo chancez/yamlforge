@@ -1,0 +1,11 @@
+# This file defines values that the dynamic-pipeline.yfg.yaml example uses to
+# determine what pipelines to execute.
+
+amiID:
+  # set method to 'static' to use the value specified in static, set it to
+  # ssmParameter for it to be looked up dynamically using the parameter
+  # specified.
+  method: static
+  # method: ssmParameter
+  static: ami-09ea311630482acd7
+  ssmParameter: '/aws/service/eks/optimized-ami/1.30/amazon-linux-2/recommended'
