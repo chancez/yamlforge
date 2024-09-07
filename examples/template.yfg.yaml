@@ -2,6 +2,7 @@ pipeline:
 - name: template
   gotemplate:
     template:
-      file: files/test.yaml
+      file: files/app-template.yaml
     vars:
-      SomeValue: "dog"
+      version: "v1.2.3"
+      environment: production

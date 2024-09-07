@@ -66,18 +66,21 @@ foo:
 		{
 			file: "template.yfg.yaml",
 			expected: trim(`
-foo:
-  bar: baz
-  key: |
-    some value
-  another_key: |
-    dog
+app:
+  version: 'v1.2.3'
+  environment: 'production'
 `),
 		},
 		{
 			file: "template-literal.yfg.yaml",
 			expected: trim(`
-some-key: some-value
+server {
+    listen 8080;
+    root /var/www/data;
+
+    location / {
+    }
+}
 `),
 		},
 		{

@@ -3,7 +3,13 @@ pipeline:
   gotemplate:
     template:
       value: |
-        {{ .key }}: {{ .value }}
+        server {
+            listen {{ .listenAddress }};
+            root {{ .webRoot }};
+
+            location / {
+            }
+        }
     vars:
-      key: "some-key"
-      value: "some-value"
+      listenAddress: 8080
+      webRoot: /var/www/data
