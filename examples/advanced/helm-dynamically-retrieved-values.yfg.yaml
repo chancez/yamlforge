@@ -42,7 +42,7 @@ pipeline:
   gotemplate:
     refVars:
       eks:
-        file: files/eks-vars.yaml
+        file: ../files/eks-vars.yaml
       amiID:
         ref: extract-ami-id
     template:
