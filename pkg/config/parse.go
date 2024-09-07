@@ -60,6 +60,9 @@ func validateGenerators(generatorCfg Generator) error {
 	if generatorCfg.File != nil {
 		count++
 	}
+	if generatorCfg.Value != nil {
+		count++
+	}
 	if generatorCfg.Exec != nil {
 		count++
 	}

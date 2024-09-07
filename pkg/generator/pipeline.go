@@ -129,6 +129,9 @@ func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, G
 	case generatorCfg.File != nil:
 		name = "file"
 		gen = NewFile(pipeline.dir, *generatorCfg.File)
+	case generatorCfg.Value != nil:
+		name = "value"
+		gen = NewValue(pipeline.dir, *generatorCfg.Value, pipeline.refStore)
 	case generatorCfg.Exec != nil:
 		name = "exec"
 		gen = NewExec(pipeline.dir, *generatorCfg.Exec)
