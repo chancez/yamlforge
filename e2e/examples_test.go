@@ -21,12 +21,13 @@ func TestExamples(t *testing.T) {
 		{
 			file: "file.yfg.yaml",
 			expected: trim(`
-foo:
-  bar: baz
-  key: |
-    some value
-  another_key: |
-    {{ .SomeValue }}
+server {
+    listen 8080;
+    root /data/up1;
+
+    location / {
+    }
+}
 `),
 		},
 		{

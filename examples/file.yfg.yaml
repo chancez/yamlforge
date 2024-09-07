@@ -1,4 +1,4 @@
 pipeline:
 - name: simple-file
   file:
-    path: files/test.yaml
+    path: files/nginx.conf
