@@ -9,7 +9,7 @@ Take a look at our examples in the `examples/` directory for comprehensive examp
 Here's an example that renders a Helm chart using dynamically rendered `values.yaml`:
 
 ```
-yfg generate ./examples/helm-templated-values.yaml
+yfg generate ./examples/advanced/helm-templated-values.yaml
 ```
 
 You use `yfg explain` to get details on the different fields available:
@@ -45,4 +45,4 @@ the values based on other configuration options.
 
 Using the `gotemplate` generator with the `helm` generator in yamlforge enables you do this.
 
-For an example take a look at [`examples/helm-templated-values.yaml`](examples/helm-templated-values.yaml).
+For an example take a look at [`examples/advanced/helm-templated-values.yaml`](examples/advanced/helm-templated-values.yaml).

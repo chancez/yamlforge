@@ -82,7 +82,7 @@ key: value
 `),
 		},
 		{
-			file: "reusable-transformer.yfg.yaml",
+			file: "advanced/reusable-transformer.yfg.yaml",
 			expected: trim(`
 foo:
     another_key: |

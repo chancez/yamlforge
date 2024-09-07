@@ -3,7 +3,7 @@ pipeline:
   gotemplate:
     refVars:
       eks:
-        file: files/eks-vars.yaml
+        file: ../files/eks-vars.yaml
     template:
       value:
         serviceAccount:

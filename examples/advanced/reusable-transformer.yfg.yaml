@@ -4,13 +4,13 @@
 pipeline:
 - name: simple-file
   file:
-    path: files/test.yaml
+    path: ../files/test.yaml
 
 # You can import other generators for re-use.
 - name: add-field
   pipeline:
     import:
-      file: transformers/add-field.yaml
+      file: ../transformers/add-field.yaml
     vars:
       # We're passing the output of the simple-file stage as the
       # transformer-input var in the add-field transformer
