@@ -53,7 +53,7 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 		}
 		refVal, err := gt.refStore.GetReference(gt.dir, ref)
 		if err != nil {
-			return nil, fmt.Errorf("variable %q: error getting import variable reference: %w", name, err)
+			return nil, fmt.Errorf("variable %q: error getting reference: %w", name, err)
 		}
 		var tmp any
 		err = yaml.Unmarshal(refVal, &tmp)
