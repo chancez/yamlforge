@@ -1,7 +1,8 @@
 pipeline:
 - name: helm
-  import:
-    path: helm.yfg.yaml
+  pipeline:
+    import:
+      file: helm.yfg.yaml
 
 # Only return the resources rendered by helm where kind is CustomResourceDefinition
 - name: filter
