@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"path"
 	"strings"
 
@@ -36,17 +35,17 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 	if len(pipeline.cfg.Pipeline) != 0 {
 		valuesSet = append(valuesSet, "pipeline")
 	}
-	if len(pipeline.cfg.Path) != 0 {
-		valuesSet = append(valuesSet, "path")
+	if pipeline.cfg.Import != nil {
+		valuesSet = append(valuesSet, "import")
 	}
 	if len(valuesSet) == 0 {
-		return nil, errors.New("must configure a pipeline, generator or path")
+		return nil, errors.New("must configure a pipeline, generator or import")
 	}
 	if len(valuesSet) > 1 {
 		return nil, fmt.Errorf("invalid configuration, cannot combine %s", strings.Join(valuesSet, ","))
 	}
 
-	if pipeline.cfg.Path != "" {
+	if pipeline.cfg.Import != nil {
 		return pipeline.executeImport(ctx)
 	}
 
@@ -72,10 +71,15 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 }
 
 func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
-	data, err := os.ReadFile(path.Join(pipeline.dir, pipeline.cfg.Path))
+	dir := pipeline.dir
+	data, err := pipeline.refStore.GetReference(pipeline.dir, *pipeline.cfg.Import)
 	if err != nil {
-		return nil, fmt.Errorf("error importing pipeline: %w", err)
+		return nil, fmt.Errorf("error getting reference to import: %w", err)
 	}
+	if pipeline.cfg.Import.File != "" {
+		dir = path.Dir(pipeline.cfg.Import.File)
+	}
+
 	subPipelineCfg, err := config.Parse(data)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing pipeline: %w", err)
@@ -95,7 +99,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 	}
 
 	newStore := reference.NewStore(pipelineVars)
-	subPipeline := NewPipeline(path.Dir(pipeline.cfg.Path), subPipelineCfg.PipelineGenerator, newStore)
+	subPipeline := NewPipeline(dir, subPipelineCfg.PipelineGenerator, newStore)
 	return subPipeline.Generate(ctx)
 }
 

@@ -42,9 +42,9 @@
         },
         {
           "required": [
-            "path"
+            "import"
           ],
-          "title": "path"
+          "title": "import"
         }
       ],
       "properties": {
@@ -59,9 +59,9 @@
           "$ref": "#/$defs/Generator",
           "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
         },
-        "path": {
-          "type": "string",
-          "description": "Path is the file path of a manifest to import."
+        "import": {
+          "$ref": "#/$defs/Value",
+          "description": "Import is a value containing a pipeline to import"
         },
         "vars": {
           "items": {
@@ -550,9 +550,9 @@
         },
         {
           "required": [
-            "path"
+            "import"
           ],
-          "title": "path"
+          "title": "import"
         }
       ],
       "properties": {
@@ -567,9 +567,9 @@
           "$ref": "#/$defs/Generator",
           "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
         },
-        "path": {
-          "type": "string",
-          "description": "Path is the file path of a manifest to import."
+        "import": {
+          "$ref": "#/$defs/Value",
+          "description": "Import is a value containing a pipeline to import"
         },
         "vars": {
           "items": {

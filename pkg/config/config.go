@@ -139,8 +139,8 @@ type PipelineGenerator struct {
 	Pipeline []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
 	// Generator is a single generator, for simple use-cases that do not require a full pipeline.
 	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
-	// Path is the file path of a manifest to import.
-	Path string `yaml:"path,omitempty" json:"path,omitempty" jsonschema:"oneof_required=path"`
+	// Import is a value containing a pipeline to import
+	Import *Value `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
 	// Vars defines variables that the pipeline expects.
 	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
 }

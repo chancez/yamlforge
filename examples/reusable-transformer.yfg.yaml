@@ -9,7 +9,8 @@ pipeline:
 # You can import other generators for re-use.
 - name: add-field
   pipeline:
-    path: transformers/add-field.yaml
+    import:
+      file: transformers/add-field.yaml
     vars:
       # We're passing the output of the simple-file stage as the
       # transformer-input var in the add-field transformer
