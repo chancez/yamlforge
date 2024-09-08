@@ -51,11 +51,7 @@ func (jq *JQ) Generate(context.Context) ([]byte, error) {
 		"--monochrome-output",
 	)
 
-	if jq.cfg.Input == nil {
-		return nil, errors.New("input is required")
-	}
-
-	refVal, err := jq.refStore.GetReference(jq.dir, *jq.cfg.Input)
+	refVal, err := jq.refStore.GetReference(jq.dir, jq.cfg.Input)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
 	}

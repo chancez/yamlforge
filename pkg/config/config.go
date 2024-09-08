@@ -111,7 +111,7 @@ type JQGenerator struct {
 	// ExprFile is a path to a file relative to the manifest containing the jq expression to evaluate. Cannot be specified in combination with Expr.
 	ExprFile string `yaml:"exprFile,omitempty" json:"exprFile,omitempty" jsonschema:"oneof_required=exprFile"`
 	// Input is the JSON input for jq to execute the expression over.
-	Input *Value `yaml:"input" json:"input"`
+	Input Value `yaml:"input" json:"input"`
 	// Slurp configures jq to read all inputs into an array and use it as a single input value.
 	Slurp bool `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
