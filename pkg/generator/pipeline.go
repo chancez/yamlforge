@@ -134,7 +134,7 @@ func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, G
 		gen = NewValue(pipeline.dir, *generatorCfg.Value, pipeline.refStore)
 	case generatorCfg.Exec != nil:
 		kind = "exec"
-		gen = NewExec(pipeline.dir, *generatorCfg.Exec)
+		gen = NewExec(pipeline.dir, *generatorCfg.Exec, pipeline.refStore)
 	case generatorCfg.Helm != nil:
 		kind = "helm"
 		gen = NewHelm(pipeline.dir, *generatorCfg.Helm, pipeline.refStore)

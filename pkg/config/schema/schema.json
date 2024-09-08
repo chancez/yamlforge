@@ -91,6 +91,13 @@
           },
           "type": "array",
           "description": "Args are the arguments to the command."
+        },
+        "env": {
+          "items": {
+            "$ref": "#/$defs/NamedVariable"
+          },
+          "type": "array",
+          "description": "Env is a list of environment variables to set for the command."
         }
       },
       "additionalProperties": false,
@@ -464,7 +471,8 @@
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name is the name of this variable."
         },
         "var": {
           "type": "string",
@@ -487,7 +495,7 @@
       "required": [
         "name"
       ],
-      "description": "NamedVariable is named Value that can be referenced by pipelines using the var attribute of a value."
+      "description": "NamedVariable is named Value"
     },
     "ParsedValue": {
       "oneOf": [

@@ -54,6 +54,8 @@ type ExecGenerator struct {
 	Command string `yaml:"command" json:"command"`
 	// Args are the arguments to the command.
 	Args []string `yaml:"args,omitempty" json:"args,omitempty"`
+	// Env is a list of environment variables to set for the command.
+	Env []NamedVariable `yaml:"env,omitempty" json:"env,omitempty"`
 }
 
 // HelmGenerator runs 'helm template' to render a Helm chart and returns the output.
@@ -154,8 +156,9 @@ type PipelineGenerator struct {
 	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
-// NamedVariable is named Value that can be referenced by pipelines using the var attribute of a value.
+// NamedVariable is named Value
 type NamedVariable struct {
+	// Name is the name of this variable.
 	Name  string `yaml:"name" json:"name"`
 	Value `yaml:",inline" json:",inline"`
 }
