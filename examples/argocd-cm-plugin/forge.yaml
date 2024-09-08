@@ -12,7 +12,6 @@ pipeline:
               extraContainers:
                 - name: yamlforge
                   command: [/var/run/argocd/argocd-cmp-server]
-                  args: ['--loglevel', 'debug']
                   image: quay.io/ecnahc515/yamlforge:0.0.4
                   securityContext:
                     runAsNonRoot: true
