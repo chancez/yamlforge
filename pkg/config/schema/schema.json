@@ -72,7 +72,7 @@
             "$ref": "#/$defs/NamedValue"
           },
           "type": "array",
-          "description": "Vars defines variables that the pipeline expects."
+          "description": "Vars defines variables that the pipeline is providing to the sub-pipeline."
         }
       },
       "additionalProperties": false,
@@ -598,7 +598,7 @@
             "$ref": "#/$defs/NamedValue"
           },
           "type": "array",
-          "description": "Vars defines variables that the pipeline expects."
+          "description": "Vars defines variables that the pipeline is providing to the sub-pipeline."
         }
       },
       "additionalProperties": false,

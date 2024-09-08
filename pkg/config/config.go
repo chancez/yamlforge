@@ -152,7 +152,7 @@ type PipelineGenerator struct {
 	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
 	// Import is a value containing a pipeline to import
 	Import *Value `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
-	// Vars defines variables that the pipeline expects.
+	// Vars defines variables that the pipeline is providing to the sub-pipeline.
 	Vars []NamedValue `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
