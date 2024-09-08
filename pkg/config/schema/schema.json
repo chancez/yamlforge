@@ -69,7 +69,7 @@
         },
         "vars": {
           "items": {
-            "$ref": "#/$defs/NamedVariable"
+            "$ref": "#/$defs/NamedValue"
           },
           "type": "array",
           "description": "Vars defines variables that the pipeline expects."
@@ -94,7 +94,7 @@
         },
         "env": {
           "items": {
-            "$ref": "#/$defs/NamedVariable"
+            "$ref": "#/$defs/NamedValue"
           },
           "type": "array",
           "description": "Env is a list of environment variables to set for the command."
@@ -442,7 +442,7 @@
       ],
       "description": "MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output."
     },
-    "NamedVariable": {
+    "NamedValue": {
       "oneOf": [
         {
           "required": [
@@ -495,7 +495,7 @@
       "required": [
         "name"
       ],
-      "description": "NamedVariable is named Value"
+      "description": "NamedValue is a Value with a name."
     },
     "ParsedValue": {
       "oneOf": [
@@ -595,7 +595,7 @@
         },
         "vars": {
           "items": {
-            "$ref": "#/$defs/NamedVariable"
+            "$ref": "#/$defs/NamedValue"
           },
           "type": "array",
           "description": "Vars defines variables that the pipeline expects."

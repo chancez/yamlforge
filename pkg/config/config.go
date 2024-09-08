@@ -55,7 +55,7 @@ type ExecGenerator struct {
 	// Args are the arguments to the command.
 	Args []string `yaml:"args,omitempty" json:"args,omitempty"`
 	// Env is a list of environment variables to set for the command.
-	Env []NamedVariable `yaml:"env,omitempty" json:"env,omitempty"`
+	Env []NamedValue `yaml:"env,omitempty" json:"env,omitempty"`
 }
 
 // HelmGenerator runs 'helm template' to render a Helm chart and returns the output.
@@ -153,14 +153,7 @@ type PipelineGenerator struct {
 	// Import is a value containing a pipeline to import
 	Import *Value `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
 	// Vars defines variables that the pipeline expects.
-	Vars []NamedVariable `yaml:"vars,omitempty" json:"vars,omitempty"`
-}
-
-// NamedVariable is named Value
-type NamedVariable struct {
-	// Name is the name of this variable.
-	Name  string `yaml:"name" json:"name"`
-	Value `yaml:",inline" json:",inline"`
+	Vars []NamedValue `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
 // Value provides inputs to generators.
@@ -173,6 +166,13 @@ type Value struct {
 	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object).
 	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+}
+
+// NamedValue is a Value with a name.
+type NamedValue struct {
+	// Name is the name of this variable.
+	Name  string `yaml:"name" json:"name"`
+	Value `yaml:",inline" json:",inline"`
 }
 
 // ParsedValue provides parsed values to generators.
