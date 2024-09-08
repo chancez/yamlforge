@@ -12,7 +12,7 @@ pipeline:
               extraContainers:
                 - name: yamlforge
                   command: [/var/run/argocd/argocd-cmp-server]
-                  image: quay.io/ecnahc515/yamlforge:0.0.4
+                  image: quay.io/ecnahc515/yamlforge:0.1.0
                   securityContext:
                     runAsNonRoot: true
                     runAsUser: 999
