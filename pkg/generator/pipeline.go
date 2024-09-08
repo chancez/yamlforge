@@ -156,6 +156,9 @@ func (pipeline *Pipeline) getGenerator(generatorCfg config.Generator) (string, G
 	case generatorCfg.CEL != nil:
 		kind = "cel"
 		gen = NewCEL(pipeline.dir, *generatorCfg.CEL, pipeline.refStore)
+	case generatorCfg.JSONPatch != nil:
+		kind = "jsonpatch"
+		gen = NewJSONPatch(pipeline.dir, *generatorCfg.JSONPatch, pipeline.refStore)
 	case generatorCfg.YAML != nil:
 		kind = "yaml"
 		gen = NewYAML(pipeline.dir, *generatorCfg.YAML, pipeline.refStore)

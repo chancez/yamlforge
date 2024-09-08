@@ -30,6 +30,8 @@ type Generator struct {
 	JQ *JQGenerator `yaml:"jq,omitempty" json:"jq,omitempty" jsonschema:"oneof_required=jq"`
 	// CEL is a generator which evaluates a CEL expression against the input.
 	CEL *CELGenerator `yaml:"cel,omitempty" json:"cel,omitempty" jsonschema:"oneof_required=cel"`
+	// JSONPatch is a generator which evaluates a JSONPatch against the input.
+	JSONPatch *JSONPatchGenerator `yaml:"jsonpatch,omitempty" json:"jsonpatch,omitempty" jsonschema:"oneof_required=jsonpatch"`
 	// YAML is a generator which returns it's inputs as YAML.
 	YAML *YAMLGenerator `yaml:"yaml,omitempty" json:"yaml,omitempty" jsonschema:"oneof_required=yaml"`
 	// JSON is a generator which returns it's inputs as JSON.
@@ -126,6 +128,16 @@ type CELGenerator struct {
 	Filter bool `yaml:"filter,omitempty" json:"filter,omitempty"`
 	// If Filter and InvertFilter is true, instead of keeping the result, it will be discarded.
 	InvertFilter bool `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
+}
+
+// JSONPatchGenerator evaluates a JSONPatch against the input.
+type JSONPatchGenerator struct {
+	// Input is the value to apply the patch to. It must be JSON.
+	Input Value `yaml:"input" json:"input"`
+	// Patch is the JSON patch. If it is YAML, it will be automatically converted to JSON.
+	Patch string `yaml:"patch" json:"patch"`
+	// If merge is true, then patch is interpreted as a JSON merge patch.
+	Merge bool `yaml:"merge,omitempty" json:"merge,omitempty"`
 }
 
 // YAMLGenerator returns it's inputs as YAML.

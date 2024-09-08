@@ -87,6 +87,9 @@ func validateGenerators(generatorCfg Generator) error {
 	if generatorCfg.CEL != nil {
 		count++
 	}
+	if generatorCfg.JSONPatch != nil {
+		count++
+	}
 	if generatorCfg.YAML != nil {
 		count++
 	}

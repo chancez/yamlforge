@@ -185,6 +185,12 @@
         },
         {
           "required": [
+            "jsonpatch"
+          ],
+          "title": "jsonpatch"
+        },
+        {
+          "required": [
             "yaml"
           ],
           "title": "yaml"
@@ -240,6 +246,10 @@
         "cel": {
           "$ref": "#/$defs/CELGenerator",
           "description": "CEL is a generator which evaluates a CEL expression against the input."
+        },
+        "jsonpatch": {
+          "$ref": "#/$defs/JSONPatchGenerator",
+          "description": "JSONPatch is a generator which evaluates a JSONPatch against the input."
         },
         "yaml": {
           "$ref": "#/$defs/YAMLGenerator",
@@ -391,6 +401,29 @@
         "input"
       ],
       "description": "JSONGenerator returns it's inputs as JSON."
+    },
+    "JSONPatchGenerator": {
+      "properties": {
+        "input": {
+          "$ref": "#/$defs/Value",
+          "description": "Input is the value to apply the patch to. It must be JSON."
+        },
+        "patch": {
+          "type": "string",
+          "description": "Patch is the JSON patch. If it is YAML, it will be automatically converted to JSON."
+        },
+        "merge": {
+          "type": "boolean",
+          "description": "If merge is true, then patch is interpreted as a JSON merge patch."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "input",
+        "patch"
+      ],
+      "description": "JSONPatchGenerator evaluates a JSONPatch against the input."
     },
     "KustomizeGenerator": {
       "oneOf": [

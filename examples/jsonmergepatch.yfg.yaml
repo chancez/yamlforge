@@ -1,0 +1,24 @@
+pipeline:
+- name: service
+  file:
+    path: files/service.yaml
+# convert to JSON for JSON patch
+- name: json
+  json:
+    input:
+      - ref: service
+- name: patch
+  jsonpatch:
+    patch: |
+      apiVersion: v1
+      kind: Service
+      metadata:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    merge: true
+    input:
+      ref: json
+- name: yaml
+  yaml:
+    input:
+      - ref: patch
