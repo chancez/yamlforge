@@ -1,0 +1,88 @@
+pipeline:
+  - name: argo-cd
+    helm:
+      releaseName: argo-cd
+      namespace: argocd
+      chart: argo-cd
+      version: 7.5.2
+      repo: https://argoproj.github.io/argo-helm
+      values:
+        - value:
+            repoServer:
+              extraContainers:
+                - name: yamlforge
+                  command: [/var/run/argocd/argocd-cmp-server]
+                  args: ['--loglevel', 'debug']
+                  image: quay.io/ecnahc515/yamlforge:0.0.4
+                  securityContext:
+                    runAsNonRoot: true
+                    runAsUser: 999
+                  volumeMounts:
+                    - mountPath: /var/run/argocd
+                      name: var-files
+                    - mountPath: /home/argocd/cmp-server/plugins
+                      name: plugins
+                    - mountPath: /home/argocd/cmp-server/config/plugin.yaml
+                      subPath: yamlforge.yaml
+                      name: argocd-cmp-cm
+                    - mountPath: /tmp
+                      name: cmp-tmp
+              volumes:
+                - name: argocd-cmp-cm
+                  configMap:
+                    name: argocd-cmp-cm
+                - emptyDir: {}
+                  name: cmp-tmp
+            configs:
+              cmp:
+                create: true
+                plugins:
+                  yamlforge:
+                    generate:
+                      command: ["yfg", "generate"]
+                    discover:
+                      filename: "./forge.yaml"
+
+  - name: example-app
+    value:
+      input:
+        value:
+          apiVersion: argoproj.io/v1alpha1
+          kind: Application
+          metadata:
+            name: example-app
+            namespace: argocd
+          spec:
+            project: default
+            source:
+              repoURL: https://github.com/chancez/yamlforge.git
+              targetRevision: main
+              path: examples/argocd-cm-plugin/example-app
+              plugin:
+                name: yamlforge
+            destination:
+              namespace: default
+              server: https://kubernetes.default.svc
+            # Automatically apply
+            syncPolicy:
+              automated:
+                prune: true
+                selfHeal: true
+              # Retry since bootstrapping and creating the Application at the same time can be an issue
+              retry:
+                limit: -1
+                backoff:
+                  duration: 5s
+                  factor: 2
+                  maxDuration: 1m
+
+  - name: output
+    yaml:
+      input:
+        - value:
+            apiVersion: v1
+            kind: Namespace
+            metadata:
+              name: argocd
+        - ref: argo-cd
+        - ref: example-app
