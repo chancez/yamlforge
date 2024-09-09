@@ -128,6 +128,8 @@ type CELGenerator struct {
 	Filter bool `yaml:"filter,omitempty" json:"filter,omitempty"`
 	// If Filter and InvertFilter is true, instead of keeping the result, it will be discarded.
 	InvertFilter bool `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
+	// Format is the format the output should be returned as. If unspecified, it defaults to YAML.
+	Format string `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=yaml,enum=json,default=yaml"`
 }
 
 // JSONPatchGenerator evaluates a JSONPatch against the input.

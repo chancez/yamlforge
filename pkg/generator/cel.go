@@ -51,18 +51,25 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 
 	var buf bytes.Buffer
 	var dec decoder
-	var enc encoder
 	switch c.cfg.Input.Format {
 	case "yaml":
 		dec = yaml.NewDecoder(bytes.NewBuffer(ref))
-		enc = yaml.NewEncoder(&buf)
 	case "json":
 		dec = json.NewDecoder(bytes.NewBuffer(ref))
-		enc = json.NewEncoder(&buf)
 	case "":
 		return nil, errors.New("input.format is required")
 	default:
-		return nil, fmt.Errorf("invalid format specified: %q", c.cfg.Input.Format)
+		return nil, fmt.Errorf("invalid input format specified: %q", c.cfg.Input.Format)
+	}
+
+	var enc encoder
+	switch c.cfg.Format {
+	case "yaml", "":
+		enc = yaml.NewEncoder(&buf)
+	case "json":
+		enc = json.NewEncoder(&buf)
+	default:
+		return nil, fmt.Errorf("invalid output format specified: %q", c.cfg.Format)
 	}
 
 	env, err := cel.NewEnv(

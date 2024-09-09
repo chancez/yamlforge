@@ -20,6 +20,15 @@
         "invertFilter": {
           "type": "boolean",
           "description": "If Filter and InvertFilter is true, instead of keeping the result, it will be discarded."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "yaml",
+            "json"
+          ],
+          "description": "Format is the format the output should be returned as. If unspecified, it defaults to YAML.",
+          "default": "yaml"
         }
       },
       "additionalProperties": false,
