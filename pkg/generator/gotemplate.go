@@ -3,6 +3,7 @@ package generator
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"text/template"
 
@@ -11,6 +12,19 @@ import (
 	"github.com/chancez/yamlforge/pkg/reference"
 	"gopkg.in/yaml.v3"
 )
+
+var extraTemplateFuncs = template.FuncMap{
+	"required": func(warn string, val any) (any, error) {
+		if val == nil {
+			return val, errors.New(warn)
+		} else if _, ok := val.(string); ok {
+			if val == "" {
+				return val, errors.New(warn)
+			}
+		}
+		return val, nil
+	},
+}
 
 var _ Generator = (*GoTemplate)(nil)
 
@@ -30,7 +44,7 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *referen
 
 func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	var buf bytes.Buffer
-	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap())
+	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap()).Funcs(extraTemplateFuncs)
 	refValue, err := gt.refStore.GetReference(gt.dir, gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
