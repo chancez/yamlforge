@@ -42,7 +42,7 @@ func (e *Exec) Generate(context.Context) ([]byte, error) {
 	cmd.Dir = e.dir
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = &buf
-	cmd.Env = env
+	cmd.Env = append(os.Environ(), env...)
 	err := cmd.Run()
 	if err != nil {
 		return nil, err
