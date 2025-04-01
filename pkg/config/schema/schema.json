@@ -530,6 +530,10 @@
         },
         "value": {
           "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+        },
+        "ignoreMissing": {
+          "type": "boolean",
+          "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         }
       },
       "additionalProperties": false,
@@ -589,6 +593,10 @@
         },
         "value": {
           "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+        },
+        "ignoreMissing": {
+          "type": "boolean",
+          "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         }
       },
       "additionalProperties": false,
@@ -689,6 +697,10 @@
         },
         "value": {
           "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+        },
+        "ignoreMissing": {
+          "type": "boolean",
+          "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         }
       },
       "additionalProperties": false,

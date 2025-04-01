@@ -180,6 +180,8 @@ type Value struct {
 	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object).
 	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.
+	IgnoreMissing bool `yaml:"ignoreMissing,omitempty" json:"ignoreMissing,omitempty"`
 }
 
 // NamedValue is a Value with a name.

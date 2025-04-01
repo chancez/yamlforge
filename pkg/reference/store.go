@@ -36,24 +36,32 @@ func (store *Store) AddReference(name string, data []byte) error {
 func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
 	return store.getReference(dir, ref)
 }
+
 func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 	switch {
 	case ref.Var != "":
 		varName := ref.Var
 		res, ok := store.vars[varName]
-		if !ok {
+		if !ok && !ref.IgnoreMissing {
 			return nil, fmt.Errorf("could not find variable %q", varName)
 		}
 		return []byte(res), nil
 	case ref.Ref != "":
 		refName := ref.Ref
 		res, ok := store.references[refName]
-		if !ok {
+		if !ok && !ref.IgnoreMissing {
 			return nil, fmt.Errorf("could not find reference %q", refName)
 		}
 		return res, nil
 	case ref.File != "":
-		return os.ReadFile(path.Join(dir, ref.File))
+		res, err := os.ReadFile(path.Join(dir, ref.File))
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) && ref.IgnoreMissing {
+				return nil, nil
+			}
+			return nil, fmt.Errorf("error opening file %q", ref.File)
+		}
+		return res, nil
 	case ref.Value != nil:
 		switch val := (ref.Value).(type) {
 		case string:
