@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
@@ -73,13 +73,9 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 }
 
 func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
-	dir := pipeline.dir
 	data, err := pipeline.refStore.GetReference(pipeline.dir, *pipeline.cfg.Import)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference to import: %w", err)
-	}
-	if pipeline.cfg.Import.File != "" {
-		dir = path.Dir(pipeline.cfg.Import.File)
 	}
 
 	subPipelineCfg, err := config.Parse(data)
@@ -100,8 +96,22 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 		pipelineVars[varName] = ref
 	}
 
+	// FIXME: We need to know if the sub-pipeline being referenced is a file, and
+	// if so, execute the sub-pipeline with the directory set to the directory of
+	// the sub-pipeline, not the parent.
+	// Ideally the pipeline wouldn't need to think about this, so GetReference
+	// should potentially return the original path if the reference was to a
+	// file.
+	subPipelineDir := pipeline.dir
+	if pipeline.cfg.Import.File != "" {
+		if !filepath.IsAbs(pipeline.cfg.Import.File) {
+			subPipelineDir = filepath.Dir(filepath.Join(pipeline.dir, pipeline.cfg.Import.File))
+		} else {
+			subPipelineDir = filepath.Dir(pipeline.cfg.Import.File)
+		}
+	}
 	newStore := reference.NewStore(pipelineVars)
-	subPipeline := NewPipeline(dir, subPipelineCfg.PipelineGenerator, newStore, pipeline.debug)
+	subPipeline := NewPipeline(subPipelineDir, subPipelineCfg.PipelineGenerator, newStore, pipeline.debug)
 	return subPipeline.Generate(ctx)
 }
 

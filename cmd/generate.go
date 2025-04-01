@@ -5,7 +5,7 @@ package cmd
 
 import (
 	"fmt"
-	"path"
+	"path/filepath"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/generator"
@@ -40,7 +40,7 @@ var generateCmd = &cobra.Command{
 		}
 
 		refStore := reference.NewStore(vars)
-		state := generator.NewPipeline(path.Dir(forgeFile), cfg.PipelineGenerator, refStore, genFlags.debug)
+		state := generator.NewPipeline(filepath.Dir(forgeFile), cfg.PipelineGenerator, refStore, genFlags.debug)
 		result, err := state.Generate(cmd.Context())
 		if err != nil {
 			return err
