@@ -164,8 +164,17 @@ type PipelineGenerator struct {
 	Pipeline []Generator `yaml:"pipeline,omitempty" json:"pipeline,omitempty" jsonschema:"oneof_required=pipeline"`
 	// Generator is a single generator, for simple use-cases that do not require a full pipeline.
 	Generator *Generator `yaml:"generator,omitempty" json:"generator,omitempty" jsonschema:"oneof_required=generator"`
-	// Import is a value containing a pipeline to import
+	// Import is a value containing a pipeline to import. Imported pipelines
+	// share no references or variables with their parent pipeline.
 	Import *Value `yaml:"import,omitempty" json:"import,omitempty" jsonschema:"oneof_required=import"`
+	// Include is a value containing a pipeline to include. Included pipelines
+	// share the same context as their parent, meaning variables and references
+	// in the parent pipeline are available within the included pipeline,
+	// behaving as if the included pipeline was directly written in the parent
+	// pipeline.
+	// If a included pipeline includes a generator with the same name as it's
+	// parent it will result in an error.
+	Include *Value `yaml:"include,omitempty" json:"include,omitempty" jsonschema:"oneof_required=include"`
 	// Vars defines variables that the pipeline is providing to the sub-pipeline.
 	Vars []NamedValue `yaml:"vars,omitempty" json:"vars,omitempty"`
 }

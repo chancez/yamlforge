@@ -58,6 +58,12 @@
             "import"
           ],
           "title": "import"
+        },
+        {
+          "required": [
+            "include"
+          ],
+          "title": "include"
         }
       ],
       "properties": {
@@ -74,7 +80,11 @@
         },
         "import": {
           "$ref": "#/$defs/Value",
-          "description": "Import is a value containing a pipeline to import"
+          "description": "Import is a value containing a pipeline to import. Imported pipelines\nshare no references or variables with their parent pipeline."
+        },
+        "include": {
+          "$ref": "#/$defs/Value",
+          "description": "Include is a value containing a pipeline to include. Included pipelines\nshare the same context as their parent, meaning variables and references\nin the parent pipeline are available within the included pipeline,\nbehaving as if the included pipeline was directly written in the parent\npipeline.\nIf a included pipeline includes a generator with the same name as it's\nparent it will result in an error."
         },
         "vars": {
           "items": {
@@ -625,6 +635,12 @@
             "import"
           ],
           "title": "import"
+        },
+        {
+          "required": [
+            "include"
+          ],
+          "title": "include"
         }
       ],
       "properties": {
@@ -641,7 +657,11 @@
         },
         "import": {
           "$ref": "#/$defs/Value",
-          "description": "Import is a value containing a pipeline to import"
+          "description": "Import is a value containing a pipeline to import. Imported pipelines\nshare no references or variables with their parent pipeline."
+        },
+        "include": {
+          "$ref": "#/$defs/Value",
+          "description": "Include is a value containing a pipeline to include. Included pipelines\nshare the same context as their parent, meaning variables and references\nin the parent pipeline are available within the included pipeline,\nbehaving as if the included pipeline was directly written in the parent\npipeline.\nIf a included pipeline includes a generator with the same name as it's\nparent it will result in an error."
         },
         "vars": {
           "items": {
