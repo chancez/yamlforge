@@ -42,14 +42,20 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 	case ref.Var != "":
 		varName := ref.Var
 		res, ok := store.vars[varName]
-		if !ok && !ref.IgnoreMissing {
+		if !ok {
+			if ref.IgnoreMissing {
+				return convertToBytes(ref.Default)
+			}
 			return nil, fmt.Errorf("could not find variable %q", varName)
 		}
 		return []byte(res), nil
 	case ref.Ref != "":
 		refName := ref.Ref
 		res, ok := store.references[refName]
-		if !ok && !ref.IgnoreMissing {
+		if !ok {
+			if ref.IgnoreMissing {
+				return convertToBytes(ref.Default)
+			}
 			return nil, fmt.Errorf("could not find reference %q", refName)
 		}
 		return res, nil
@@ -57,20 +63,27 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 		res, err := os.ReadFile(path.Join(dir, ref.File))
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) && ref.IgnoreMissing {
-				return nil, nil
+				return convertToBytes(ref.Default)
 			}
 			return nil, fmt.Errorf("error opening file %q", ref.File)
 		}
 		return res, nil
 	case ref.Value != nil:
-		switch val := (ref.Value).(type) {
-		case string:
-			return []byte(val), nil
-		case []byte:
-			return val, nil
-		}
-		return yaml.Marshal(ref.Value)
+		return convertToBytes(ref.Value)
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
+}
+
+func convertToBytes(val any) ([]byte, error) {
+	if val == nil {
+		return nil, nil
+	}
+	switch val := val.(type) {
+	case string:
+		return []byte(val), nil
+	case []byte:
+		return val, nil
+	}
+	return yaml.Marshal(val)
 }

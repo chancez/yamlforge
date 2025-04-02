@@ -544,6 +544,9 @@
         "ignoreMissing": {
           "type": "boolean",
           "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
+        },
+        "default": {
+          "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },
       "additionalProperties": false,
@@ -607,6 +610,9 @@
         "ignoreMissing": {
           "type": "boolean",
           "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
+        },
+        "default": {
+          "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },
       "additionalProperties": false,
@@ -721,6 +727,9 @@
         "ignoreMissing": {
           "type": "boolean",
           "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
+        },
+        "default": {
+          "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },
       "additionalProperties": false,

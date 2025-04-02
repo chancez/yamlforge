@@ -191,6 +191,10 @@ type Value struct {
 	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
 	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.
 	IgnoreMissing bool `yaml:"ignoreMissing,omitempty" json:"ignoreMissing,omitempty"`
+	// Default specifies the default value to use if a ref, variable, or file is
+	// missing. Has no effect unless ignoreMissing is true.
+	// It can be any valid YAML/JSON type ( string, boolean, number, array, object).
+	Default any `yaml:"default,omitempty" json:"default,omitempty"`
 }
 
 // NamedValue is a Value with a name.
