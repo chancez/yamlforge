@@ -1,12 +1,9 @@
 package config
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
-
-	"gopkg.in/yaml.v3"
 )
 
 func ParseFile(forgeFile string) (Config, error) {
@@ -19,9 +16,7 @@ func ParseFile(forgeFile string) (Config, error) {
 
 func Parse(data []byte) (Config, error) {
 	var cfg Config
-	dec := yaml.NewDecoder(bytes.NewBuffer(data))
-	dec.KnownFields(true)
-	err := dec.Decode(&cfg)
+	err := DecodeYAML(data, &cfg)
 	if err != nil {
 		return Config{}, fmt.Errorf("error parsing config: %w", err)
 	}

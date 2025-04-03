@@ -6,8 +6,6 @@ import (
 	"os"
 	"path"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/chancez/yamlforge/pkg/config"
 )
 
@@ -85,5 +83,5 @@ func convertToBytes(val any) ([]byte, error) {
 	case []byte:
 		return val, nil
 	}
-	return yaml.Marshal(val)
+	return config.EncodeYAML(val)
 }

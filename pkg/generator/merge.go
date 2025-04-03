@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"gopkg.in/yaml.v3"
-
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/mapmerge"
 	"github.com/chancez/yamlforge/pkg/reference"
@@ -35,7 +33,7 @@ func (m *Merge) Generate(_ context.Context) ([]byte, error) {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
 		var item any
-		err = yaml.Unmarshal(ref, &item)
+		err = config.DecodeYAML(ref, &item)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
 		}
@@ -50,7 +48,7 @@ func (m *Merge) Generate(_ context.Context) ([]byte, error) {
 		}
 		merged = mapmerge.Merge(merged, itemMap)
 	}
-	out, err := yaml.Marshal(merged)
+	out, err := config.EncodeYAML(merged)
 	if err != nil {
 		return nil, fmt.Errorf("error while marshaling merged results to YAML: %w", err)
 	}

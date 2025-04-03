@@ -8,7 +8,6 @@ import (
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
 	jsonpatch "github.com/evanphx/json-patch/v5"
-	"gopkg.in/yaml.v3"
 )
 
 var _ Generator = (*JSONPatch)(nil)
@@ -37,7 +36,7 @@ func (jp *JSONPatch) Generate(context.Context) ([]byte, error) {
 
 	// Try parsing the patch as YAML, and convert to JSON
 	var parsedPatch any
-	err = yaml.Unmarshal([]byte(jp.cfg.Patch), &parsedPatch)
+	err = config.DecodeYAML([]byte(jp.cfg.Patch), &parsedPatch)
 	if err == nil {
 		configPatch, err = json.Marshal(parsedPatch)
 		if err != nil {

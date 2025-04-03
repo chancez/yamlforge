@@ -12,7 +12,6 @@ import (
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
 	"github.com/google/cel-go/cel"
-	"gopkg.in/yaml.v3"
 )
 
 var _ Generator = (*CEL)(nil)
@@ -53,7 +52,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 	var dec decoder
 	switch c.cfg.Input.Format {
 	case "yaml":
-		dec = yaml.NewDecoder(bytes.NewBuffer(ref))
+		dec = config.NewYAMLDecoder(bytes.NewBuffer(ref))
 	case "json":
 		dec = json.NewDecoder(bytes.NewBuffer(ref))
 	case "":
@@ -65,7 +64,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 	var enc encoder
 	switch c.cfg.Format {
 	case "yaml", "":
-		enc = yaml.NewEncoder(&buf)
+		enc = config.NewYAMLEncoder(&buf)
 	case "json":
 		enc = json.NewEncoder(&buf)
 	default:
@@ -131,6 +130,12 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 		err = enc.Encode(toEncode)
 		if err != nil {
 			return nil, fmt.Errorf("error encoding result at %s: %w", c.cfg.Input.Format, err)
+		}
+	}
+
+	if closer, ok := enc.(io.Closer); ok {
+		if err := closer.Close(); err != nil {
+			return nil, fmt.Errorf("error closing encoder: %w", err)
 		}
 	}
 

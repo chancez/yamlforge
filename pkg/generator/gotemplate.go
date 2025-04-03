@@ -10,7 +10,6 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
-	"gopkg.in/yaml.v3"
 )
 
 var extraTemplateFuncs = template.FuncMap{
@@ -70,7 +69,7 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 			return nil, fmt.Errorf("variable %q: error getting reference: %w", name, err)
 		}
 		var tmp any
-		err = yaml.Unmarshal(refVal, &tmp)
+		err = config.DecodeYAML(refVal, &tmp)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
 		}

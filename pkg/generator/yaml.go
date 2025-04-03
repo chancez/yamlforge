@@ -8,7 +8,6 @@ import (
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
-	"gopkg.in/yaml.v3"
 )
 
 var _ Generator = (*YAML)(nil)
@@ -29,16 +28,13 @@ func NewYAML(dir string, cfg config.YAMLGenerator, refStore *reference.Store) *Y
 
 func (y *YAML) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
-	enc := yaml.NewEncoder(&out)
-	if y.cfg.Indent != 0 {
-		enc.SetIndent(y.cfg.Indent)
-	}
+	enc := config.NewYAMLEncoderWithIndent(&out, y.cfg.Indent)
 	for _, input := range y.cfg.Input {
 		ref, err := y.refStore.GetReference(y.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
-		dec := yaml.NewDecoder(bytes.NewBuffer(ref))
+		dec := config.NewYAMLDecoder(bytes.NewBuffer(ref))
 		for {
 			var tmp any
 			err = dec.Decode(&tmp)

@@ -10,7 +10,6 @@ import (
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
-	"gopkg.in/yaml.v3"
 )
 
 var _ Generator = (*JSON)(nil)
@@ -40,7 +39,7 @@ func (j *JSON) Generate(context.Context) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
-		dec := yaml.NewDecoder(bytes.NewBuffer(ref))
+		dec := config.NewYAMLDecoder(bytes.NewBuffer(ref))
 		for {
 			var tmp any
 			err = dec.Decode(&tmp)
