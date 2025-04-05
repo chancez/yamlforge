@@ -3,6 +3,31 @@
   "$id": "https://github.com/chancez/yamlforge/pkg/config/config",
   "$ref": "#/$defs/Config",
   "$defs": {
+    "AnyValue": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        },
+        {
+          "type": "object"
+        },
+        {
+          "type": "array"
+        },
+        {
+          "$ref": "#/$defs/Value"
+        }
+      ]
+    },
     "BoolValue": {
       "oneOf": [
         {
@@ -237,8 +262,8 @@
           "description": "Name is the name of this generator which other generators can reference this generator's output by."
         },
         "value": {
-          "$ref": "#/$defs/ValueGenerator",
-          "description": "Value is a simple generator that takes an input and returns it unaltered."
+          "$ref": "#/$defs/AnyValue",
+          "description": "Value is a simple generator that takes a value and returns it unaltered."
         },
         "file": {
           "$ref": "#/$defs/FileGenerator",
@@ -755,20 +780,6 @@
       "additionalProperties": false,
       "type": "object",
       "description": "Value provides inputs to generators."
-    },
-    "ValueGenerator": {
-      "properties": {
-        "input": {
-          "$ref": "#/$defs/Value",
-          "description": "Input is the input value to be returned by the generator."
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "input"
-      ],
-      "description": "ValueGenerator takes a value as an input and returns it"
     },
     "YAMLGenerator": {
       "properties": {

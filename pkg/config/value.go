@@ -1,6 +1,7 @@
 package config
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -65,16 +66,72 @@ func (BoolValue) JSONSchema() *jsonschema.Schema {
 	return oneOfTypeOrValueSchema("boolean")
 }
 
-func oneOfTypeOrValueSchema(typ string) *jsonschema.Schema {
+type AnyValue struct {
+	Any   *any
+	Value *Value
+}
+
+var _ json.Unmarshaler = (*AnyValue)(nil)
+
+func (av *AnyValue) UnmarshalJSON(data []byte) error {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) == 0 {
+		return nil
+	}
+
+	unmarshalValue := func() error {
+		// Unmarshal into Value.
+		var val Value
+		if err := json.Unmarshal(data, &val); err != nil {
+			return err
+		}
+		av.Value = &val
+		return nil
+	}
+
+	// If the JSON starts with '{', check if it contains any keys that belong to Value.
+	if trimmed[0] == '{' {
+		var obj map[string]json.RawMessage
+		if err := json.Unmarshal(data, &obj); err != nil {
+			return err
+		}
+		if _, hasVar := obj["var"]; hasVar {
+			return unmarshalValue()
+		}
+		if _, hasRef := obj["ref"]; hasRef {
+			return unmarshalValue()
+		}
+		if _, hasFile := obj["file"]; hasFile {
+			return unmarshalValue()
+		}
+		// If none of the specific keys exist, treat it as any.
+	}
+
+	// Unmarshal into any.
+	var anyVal any
+	if err := json.Unmarshal(data, &anyVal); err != nil {
+		return err
+	}
+	av.Any = &anyVal
+	return nil
+}
+
+func (AnyValue) JSONSchema() *jsonschema.Schema {
+	return oneOfTypeOrValueSchema("number", "string", "boolean", "null", "object", "array")
+}
+
+func oneOfTypeOrValueSchema(typs ...string) *jsonschema.Schema {
+	var schemas []*jsonschema.Schema
+	for _, typ := range typs {
+		schemas = append(schemas, &jsonschema.Schema{
+			Type: typ,
+		})
+	}
+	schemas = append(schemas,
+		&jsonschema.Schema{Ref: "#/$defs/Value"},
+	)
 	return &jsonschema.Schema{
-		OneOf: []*jsonschema.Schema{
-			{
-				Type: typ,
-			},
-			{
-				Ref: "#/$defs/Value",
-			},
-		},
+		OneOf: schemas,
 	}
 }
 

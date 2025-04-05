@@ -10,8 +10,8 @@ type Config struct {
 type Generator struct {
 	// Name is the name of this generator which other generators can reference this generator's output by.
 	Name string `yaml:"name" json:"name"`
-	// Value is a simple generator that takes an input and returns it unaltered.
-	Value *ValueGenerator `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+	// Value is a simple generator that takes a value and returns it unaltered.
+	Value *AnyValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
 	// File is a generator which reads files at the specified path and returns their output.
 	File *FileGenerator `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Exec is a generator which execs the command specified and returns the stdout of the program.
@@ -36,12 +36,6 @@ type Generator struct {
 	YAML *YAMLGenerator `yaml:"yaml,omitempty" json:"yaml,omitempty" jsonschema:"oneof_required=yaml"`
 	// JSON is a generator which returns it's inputs as JSON.
 	JSON *JSONGenerator `yaml:"json,omitempty" json:"json,omitempty" jsonschema:"oneof_required=json"`
-}
-
-// ValueGenerator takes a value as an input and returns it
-type ValueGenerator struct {
-	// Input is the input value to be returned by the generator.
-	Input Value `yaml:"input" json:"input"`
 }
 
 // FileGenerator reads files at the specified path and returns their output.

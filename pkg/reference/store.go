@@ -35,6 +35,16 @@ func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
 	return store.getReference(dir, ref)
 }
 
+func (store *Store) GetAnyValue(dir string, val config.AnyValue) (any, error) {
+	if val.Any != nil {
+		return *val.Any, nil
+	}
+	if val.Value != nil {
+		return store.getReference(dir, *val.Value)
+	}
+	panic("invalid AnyValue")
+}
+
 func (store *Store) GetStringValue(dir string, val config.StringValue) (string, error) {
 	if val.String != nil {
 		return *val.String, nil
@@ -80,7 +90,7 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 		res, ok := store.vars[varName]
 		if !ok {
 			if ref.IgnoreMissing {
-				return convertToBytes(ref.Default)
+				return ConvertToBytes(ref.Default)
 			}
 			return nil, fmt.Errorf("could not find variable %q", varName)
 		}
@@ -90,7 +100,7 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 		res, ok := store.references[refName]
 		if !ok {
 			if ref.IgnoreMissing {
-				return convertToBytes(ref.Default)
+				return ConvertToBytes(ref.Default)
 			}
 			return nil, fmt.Errorf("could not find reference %q", refName)
 		}
@@ -99,19 +109,19 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 		res, err := os.ReadFile(path.Join(dir, ref.File))
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) && ref.IgnoreMissing {
-				return convertToBytes(ref.Default)
+				return ConvertToBytes(ref.Default)
 			}
 			return nil, fmt.Errorf("error opening file %q", ref.File)
 		}
 		return res, nil
 	case ref.Value != nil:
-		return convertToBytes(ref.Value)
+		return ConvertToBytes(ref.Value)
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
 }
 
-func convertToBytes(val any) ([]byte, error) {
+func ConvertToBytes(val any) ([]byte, error) {
 	if val == nil {
 		return nil, nil
 	}

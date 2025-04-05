@@ -11,18 +11,22 @@ var _ Generator = (*Value)(nil)
 
 type Value struct {
 	dir      string
-	cfg      config.ValueGenerator
+	val      config.AnyValue
 	refStore *reference.Store
 }
 
-func NewValue(dir string, cfg config.ValueGenerator, refStore *reference.Store) *Value {
+func NewValue(dir string, val config.AnyValue, refStore *reference.Store) *Value {
 	return &Value{
 		dir:      dir,
-		cfg:      cfg,
+		val:      val,
 		refStore: refStore,
 	}
 }
 
 func (v *Value) Generate(context.Context) ([]byte, error) {
-	return v.refStore.GetReference(v.dir, v.cfg.Input)
+	val, err := v.refStore.GetAnyValue(v.dir, v.val)
+	if err != nil {
+		return nil, err
+	}
+	return reference.ConvertToBytes(val)
 }
