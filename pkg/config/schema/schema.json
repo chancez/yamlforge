@@ -328,15 +328,11 @@
           "description": "Template is the template to render."
         },
         "vars": {
-          "type": "object",
-          "description": "Vars are input variables to the template."
-        },
-        "refVars": {
           "additionalProperties": {
-            "$ref": "#/$defs/ParsedValue"
+            "$ref": "#/$defs/AnyValue"
           },
           "type": "object",
-          "description": "RefVars are input variables to the template allowing references to other generator outputs or files."
+          "description": "Vars are input variables to the template."
         }
       },
       "additionalProperties": false,

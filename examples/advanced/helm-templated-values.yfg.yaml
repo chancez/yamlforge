@@ -1,7 +1,7 @@
 pipeline:
 - name: karpenter-values
   gotemplate:
-    refVars:
+    vars:
       eks:
         file: ../files/eks-vars.yaml
     template:

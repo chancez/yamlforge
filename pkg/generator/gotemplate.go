@@ -54,21 +54,19 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	}
 
 	vars := make(map[string]any)
-	for name, val := range gt.cfg.Vars {
+	for name, ref := range gt.cfg.Vars {
 		if name == "" {
 			return nil, fmt.Errorf("vars: variable name cannot be empty")
 		}
-		vars[name] = val
-	}
-	for name, ref := range gt.cfg.RefVars {
-		if name == "" {
-			return nil, fmt.Errorf("refVars: variable name cannot be empty")
-		}
-		pv, err := gt.refStore.GetParsedValue(gt.dir, ref)
+		v, err := gt.refStore.GetAnyValue(gt.dir, ref)
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting value: %w", name, err)
 		}
-		vars[name] = pv.Parsed()
+		// Convert bytes to string when using with templates.
+		if bv, ok := v.([]byte); ok {
+			v = string(bv)
+		}
+		vars[name] = v
 	}
 
 	err = tpl.Execute(&buf, vars)

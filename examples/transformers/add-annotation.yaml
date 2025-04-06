@@ -3,16 +3,16 @@ pipeline:
 - name: new-annotation
   gotemplate:
     # User defined inputs
-    refVars:
+    vars:
       annotation:
         var: annotation
-      value:
+      annotation_value:
         var: value
     template:
       value:
         metadata:
           annotations:
-            "{{ .annotation }}": "{{ .value }}"
+            "{{ .annotation }}": "{{ .annotation_value }}"
 - name: add-annotation
   merge:
     input:

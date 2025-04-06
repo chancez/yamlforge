@@ -96,6 +96,9 @@ func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
 		if _, hasFile := obj["file"]; hasFile {
 			return true, unmarshalValue()
 		}
+		if _, hasValue := obj["value"]; hasValue {
+			return true, unmarshalValue()
+		}
 		// If none of the specific keys exist, then it's not a "Value" type, so return false without decoding anything
 	}
 	return false, nil

@@ -95,9 +95,7 @@ type GoTemplateGenerator struct {
 	// Template is the template to render.
 	Template Value `yaml:"template" json:"template"`
 	// Vars are input variables to the template.
-	Vars map[string]any `yaml:"vars,omitempty" json:"vars,omitempty"`
-	// RefVars are input variables to the template allowing references to other generator outputs or files.
-	RefVars map[string]ParsedValue `yaml:"refVars,omitempty" json:"refVars,omitempty"`
+	Vars map[string]AnyValue `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
 // JQGenerator executes 'jq' and returns the output.

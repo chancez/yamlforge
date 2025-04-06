@@ -6,7 +6,7 @@ pipeline:
 # on the configuration options specified in file/dynamic-config.yaml
 - name: dynamic-fetch-ami-id
   gotemplate:
-    refVars:
+    vars:
       config:
         file: files/dynamic-config.yaml
     template:
@@ -44,7 +44,7 @@ pipeline:
 
 - name: karpenter-values
   gotemplate:
-    refVars:
+    vars:
       eks:
         file: ../files/eks-vars.yaml
     template:
@@ -69,7 +69,7 @@ pipeline:
 
 - name: karpenter-node-pool
   gotemplate:
-    refVars:
+    vars:
       eks:
         file: ../files/eks-vars.yaml
       amiID:
