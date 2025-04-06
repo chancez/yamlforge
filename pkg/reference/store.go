@@ -1,8 +1,12 @@
 package reference
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"iter"
 	"os"
 	"path"
 
@@ -118,6 +122,50 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 		return ConvertToBytes(ref.Value)
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
+	}
+}
+
+func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (iter.Seq2[any, error], error) {
+	dec, err := store.getParsedValueDecoder(dir, parsedVal)
+	if err != nil {
+		return nil, err
+	}
+	return func(yield func(any, error) bool) {
+		for {
+			var val any
+			err := dec.Decode(&val)
+			if err == io.EOF {
+				return
+			}
+			if !yield(val, err) {
+				return
+			}
+		}
+	}, nil
+}
+
+func (store *Store) getParsedValueDecoder(dir string, val config.ParsedValue) (Decoder, error) {
+	data, err := store.getReference(dir, val.Value)
+	if err != nil {
+		return nil, fmt.Errorf("error getting reference: %w", err)
+	}
+	return NewDecoder(val.Format, data)
+}
+
+type Decoder interface {
+	Decode(any) error
+}
+
+func NewDecoder(format string, data []byte) (Decoder, error) {
+	switch format {
+	case "yaml":
+		return config.NewYAMLDecoder(bytes.NewBuffer(data)), nil
+	case "json":
+		return json.NewDecoder(bytes.NewBuffer(data)), nil
+	case "":
+		return nil, errors.New("input.format is required")
+	default:
+		return nil, fmt.Errorf("invalid input format specified: %q", format)
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"reflect"
@@ -34,33 +33,17 @@ func NewCEL(dir string, cfg config.CELGenerator, refStore *reference.Store) *CEL
 	}
 }
 
-type decoder interface {
-	Decode(any) error
-}
-
 type encoder interface {
 	Encode(any) error
 }
 
 func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
-	ref, err := c.refStore.GetReference(c.dir, c.cfg.Input.Value)
+	vals, err := c.refStore.GetParsedValues(c.dir, c.cfg.Input)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference: %w", err)
+		return nil, err
 	}
 
 	var buf bytes.Buffer
-	var dec decoder
-	switch c.cfg.Input.Format {
-	case "yaml":
-		dec = config.NewYAMLDecoder(bytes.NewBuffer(ref))
-	case "json":
-		dec = json.NewDecoder(bytes.NewBuffer(ref))
-	case "":
-		return nil, errors.New("input.format is required")
-	default:
-		return nil, fmt.Errorf("invalid input format specified: %q", c.cfg.Input.Format)
-	}
-
 	var enc encoder
 	switch c.cfg.Format {
 	case "yaml", "":
@@ -96,16 +79,10 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 		return nil, fmt.Errorf("CEL program construction error: %s", err)
 	}
 
-	for {
-		var val any
-		err := dec.Decode(&val)
-		if err == io.EOF {
-			break
-		}
+	for val, err := range vals {
 		if err != nil {
-			return nil, fmt.Errorf("error decoding input as %s: %w", c.cfg.Input.Format, err)
+			return nil, fmt.Errorf("error while processing input: %w", err)
 		}
-
 		out, _, err := prg.ContextEval(ctx, map[string]any{
 			"val": val,
 		})
