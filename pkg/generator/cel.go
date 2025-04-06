@@ -106,7 +106,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 
 		err = enc.Encode(toEncode)
 		if err != nil {
-			return nil, fmt.Errorf("error encoding result at %s: %w", c.cfg.Input.Format, err)
+			return nil, fmt.Errorf("error encoding result as %q: %w", c.cfg.Format, err)
 		}
 	}
 
