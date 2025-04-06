@@ -625,7 +625,8 @@
             "yaml",
             "json"
           ],
-          "description": "Format defines the format to parse the retrieved value as. Valid options are yaml or json."
+          "description": "Format defines the format to parse the retrieved value as. Valid options\nare yaml or json. Defaults to yaml if unspecified, or if the value\nreferences a file, it will attempt to use the file extension to determine\nthe correct format.",
+          "default": "yaml"
         },
         "var": {
           "type": "string",

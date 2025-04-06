@@ -145,11 +145,23 @@ func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (i
 }
 
 func (store *Store) getParsedValueDecoder(dir string, val config.ParsedValue) (Decoder, error) {
+	format := val.Format
+	if format == "" && val.File != "" {
+		switch path.Ext(val.File) {
+		case "yaml":
+			format = "yaml"
+		case "json":
+			format = "json"
+		}
+	}
+	if format == "" {
+		format = "yaml"
+	}
 	data, err := store.getReference(dir, val.Value)
 	if err != nil {
 		return nil, fmt.Errorf("error getting reference: %w", err)
 	}
-	return NewDecoder(val.Format, data)
+	return NewDecoder(format, data)
 }
 
 type Decoder interface {

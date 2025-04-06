@@ -162,7 +162,15 @@ type NamedValue struct {
 
 // ParsedValue provides parsed values to generators.
 type ParsedValue struct {
-	// Format defines the format to parse the retrieved value as. Valid options are yaml or json.
-	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json"`
+	// Format defines the format to parse the retrieved value as. Valid options
+	// are yaml or json. Defaults to yaml if unspecified, or if the value
+	// references a file, it will attempt to use the file extension to determine
+	// the correct format.
+	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json,default=yaml"`
 	Value  `yaml:",inline" json:",inline"`
+}
+
+func (pv ParsedValue) String() string {
+	b, _ := json.Marshal(pv)
+	return string(b)
 }
