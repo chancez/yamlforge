@@ -36,7 +36,7 @@ func (store *Store) AddReference(name string, data []byte) error {
 }
 
 func (store *Store) GetValueBytes(dir string, ref config.Value) ([]byte, error) {
-	return store.getReference(dir, ref)
+	return store.getValue(dir, ref)
 }
 
 func (store *Store) GetAnyValue(dir string, val config.AnyValue) (any, error) {
@@ -44,7 +44,7 @@ func (store *Store) GetAnyValue(dir string, val config.AnyValue) (any, error) {
 		return *val.Any, nil
 	}
 	if val.Value != nil {
-		return store.getReference(dir, *val.Value)
+		return store.getValue(dir, *val.Value)
 	}
 	panic("invalid AnyValue")
 }
@@ -54,7 +54,7 @@ func (store *Store) GetStringValue(dir string, val config.StringValue) (string, 
 		return *val.String, nil
 	}
 	if val.Value != nil {
-		data, err := store.getReference(dir, *val.Value)
+		data, err := store.getValue(dir, *val.Value)
 		if err != nil {
 			return "", err
 		}
@@ -87,7 +87,7 @@ func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error)
 		return *val.Bool, nil
 	}
 	if val.Value != nil {
-		data, err := store.getReference(dir, *val.Value)
+		data, err := store.getValue(dir, *val.Value)
 		if err != nil {
 			return false, err
 		}
@@ -106,7 +106,7 @@ func (store *Store) GetMapValue(dir string, val config.MapValue) (map[string]any
 		return val.Map, nil
 	}
 	if val.Value != nil {
-		data, err := store.getReference(dir, *val.Value)
+		data, err := store.getValue(dir, *val.Value)
 		if err != nil {
 			return nil, err
 		}
@@ -120,7 +120,7 @@ func (store *Store) GetMapValue(dir string, val config.MapValue) (map[string]any
 	panic("invalid MapValue")
 }
 
-func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
+func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
 	switch {
 	case ref.Var != "":
 		varName := ref.Var
@@ -173,7 +173,7 @@ func (pv ParsedValue) Parsed() any {
 }
 
 func (store *Store) getParsedValueDecoder(dir string, parsedVal config.ParsedValue) (Decoder, []byte, error) {
-	data, err := store.getReference(dir, parsedVal.Value)
+	data, err := store.getValue(dir, parsedVal.Value)
 	if err != nil {
 		return nil, nil, fmt.Errorf("error getting reference: %w", err)
 	}
