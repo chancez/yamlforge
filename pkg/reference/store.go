@@ -96,9 +96,28 @@ func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error)
 		if err != nil {
 			return false, err
 		}
-		return b, err
+		return b, nil
 	}
 	panic("invalid BoolValue")
+}
+
+func (store *Store) GetMapValue(dir string, val config.MapValue) (map[string]any, error) {
+	if val.Map != nil {
+		return val.Map, nil
+	}
+	if val.Value != nil {
+		data, err := store.getReference(dir, *val.Value)
+		if err != nil {
+			return nil, err
+		}
+		var m map[string]any
+		err = config.DecodeYAML(data, &m)
+		if err != nil {
+			return nil, err
+		}
+		return m, nil
+	}
+	panic("invalid MapValue")
 }
 
 func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {

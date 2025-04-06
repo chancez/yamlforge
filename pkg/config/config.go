@@ -87,7 +87,7 @@ type KustomizeGenerator struct {
 // MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output.
 type MergeGenerator struct {
 	// Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs.
-	Input []ParsedValue `yaml:"input" json:"input"`
+	Input []MapValue `yaml:"input" json:"input"`
 }
 
 // GoTemplateGenerator renders Go 'text/template' templates and returns the output.

@@ -66,6 +66,72 @@ func (BoolValue) JSONSchema() *jsonschema.Schema {
 	return oneOfTypeOrValueSchema("boolean")
 }
 
+func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
+	trimmed := bytes.TrimSpace(data)
+	if len(trimmed) == 0 {
+		return false, nil
+	}
+
+	unmarshalValue := func() error {
+		*val = new(Value)
+		// Unmarshal into Value.
+		if err := json.Unmarshal(data, *val); err != nil {
+			return err
+		}
+		return nil
+	}
+
+	// If the JSON starts with '{', check if it contains any keys that belong to Value.
+	if trimmed[0] == '{' {
+		var obj map[string]json.RawMessage
+		if err := json.Unmarshal(data, &obj); err != nil {
+			return false, err
+		}
+		if _, hasVar := obj["var"]; hasVar {
+			return true, unmarshalValue()
+		}
+		if _, hasRef := obj["ref"]; hasRef {
+			return true, unmarshalValue()
+		}
+		if _, hasFile := obj["file"]; hasFile {
+			return true, unmarshalValue()
+		}
+		// If none of the specific keys exist, then it's not a "Value" type, so return false without decoding anything
+	}
+	return false, nil
+}
+
+type MapValue struct {
+	Map   map[string]any
+	Value *Value
+}
+
+var _ json.Unmarshaler = (*MapValue)(nil)
+
+func (mv *MapValue) UnmarshalJSON(data []byte) error {
+	// Unmarshal into Value
+	ok, err := maybeUnmarshalValue(data, &mv.Value)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+
+	// Try to unmarshal as a generic map.
+	var m map[string]any
+	if err := json.Unmarshal(data, &m); err == nil {
+		mv.Map = m
+		return nil
+	}
+
+	return fmt.Errorf("MapValue: cannot unmarshal %s", data)
+}
+
+func (MapValue) JSONSchema() *jsonschema.Schema {
+	return oneOfTypeOrValueSchema("object")
+}
+
 type AnyValue struct {
 	Any   *any
 	Value *Value
@@ -74,39 +140,14 @@ type AnyValue struct {
 var _ json.Unmarshaler = (*AnyValue)(nil)
 
 func (av *AnyValue) UnmarshalJSON(data []byte) error {
-	trimmed := bytes.TrimSpace(data)
-	if len(trimmed) == 0 {
+	// Unmarshal into Value
+	ok, err := maybeUnmarshalValue(data, &av.Value)
+	if err != nil {
+		return err
+	}
+	if ok {
 		return nil
 	}
-
-	unmarshalValue := func() error {
-		// Unmarshal into Value.
-		var val Value
-		if err := json.Unmarshal(data, &val); err != nil {
-			return err
-		}
-		av.Value = &val
-		return nil
-	}
-
-	// If the JSON starts with '{', check if it contains any keys that belong to Value.
-	if trimmed[0] == '{' {
-		var obj map[string]json.RawMessage
-		if err := json.Unmarshal(data, &obj); err != nil {
-			return err
-		}
-		if _, hasVar := obj["var"]; hasVar {
-			return unmarshalValue()
-		}
-		if _, hasRef := obj["ref"]; hasRef {
-			return unmarshalValue()
-		}
-		if _, hasFile := obj["file"]; hasFile {
-			return unmarshalValue()
-		}
-		// If none of the specific keys exist, treat it as any.
-	}
-
 	// Unmarshal into any.
 	var anyVal any
 	if err := json.Unmarshal(data, &anyVal); err != nil {

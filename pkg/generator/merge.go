@@ -28,25 +28,11 @@ func NewMerge(dir string, cfg config.MergeGenerator, refStore *reference.Store) 
 func (m *Merge) Generate(_ context.Context) ([]byte, error) {
 	merged := make(map[string]any)
 	for _, input := range m.cfg.Input {
-		vals, err := m.refStore.GetParsedValues(m.dir, input)
+		val, err := m.refStore.GetMapValue(m.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		for val, err := range vals {
-			if err != nil {
-				return nil, fmt.Errorf("error while processing input: %w", err)
-			}
-			itemMap, ok := val.Parsed().(map[string]any)
-			if !ok {
-				// Provide a snippet of the data being merged
-				refStr := string(val.Data())
-				if len(refStr) > 20 {
-					refStr = refStr[0:20]
-				}
-				return nil, fmt.Errorf("unable to merge non-map values from %q", refStr)
-			}
-			merged = mapmerge.Merge(merged, itemMap)
-		}
+		merged = mapmerge.Merge(merged, val)
 	}
 	out, err := config.EncodeYAML(merged)
 	if err != nil {

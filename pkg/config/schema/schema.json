@@ -512,11 +512,21 @@
       "type": "object",
       "description": "KustomizeGenerator runs 'kustomize build' to render a Kustomization and returns the output."
     },
+    "MapValue": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "$ref": "#/$defs/Value"
+        }
+      ]
+    },
     "MergeGenerator": {
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/ParsedValue"
+            "$ref": "#/$defs/MapValue"
           },
           "type": "array",
           "description": "Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs."
