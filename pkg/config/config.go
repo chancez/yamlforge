@@ -47,9 +47,9 @@ type FileGenerator struct {
 // ExecGenerator execs the command specified and returns the stdout of the program.
 type ExecGenerator struct {
 	// Command is the command to execute.
-	Command string `yaml:"command" json:"command"`
+	Command StringValue `yaml:"command" json:"command"`
 	// Args are the arguments to the command.
-	Args []string `yaml:"args,omitempty" json:"args,omitempty"`
+	Args []StringValue `yaml:"args,omitempty" json:"args,omitempty"`
 	// Env is a list of environment variables to set for the command.
 	Env []NamedValue `yaml:"env,omitempty" json:"env,omitempty"`
 }

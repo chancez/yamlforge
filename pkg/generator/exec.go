@@ -37,13 +37,23 @@ func (e *Exec) Generate(context.Context) ([]byte, error) {
 		}
 		env = append(env, fmt.Sprintf("%s=%s", envVar.Name, string(data)))
 	}
+
+	command, err := e.refStore.GetStringValue(e.dir, e.cfg.Command)
+	if err != nil {
+		return nil, err
+	}
+	args, err := e.refStore.GetStringValueList(e.dir, e.cfg.Args)
+	if err != nil {
+		return nil, err
+	}
+
 	var buf bytes.Buffer
-	cmd := exec.Command(e.cfg.Command, e.cfg.Args...)
+	cmd := exec.Command(command, args...)
 	cmd.Dir = e.dir
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = &buf
 	cmd.Env = append(os.Environ(), env...)
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return nil, err
 	}

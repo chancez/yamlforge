@@ -136,12 +136,12 @@
     "ExecGenerator": {
       "properties": {
         "command": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Command is the command to execute."
         },
         "args": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/StringValue"
           },
           "type": "array",
           "description": "Args are the arguments to the command."
