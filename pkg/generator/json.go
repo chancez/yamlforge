@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
@@ -35,21 +34,15 @@ func (j *JSON) Generate(context.Context) ([]byte, error) {
 		enc.SetIndent("", strings.Repeat(" ", j.cfg.Indent))
 	}
 	for _, input := range j.cfg.Input {
-		data, err := j.refStore.GetValueBytes(j.dir, input)
+		vals, err := j.refStore.GetParsedValues(j.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		dec := config.NewYAMLDecoder(bytes.NewBuffer(data))
-		for {
-			var tmp any
-			err = dec.Decode(&tmp)
-			if err == io.EOF {
-				break
-			}
+		for val, err := range vals {
 			if err != nil {
-				return nil, fmt.Errorf("error decoding reference as YAML: %w", err)
+				return nil, fmt.Errorf("error while processing input: %w", err)
 			}
-			err = enc.Encode(tmp)
+			err = enc.Encode(val.Parsed())
 			if err != nil {
 				return nil, fmt.Errorf("error writing JSON: %w", err)
 			}

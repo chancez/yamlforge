@@ -87,7 +87,7 @@ type KustomizeGenerator struct {
 // MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output.
 type MergeGenerator struct {
 	// Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs.
-	Input []Value `yaml:"input" json:"input"`
+	Input []ParsedValue `yaml:"input" json:"input"`
 }
 
 // GoTemplateGenerator renders Go 'text/template' templates and returns the output.
@@ -97,7 +97,7 @@ type GoTemplateGenerator struct {
 	// Vars are input variables to the template.
 	Vars map[string]any `yaml:"vars,omitempty" json:"vars,omitempty"`
 	// RefVars are input variables to the template allowing references to other generator outputs or files.
-	RefVars map[string]Value `yaml:"refVars,omitempty" json:"refVars,omitempty"`
+	RefVars map[string]ParsedValue `yaml:"refVars,omitempty" json:"refVars,omitempty"`
 }
 
 // JQGenerator executes 'jq' and returns the output.
@@ -139,7 +139,7 @@ type JSONPatchGenerator struct {
 // YAMLGenerator returns it's inputs as YAML.
 type YAMLGenerator struct {
 	// Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned.
-	Input []Value `yaml:"input" json:"input"`
+	Input []ParsedValue `yaml:"input" json:"input"`
 	// Indent defines the indent level to use for the output.
 	Indent int `yaml:"indent,omitempty" json:"indent,omitempty"`
 }
@@ -147,7 +147,7 @@ type YAMLGenerator struct {
 // JSONGenerator returns it's inputs as JSON.
 type JSONGenerator struct {
 	// Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned.
-	Input []Value `yaml:"input" json:"input"`
+	Input []ParsedValue `yaml:"input" json:"input"`
 	// Indent defines the indent level to use for the output.
 	Indent int `yaml:"indent,omitempty" json:"indent,omitempty"`
 }

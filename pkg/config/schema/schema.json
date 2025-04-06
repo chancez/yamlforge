@@ -333,7 +333,7 @@
         },
         "refVars": {
           "additionalProperties": {
-            "$ref": "#/$defs/Value"
+            "$ref": "#/$defs/ParsedValue"
           },
           "type": "object",
           "description": "RefVars are input variables to the template allowing references to other generator outputs or files."
@@ -439,7 +439,7 @@
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/Value"
+            "$ref": "#/$defs/ParsedValue"
           },
           "type": "array",
           "description": "Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned."
@@ -516,7 +516,7 @@
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/Value"
+            "$ref": "#/$defs/ParsedValue"
           },
           "type": "array",
           "description": "Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs."
@@ -786,7 +786,7 @@
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/Value"
+            "$ref": "#/$defs/ParsedValue"
           },
           "type": "array",
           "description": "Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned."

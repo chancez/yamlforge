@@ -84,7 +84,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 			return nil, fmt.Errorf("error while processing input: %w", err)
 		}
 		out, _, err := prg.ContextEval(ctx, map[string]any{
-			"val": val,
+			"val": val.Parsed(),
 		})
 		if err != nil {
 			return nil, fmt.Errorf("error evaluating CEL program: %s", err)

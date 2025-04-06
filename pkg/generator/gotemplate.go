@@ -64,16 +64,11 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 		if name == "" {
 			return nil, fmt.Errorf("refVars: variable name cannot be empty")
 		}
-		data, err := gt.refStore.GetValueBytes(gt.dir, ref)
+		pv, err := gt.refStore.GetParsedValue(gt.dir, ref)
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting value: %w", name, err)
 		}
-		var tmp any
-		err = config.DecodeYAML(data, &tmp)
-		if err != nil {
-			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
-		}
-		vars[name] = tmp
+		vars[name] = pv.Parsed()
 	}
 
 	err = tpl.Execute(&buf, vars)

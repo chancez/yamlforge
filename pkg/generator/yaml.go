@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
@@ -30,21 +29,15 @@ func (y *YAML) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := config.NewYAMLEncoderWithIndent(&out, y.cfg.Indent)
 	for _, input := range y.cfg.Input {
-		data, err := y.refStore.GetValueBytes(y.dir, input)
+		vals, err := y.refStore.GetParsedValues(y.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		dec := config.NewYAMLDecoder(bytes.NewBuffer(data))
-		for {
-			var tmp any
-			err = dec.Decode(&tmp)
-			if err == io.EOF {
-				break
-			}
+		for val, err := range vals {
 			if err != nil {
-				return nil, fmt.Errorf("error decoding reference as YAML: %w", err)
+				return nil, fmt.Errorf("error while processing input: %w", err)
 			}
-			err = enc.Encode(tmp)
+			err = enc.Encode(val.Parsed())
 			if err != nil {
 				return nil, fmt.Errorf("error writing YAML: %w", err)
 			}

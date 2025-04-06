@@ -125,29 +125,28 @@ func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 	}
 }
 
-func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (iter.Seq2[any, error], error) {
-	dec, err := store.getParsedValueDecoder(dir, parsedVal)
-	if err != nil {
-		return nil, err
-	}
-	return func(yield func(any, error) bool) {
-		for {
-			var val any
-			err := dec.Decode(&val)
-			if err == io.EOF {
-				return
-			}
-			if !yield(val, err) {
-				return
-			}
-		}
-	}, nil
+// ParsedValue stores the parsed Value retrieved from the store, and the original data before parsing.
+type ParsedValue struct {
+	parsed any
+	data   []byte
 }
 
-func (store *Store) getParsedValueDecoder(dir string, val config.ParsedValue) (Decoder, error) {
-	format := val.Format
-	if format == "" && val.File != "" {
-		switch path.Ext(val.File) {
+func (pv ParsedValue) Data() []byte {
+	return pv.data
+}
+
+func (pv ParsedValue) Parsed() any {
+	return pv.parsed
+}
+
+func (store *Store) getParsedValueDecoder(dir string, parsedVal config.ParsedValue) (Decoder, []byte, error) {
+	data, err := store.getReference(dir, parsedVal.Value)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error getting reference: %w", err)
+	}
+	format := parsedVal.Format
+	if format == "" && parsedVal.File != "" {
+		switch path.Ext(parsedVal.File) {
 		case "yaml":
 			format = "yaml"
 		case "json":
@@ -157,11 +156,57 @@ func (store *Store) getParsedValueDecoder(dir string, val config.ParsedValue) (D
 	if format == "" {
 		format = "yaml"
 	}
-	data, err := store.getReference(dir, val.Value)
+	dec, err := NewDecoder(format, data)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference: %w", err)
+		return nil, nil, fmt.Errorf("error creating decoder: %w", err)
 	}
-	return NewDecoder(format, data)
+	return dec, data, nil
+}
+
+func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (iter.Seq2[ParsedValue, error], error) {
+	dec, data, err := store.getParsedValueDecoder(dir, parsedVal)
+	if err != nil {
+		return nil, err
+	}
+	return func(yield func(ParsedValue, error) bool) {
+		for {
+			pv := ParsedValue{
+				data: data,
+			}
+			err := dec.Decode(&pv.parsed)
+			if err == io.EOF {
+				return
+			}
+			if !yield(pv, err) {
+				return
+			}
+		}
+	}, nil
+}
+
+func (store *Store) GetParsedValue(dir string, parsedVal config.ParsedValue) (ParsedValue, error) {
+	dec, data, err := store.getParsedValueDecoder(dir, parsedVal)
+	if err != nil {
+		return ParsedValue{}, err
+	}
+	var vals []any
+	pv := ParsedValue{
+		data: data,
+	}
+	for {
+		var tmp any
+		err := dec.Decode(&tmp)
+		if err == io.EOF {
+			break
+		}
+		vals = append(vals, tmp)
+	}
+	if len(vals) == 1 {
+		pv.parsed = vals[0]
+	} else {
+		pv.parsed = vals
+	}
+	return pv, nil
 }
 
 type Decoder interface {
