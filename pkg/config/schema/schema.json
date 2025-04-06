@@ -3,6 +3,16 @@
   "$id": "https://github.com/chancez/yamlforge/pkg/config/config",
   "$ref": "#/$defs/Config",
   "$defs": {
+    "BoolValue": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/$defs/Value"
+        }
+      ]
+    },
     "CELGenerator": {
       "properties": {
         "input": {
@@ -314,39 +324,39 @@
     "HelmGenerator": {
       "properties": {
         "releaseName": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "ReleaseName is the release name."
         },
         "chart": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Chart is the Helm chart to install. Prefix with oci:// to use a chart stored in an OCI registry."
         },
         "version": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Version is the version of the helm chart to install."
         },
         "repo": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Repo is the repository to install the Helm chart from."
         },
         "namespace": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Namespace is the Kubernetes namespace to use when rendering resources."
         },
         "includeCRDs": {
-          "type": "boolean",
+          "$ref": "#/$defs/BoolValue",
           "description": "IncludeCRDs specifies if CRDs are included in the templated output"
         },
         "apiVersions": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/StringValue"
           },
           "type": "array",
           "description": "APIVersions are Kubernetes api versions used for Capabilities.APIVersions."
         },
         "values": {
           "items": {
-            "$ref": "#/$defs/Value"
+            "$ref": "#/$defs/StringValue"
           },
           "type": "array",
           "description": "Values are the Helm values used as configuration for the Helm chart."
@@ -680,6 +690,16 @@
       "additionalProperties": false,
       "type": "object",
       "description": "PipelineGenerator executes other generators in a pipeline or singular context."
+    },
+    "StringValue": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/Value"
+        }
+      ]
     },
     "Value": {
       "oneOf": [

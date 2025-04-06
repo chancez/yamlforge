@@ -35,6 +35,44 @@ func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
 	return store.getReference(dir, ref)
 }
 
+func (store *Store) GetStringValue(dir string, val config.StringValue) (string, error) {
+	if val.String != nil {
+		return *val.String, nil
+	}
+	if val.Value != nil {
+		data, err := store.getReference(dir, *val.Value)
+		if err != nil {
+			return "", err
+		}
+		var s string
+		err = config.DecodeYAML(data, &s)
+		if err != nil {
+			return "", err
+		}
+		return s, err
+	}
+	panic("invalid StringValue")
+}
+
+func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error) {
+	if val.Bool != nil {
+		return *val.Bool, nil
+	}
+	if val.Value != nil {
+		data, err := store.getReference(dir, *val.Value)
+		if err != nil {
+			return false, err
+		}
+		var b bool
+		err = config.DecodeYAML(data, &b)
+		if err != nil {
+			return false, err
+		}
+		return b, err
+	}
+	panic("invalid BoolValue")
+}
+
 func (store *Store) getReference(dir string, ref config.Value) ([]byte, error) {
 	switch {
 	case ref.Var != "":

@@ -72,4 +72,42 @@ func TestStore(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.Equal(t, []byte(`some-file-data`), fileData)
+
+	// Look up an existing ref as a string
+	strData, err := store.GetStringValue("", config.StringValue{
+		Value: &config.Value{
+			Ref: "example",
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, "ref-data", strData)
+
+	// Call GetStringValue on a non-ref value
+	exampleStr := "example-str"
+	strData2, err := store.GetStringValue("", config.StringValue{
+		String: &exampleStr,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, exampleStr, strData2)
+
+	// Store a boolean as a ref
+	err = store.AddReference("bool-ref", []byte(`true`))
+	require.NoError(t, err)
+
+	// Look up an existing ref as a bool
+	boolData, err := store.GetBoolValue("", config.BoolValue{
+		Value: &config.Value{
+			Ref: "bool-ref",
+		},
+	})
+	require.NoError(t, err)
+	assert.Equal(t, true, boolData)
+
+	// Call GetBoolValue on a non-ref value
+	exampleBool := true
+	boolData2, err := store.GetBoolValue("", config.BoolValue{
+		Bool: &exampleBool,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, true, boolData2)
 }

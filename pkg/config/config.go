@@ -63,21 +63,21 @@ type ExecGenerator struct {
 // HelmGenerator runs 'helm template' to render a Helm chart and returns the output.
 type HelmGenerator struct {
 	// ReleaseName is the release name.
-	ReleaseName string `yaml:"releaseName" json:"releaseName"`
+	ReleaseName StringValue `yaml:"releaseName" json:"releaseName"`
 	// Chart is the Helm chart to install. Prefix with oci:// to use a chart stored in an OCI registry.
-	Chart string `yaml:"chart" json:"chart"`
+	Chart StringValue `yaml:"chart" json:"chart"`
 	// Version is the version of the helm chart to install.
-	Version string `yaml:"version,omitempty" json:"version,omitempty"`
+	Version StringValue `yaml:"version,omitempty" json:"version,omitempty"`
 	// Repo is the repository to install the Helm chart from.
-	Repo string `yaml:"repo,omitempty" json:"repo,omitempty"`
+	Repo StringValue `yaml:"repo,omitempty" json:"repo,omitempty"`
 	// Namespace is the Kubernetes namespace to use when rendering resources.
-	Namespace string `yaml:"namespace,omitempty" json:"namespace,omitempty"`
+	Namespace StringValue `yaml:"namespace,omitempty" json:"namespace,omitempty"`
 	// IncludeCRDs specifies if CRDs are included in the templated output
-	IncludeCRDs bool `yaml:"includeCRDs,omitempty" json:"includeCRDs,omitempty"`
+	IncludeCRDs BoolValue `yaml:"includeCRDs,omitempty" json:"includeCRDs,omitempty"`
 	// APIVersions are Kubernetes api versions used for Capabilities.APIVersions.
-	APIVersions []string `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
+	APIVersions []StringValue `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
 	// Values are the Helm values used as configuration for the Helm chart.
-	Values []Value `yaml:"values,omitempty" json:"values,omitempty"`
+	Values []StringValue `yaml:"values,omitempty" json:"values,omitempty"`
 }
 
 // KustomizeGenerator runs 'kustomize build' to render a Kustomization and returns the output.
@@ -177,36 +177,4 @@ type PipelineGenerator struct {
 	Include *Value `yaml:"include,omitempty" json:"include,omitempty" jsonschema:"oneof_required=include"`
 	// Vars defines variables that the pipeline is providing to the sub-pipeline.
 	Vars []NamedValue `yaml:"vars,omitempty" json:"vars,omitempty"`
-}
-
-// Value provides inputs to generators.
-type Value struct {
-	// Var allows defining variables that can be externally provided to a pipeline.
-	Var string `yaml:"var,omitempty" json:"var,omitempty" jsonschema:"oneof_required=var"`
-	// Ref takes the name of a previous stage in the pipeline and returns the output of that stage.
-	Ref string `yaml:"ref,omitempty" json:"ref,omitempty" jsonschema:"oneof_required=ref"`
-	// File takes a path relative to this pipeline file to read and returns the content of the file specified.
-	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
-	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object).
-	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
-	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.
-	IgnoreMissing bool `yaml:"ignoreMissing,omitempty" json:"ignoreMissing,omitempty"`
-	// Default specifies the default value to use if a ref, variable, or file is
-	// missing. Has no effect unless ignoreMissing is true.
-	// It can be any valid YAML/JSON type ( string, boolean, number, array, object).
-	Default any `yaml:"default,omitempty" json:"default,omitempty"`
-}
-
-// NamedValue is a Value with a name.
-type NamedValue struct {
-	// Name is the name of this variable.
-	Name  string `yaml:"name" json:"name"`
-	Value `yaml:",inline" json:",inline"`
-}
-
-// ParsedValue provides parsed values to generators.
-type ParsedValue struct {
-	// Format defines the format to parse the retrieved value as. Valid options are yaml or json.
-	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json"`
-	Value  `yaml:",inline" json:",inline"`
 }

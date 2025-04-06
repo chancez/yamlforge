@@ -30,31 +30,67 @@ func NewHelm(dir string, cfg config.HelmGenerator, refStore *reference.Store) *H
 
 func (h *Helm) Generate(context.Context) ([]byte, error) {
 	var buf bytes.Buffer
-	templateArgs := []string{
-		"template",
-		h.cfg.ReleaseName,
-		h.cfg.Chart,
+	releaseName, err := h.refStore.GetStringValue(h.dir, h.cfg.ReleaseName)
+	if err != nil {
+		return nil, err
 	}
-	if h.cfg.Version != "" {
-		templateArgs = append(templateArgs, "--version", h.cfg.Version)
+	chart, err := h.refStore.GetStringValue(h.dir, h.cfg.Chart)
+	if err != nil {
+		return nil, err
 	}
-	if h.cfg.Repo != "" {
-		templateArgs = append(templateArgs, "--repo", h.cfg.Repo)
+	version, err := h.refStore.GetStringValue(h.dir, h.cfg.Version)
+	if err != nil {
+		return nil, err
 	}
-	if h.cfg.Namespace != "" {
-		templateArgs = append(templateArgs, "--namespace", h.cfg.Namespace)
+	repo, err := h.refStore.GetStringValue(h.dir, h.cfg.Repo)
+	if err != nil {
+		return nil, err
 	}
-	if h.cfg.IncludeCRDs {
-		templateArgs = append(templateArgs, "--include-crds")
+	namespace, err := h.refStore.GetStringValue(h.dir, h.cfg.Namespace)
+	if err != nil {
+		return nil, err
 	}
+	includeCRDs, err := h.refStore.GetBoolValue(h.dir, h.cfg.IncludeCRDs)
+	if err != nil {
+		return nil, err
+	}
+
+	var apiVersions []string
 	if len(h.cfg.APIVersions) != 0 {
 		for _, apiVersion := range h.cfg.APIVersions {
-			templateArgs = append(templateArgs, "--api-versions", apiVersion)
+			apiV, err := h.refStore.GetStringValue(h.dir, apiVersion)
+			if err != nil {
+				return nil, err
+			}
+			if apiV != "" {
+				apiVersions = append(apiVersions, apiV)
+			}
 		}
 	}
-	var refs [][]byte
+
+	templateArgs := []string{
+		"template",
+		releaseName,
+		chart,
+	}
+	if version != "" {
+		templateArgs = append(templateArgs, "--version", version)
+	}
+	if repo != "" {
+		templateArgs = append(templateArgs, "--repo", repo)
+	}
+	if namespace != "" {
+		templateArgs = append(templateArgs, "--namespace", namespace)
+	}
+	if includeCRDs {
+		templateArgs = append(templateArgs, "--include-crds")
+	}
+	for _, apiVersion := range apiVersions {
+		templateArgs = append(templateArgs, "--api-versions", apiVersion)
+	}
+	var refs []string
 	for _, input := range h.cfg.Values {
-		ref, err := h.refStore.GetReference(h.dir, input)
+		ref, err := h.refStore.GetStringValue(h.dir, input)
 		if err != nil {
 			return nil, fmt.Errorf("error getting reference: %w", err)
 		}
@@ -71,7 +107,7 @@ func (h *Helm) Generate(context.Context) ([]byte, error) {
 
 	for i, ref := range refs {
 		refPath := path.Join(tmpDir, fmt.Sprintf("ref-%d-values.yaml", i))
-		err = os.WriteFile(refPath, ref, 0400)
+		err = os.WriteFile(refPath, []byte(ref), 0400)
 		if err != nil {
 			return nil, fmt.Errorf("error writing helm values to %q: %w", refPath, err)
 		}
