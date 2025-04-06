@@ -68,6 +68,20 @@ func (store *Store) GetStringValue(dir string, val config.StringValue) (string, 
 	panic("invalid StringValue")
 }
 
+func (store *Store) GetStringValueList(dir string, vals []config.StringValue) ([]string, error) {
+	var ret []string
+	if len(vals) != 0 {
+		for _, apiVersion := range vals {
+			apiV, err := store.GetStringValue(dir, apiVersion)
+			if err != nil {
+				return nil, err
+			}
+			ret = append(ret, apiV)
+		}
+	}
+	return ret, nil
+}
+
 func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error) {
 	if val.Bool != nil {
 		return *val.Bool, nil

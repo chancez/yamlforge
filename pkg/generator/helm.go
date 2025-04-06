@@ -55,17 +55,9 @@ func (h *Helm) Generate(context.Context) ([]byte, error) {
 		return nil, err
 	}
 
-	var apiVersions []string
-	if len(h.cfg.APIVersions) != 0 {
-		for _, apiVersion := range h.cfg.APIVersions {
-			apiV, err := h.refStore.GetStringValue(h.dir, apiVersion)
-			if err != nil {
-				return nil, err
-			}
-			if apiV != "" {
-				apiVersions = append(apiVersions, apiV)
-			}
-		}
+	apiVersions, err := h.refStore.GetStringValueList(h.dir, h.cfg.APIVersions)
+	if err != nil {
+		return nil, err
 	}
 
 	templateArgs := []string{
