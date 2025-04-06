@@ -51,14 +51,14 @@ func (jq *JQ) Generate(context.Context) ([]byte, error) {
 		"--monochrome-output",
 	)
 
-	refVal, err := jq.refStore.GetReference(jq.dir, jq.cfg.Input)
+	data, err := jq.refStore.GetValueBytes(jq.dir, jq.cfg.Input)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference: %w", err)
+		return nil, fmt.Errorf("error getting value: %w", err)
 	}
 
 	var buf bytes.Buffer
 	cmd := exec.Command("jq", jqArgs...)
-	cmd.Stdin = bytes.NewBuffer(refVal)
+	cmd.Stdin = bytes.NewBuffer(data)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = &buf
 	err = cmd.Run()

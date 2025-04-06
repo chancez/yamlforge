@@ -30,11 +30,11 @@ func (y *YAML) Generate(context.Context) ([]byte, error) {
 	var out bytes.Buffer
 	enc := config.NewYAMLEncoderWithIndent(&out, y.cfg.Indent)
 	for _, input := range y.cfg.Input {
-		ref, err := y.refStore.GetReference(y.dir, input)
+		data, err := y.refStore.GetValueBytes(y.dir, input)
 		if err != nil {
-			return nil, fmt.Errorf("error getting reference: %w", err)
+			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		dec := config.NewYAMLDecoder(bytes.NewBuffer(ref))
+		dec := config.NewYAMLDecoder(bytes.NewBuffer(data))
 		for {
 			var tmp any
 			err = dec.Decode(&tmp)

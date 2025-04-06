@@ -31,9 +31,9 @@ func NewExec(dir string, cfg config.ExecGenerator, refStore *reference.Store) *E
 func (e *Exec) Generate(context.Context) ([]byte, error) {
 	var env []string
 	for _, envVar := range e.cfg.Env {
-		data, err := e.refStore.GetReference(e.dir, envVar.Value)
+		data, err := e.refStore.GetValueBytes(e.dir, envVar.Value)
 		if err != nil {
-			return nil, fmt.Errorf("error getting reference: %w", err)
+			return nil, fmt.Errorf("error getting value: %w", err)
 		}
 		env = append(env, fmt.Sprintf("%s=%s", envVar.Name, string(data)))
 	}

@@ -44,11 +44,11 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *referen
 func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap()).Funcs(extraTemplateFuncs)
-	refValue, err := gt.refStore.GetReference(gt.dir, gt.cfg.Template)
+	data, err := gt.refStore.GetValueBytes(gt.dir, gt.cfg.Template)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference: %w", err)
+		return nil, fmt.Errorf("error getting value: %w", err)
 	}
-	tpl, err = tpl.Parse(string(refValue))
+	tpl, err = tpl.Parse(string(data))
 	if err != nil {
 		return nil, fmt.Errorf("error parsing template: %w", err)
 	}
@@ -64,12 +64,12 @@ func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 		if name == "" {
 			return nil, fmt.Errorf("refVars: variable name cannot be empty")
 		}
-		refVal, err := gt.refStore.GetReference(gt.dir, ref)
+		data, err := gt.refStore.GetValueBytes(gt.dir, ref)
 		if err != nil {
-			return nil, fmt.Errorf("variable %q: error getting reference: %w", name, err)
+			return nil, fmt.Errorf("variable %q: error getting value: %w", name, err)
 		}
 		var tmp any
-		err = config.DecodeYAML(refVal, &tmp)
+		err = config.DecodeYAML(data, &tmp)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
 		}

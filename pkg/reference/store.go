@@ -35,7 +35,7 @@ func (store *Store) AddReference(name string, data []byte) error {
 	return nil
 }
 
-func (store *Store) GetReference(dir string, ref config.Value) ([]byte, error) {
+func (store *Store) GetValueBytes(dir string, ref config.Value) ([]byte, error) {
 	return store.getReference(dir, ref)
 }
 

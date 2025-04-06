@@ -27,9 +27,9 @@ func NewJSONPatch(dir string, cfg config.JSONPatchGenerator, refStore *reference
 }
 
 func (jp *JSONPatch) Generate(context.Context) ([]byte, error) {
-	data, err := jp.refStore.GetReference(jp.dir, jp.cfg.Input)
+	data, err := jp.refStore.GetValueBytes(jp.dir, jp.cfg.Input)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference: %w", err)
+		return nil, fmt.Errorf("error getting value: %w", err)
 	}
 
 	configPatch := []byte(jp.cfg.Patch)

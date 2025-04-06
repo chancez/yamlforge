@@ -80,9 +80,9 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 }
 
 func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
-	data, err := pipeline.refStore.GetReference(pipeline.dir, *pipeline.cfg.Import)
+	data, err := pipeline.refStore.GetValueBytes(pipeline.dir, *pipeline.cfg.Import)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference to import: %w", err)
+		return nil, fmt.Errorf("error getting value to import: %w", err)
 	}
 
 	subPipelineCfg, err := config.Parse(data)
@@ -95,7 +95,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 		if pipelineVar.Name == "" {
 			return nil, fmt.Errorf("vars[%d]: pipeline variable name cannot be empty", i)
 		}
-		ref, err := pipeline.refStore.GetReference(pipeline.dir, pipelineVar.Value)
+		ref, err := pipeline.refStore.GetValueBytes(pipeline.dir, pipelineVar.Value)
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting pipeline variable reference: %w", pipelineVar.Name, err)
 		}
@@ -123,9 +123,9 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 }
 
 func (pipeline *Pipeline) executeInclude(ctx context.Context) ([]byte, error) {
-	data, err := pipeline.refStore.GetReference(pipeline.dir, *pipeline.cfg.Include)
+	data, err := pipeline.refStore.GetValueBytes(pipeline.dir, *pipeline.cfg.Include)
 	if err != nil {
-		return nil, fmt.Errorf("error getting reference to import: %w", err)
+		return nil, fmt.Errorf("error getting value to import: %w", err)
 	}
 
 	subPipelineCfg, err := config.Parse(data)

@@ -28,19 +28,19 @@ func NewMerge(dir string, cfg config.MergeGenerator, refStore *reference.Store) 
 func (m *Merge) Generate(_ context.Context) ([]byte, error) {
 	merged := make(map[string]any)
 	for _, input := range m.cfg.Input {
-		ref, err := m.refStore.GetReference(m.dir, input)
+		data, err := m.refStore.GetValueBytes(m.dir, input)
 		if err != nil {
-			return nil, fmt.Errorf("error getting reference: %w", err)
+			return nil, fmt.Errorf("error getting value: %w", err)
 		}
 		var item any
-		err = config.DecodeYAML(ref, &item)
+		err = config.DecodeYAML(data, &item)
 		if err != nil {
 			return nil, fmt.Errorf("error parsing reference as YAML: %w", err)
 		}
 		itemMap, ok := item.(map[string]any)
 		if !ok {
 			// Provide a snippet of the data being merged
-			refStr := string(ref)
+			refStr := string(data)
 			if len(refStr) > 20 {
 				refStr = refStr[0:20]
 			}

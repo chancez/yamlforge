@@ -92,7 +92,7 @@ func (h *Helm) Generate(context.Context) ([]byte, error) {
 	for _, input := range h.cfg.Values {
 		ref, err := h.refStore.GetStringValue(h.dir, input)
 		if err != nil {
-			return nil, fmt.Errorf("error getting reference: %w", err)
+			return nil, fmt.Errorf("error getting value: %w", err)
 		}
 		refs = append(refs, ref)
 	}

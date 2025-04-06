@@ -35,11 +35,11 @@ func (j *JSON) Generate(context.Context) ([]byte, error) {
 		enc.SetIndent("", strings.Repeat(" ", j.cfg.Indent))
 	}
 	for _, input := range j.cfg.Input {
-		ref, err := j.refStore.GetReference(j.dir, input)
+		data, err := j.refStore.GetValueBytes(j.dir, input)
 		if err != nil {
-			return nil, fmt.Errorf("error getting reference: %w", err)
+			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		dec := config.NewYAMLDecoder(bytes.NewBuffer(ref))
+		dec := config.NewYAMLDecoder(bytes.NewBuffer(data))
 		for {
 			var tmp any
 			err = dec.Decode(&tmp)
