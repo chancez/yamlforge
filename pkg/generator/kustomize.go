@@ -33,22 +33,35 @@ func (h *Kustomize) Generate(context.Context) ([]byte, error) {
 	kustomizeArgs := []string{
 		"build",
 	}
-	switch {
-	case h.cfg.Dir != "" && h.cfg.URL != "":
-		return nil, errors.New("cannot specify both dir and url")
-	case h.cfg.Dir != "":
-		kustomizeDir := path.Join(h.dir, h.cfg.Dir)
-		kustomizeArgs = append(kustomizeArgs, kustomizeDir)
-	case h.cfg.URL != "":
-		kustomizeArgs = append(kustomizeArgs, h.cfg.URL)
+	dir, err := h.refStore.GetStringValue(h.dir, h.cfg.Dir)
+	if err != nil {
+		return nil, err
 	}
-	if h.cfg.EnableHelm {
+	u, err := h.refStore.GetStringValue(h.dir, h.cfg.URL)
+	if err != nil {
+		return nil, err
+	}
+	enableHelm, err := h.refStore.GetBoolValue(h.dir, h.cfg.EnableHelm)
+	if err != nil {
+		return nil, err
+	}
+
+	switch {
+	case dir != "" && u != "":
+		return nil, errors.New("cannot specify both dir and url")
+	case dir != "":
+		kustomizeDir := path.Join(h.dir, dir)
+		kustomizeArgs = append(kustomizeArgs, kustomizeDir)
+	case u != "":
+		kustomizeArgs = append(kustomizeArgs, u)
+	}
+	if enableHelm {
 		kustomizeArgs = append(kustomizeArgs, "--enable-helm")
 	}
 	cmd := exec.Command("kustomize", kustomizeArgs...)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = &buf
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return nil, err
 	}

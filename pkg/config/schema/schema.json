@@ -496,15 +496,15 @@
       ],
       "properties": {
         "dir": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Dir is the path to a directory containing 'kustomization.yaml' relative to the manifest."
         },
         "url": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "URL is a git repository URL with a path suffix containing a 'kustomization.yaml'."
         },
         "enableHelm": {
-          "type": "boolean",
+          "$ref": "#/$defs/BoolValue",
           "description": "EnableHelm enables use of the Helm chart inflator generator."
         }
       },

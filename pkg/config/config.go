@@ -77,11 +77,11 @@ type HelmGenerator struct {
 // KustomizeGenerator runs 'kustomize build' to render a Kustomization and returns the output.
 type KustomizeGenerator struct {
 	// Dir is the path to a directory containing 'kustomization.yaml' relative to the manifest.
-	Dir string `yaml:"dir,omitempty" json:"dir,omitempty" jsonschema:"oneof_required=dir"`
+	Dir StringValue `yaml:"dir,omitempty" json:"dir,omitempty" jsonschema:"oneof_required=dir"`
 	// URL is a git repository URL with a path suffix containing a 'kustomization.yaml'.
-	URL string `yaml:"url,omitempty" json:"url,omitempty"  jsonschema:"oneof_required=url"`
+	URL StringValue `yaml:"url,omitempty" json:"url,omitempty"  jsonschema:"oneof_required=url"`
 	// EnableHelm enables use of the Helm chart inflator generator.
-	EnableHelm bool `yaml:"enableHelm,omitempty" json:"enableHelm,omitempty"`
+	EnableHelm BoolValue `yaml:"enableHelm,omitempty" json:"enableHelm,omitempty"`
 }
 
 // MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output.
