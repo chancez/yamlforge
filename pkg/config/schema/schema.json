@@ -324,7 +324,7 @@
     "GoTemplateGenerator": {
       "properties": {
         "template": {
-          "$ref": "#/$defs/Value",
+          "$ref": "#/$defs/AnyValue",
           "description": "Template is the template to render."
         },
         "vars": {

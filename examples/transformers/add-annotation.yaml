@@ -9,10 +9,9 @@ pipeline:
       annotation_value:
         var: value
     template:
-      value:
-        metadata:
-          annotations:
-            "{{ .annotation }}": "{{ .annotation_value }}"
+      metadata:
+        annotations:
+          "{{ .annotation }}": "{{ .annotation_value }}"
 - name: add-annotation
   merge:
     input:
