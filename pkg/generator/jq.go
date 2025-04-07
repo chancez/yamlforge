@@ -3,10 +3,10 @@ package generator
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/reference"
@@ -29,20 +29,20 @@ func NewJQ(dir string, cfg config.JQGenerator, refStore *reference.Store) *JQ {
 }
 
 func (jq *JQ) Generate(context.Context) ([]byte, error) {
-	var jqArgs []string
-
-	switch {
-	case jq.cfg.Expr != "" && jq.cfg.ExprFile != "":
-		return nil, errors.New("cannot specify both expr and exprFile")
-	case jq.cfg.Expr != "":
-		jqArgs = append(jqArgs, jq.cfg.Expr)
-	case jq.cfg.ExprFile != "":
-		jqArgs = append(jqArgs, "--from-file", jq.cfg.ExprFile)
-	default:
-		return nil, errors.New("expression is required")
+	expr, err := jq.refStore.GetStringValue(jq.dir, jq.cfg.Expr)
+	if err != nil {
+		return nil, fmt.Errorf("error getting expression: %w", err)
+	}
+	jqArgs := []string{
+		expr,
 	}
 
-	if jq.cfg.Slurp {
+	slurp, err := jq.refStore.GetBoolValue(jq.dir, jq.cfg.Slurp)
+	if err != nil {
+		return nil, fmt.Errorf("error getting slurp: %w", err)
+	}
+
+	if slurp {
 		jqArgs = append(jqArgs, "--slurp")
 	}
 
@@ -51,14 +51,14 @@ func (jq *JQ) Generate(context.Context) ([]byte, error) {
 		"--monochrome-output",
 	)
 
-	data, err := jq.refStore.GetValueBytes(jq.dir, jq.cfg.Input)
+	data, err := jq.refStore.GetStringValue(jq.dir, jq.cfg.Input)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value: %w", err)
 	}
 
 	var buf bytes.Buffer
 	cmd := exec.Command("jq", jqArgs...)
-	cmd.Stdin = bytes.NewBuffer(data)
+	cmd.Stdin = strings.NewReader(data)
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = &buf
 	err = cmd.Run()

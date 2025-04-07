@@ -100,14 +100,12 @@ type GoTemplateGenerator struct {
 
 // JQGenerator executes 'jq' and returns the output.
 type JQGenerator struct {
-	// Expr is the jq expression to evaluate. Cannot be specified in combination with ExprFile.
-	Expr string `yaml:"expr,omitempty" json:"expr,omitempty" jsonschema:"oneof_required=expr"`
-	// ExprFile is a path to a file relative to the manifest containing the jq expression to evaluate. Cannot be specified in combination with Expr.
-	ExprFile string `yaml:"exprFile,omitempty" json:"exprFile,omitempty" jsonschema:"oneof_required=exprFile"`
+	// Expr is the jq expression to evaluate.
+	Expr StringValue `yaml:"expr,omitempty" json:"expr,omitempty"`
 	// Input is the JSON input for jq to execute the expression over.
-	Input Value `yaml:"input" json:"input"`
+	Input StringValue `yaml:"input" json:"input"`
 	// Slurp configures jq to read all inputs into an array and use it as a single input value.
-	Slurp bool `yaml:"slurp,omitempty" json:"slurp,omitempty"`
+	Slurp BoolValue `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
 // CELGenerator evaluates a CEL expression and returns the result of the expression.

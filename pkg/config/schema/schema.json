@@ -392,35 +392,17 @@
       "description": "HelmGenerator runs 'helm template' to render a Helm chart and returns the output."
     },
     "JQGenerator": {
-      "oneOf": [
-        {
-          "required": [
-            "expr"
-          ],
-          "title": "expr"
-        },
-        {
-          "required": [
-            "exprFile"
-          ],
-          "title": "exprFile"
-        }
-      ],
       "properties": {
         "expr": {
-          "type": "string",
-          "description": "Expr is the jq expression to evaluate. Cannot be specified in combination with ExprFile."
-        },
-        "exprFile": {
-          "type": "string",
-          "description": "ExprFile is a path to a file relative to the manifest containing the jq expression to evaluate. Cannot be specified in combination with Expr."
+          "$ref": "#/$defs/StringValue",
+          "description": "Expr is the jq expression to evaluate."
         },
         "input": {
-          "$ref": "#/$defs/Value",
+          "$ref": "#/$defs/StringValue",
           "description": "Input is the JSON input for jq to execute the expression over."
         },
         "slurp": {
-          "type": "boolean",
+          "$ref": "#/$defs/BoolValue",
           "description": "Slurp configures jq to read all inputs into an array and use it as a single input value."
         }
       },
