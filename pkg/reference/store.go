@@ -46,7 +46,7 @@ func (store *Store) GetAnyValue(dir string, val config.AnyValue) (any, error) {
 	if val.Value != nil {
 		return store.getValue(dir, *val.Value)
 	}
-	panic("invalid AnyValue")
+	return nil, nil
 }
 
 func (store *Store) GetStringValue(dir string, val config.StringValue) (string, error) {
@@ -60,7 +60,7 @@ func (store *Store) GetStringValue(dir string, val config.StringValue) (string, 
 		}
 		return string(data), nil
 	}
-	panic("invalid StringValue")
+	return "", nil
 }
 
 func (store *Store) GetStringValueList(dir string, vals []config.StringValue) ([]string, error) {
@@ -93,7 +93,7 @@ func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error)
 		}
 		return b, nil
 	}
-	panic("invalid BoolValue")
+	return false, nil
 }
 
 func (store *Store) GetMapValue(dir string, val config.MapValue) (map[string]any, error) {
@@ -112,7 +112,7 @@ func (store *Store) GetMapValue(dir string, val config.MapValue) (map[string]any
 		}
 		return m, nil
 	}
-	panic("invalid MapValue")
+	return nil, nil
 }
 
 func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
