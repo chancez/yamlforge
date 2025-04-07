@@ -45,25 +45,20 @@
           "description": "Input values are parsed then evaluated against the configure CEL expression."
         },
         "expr": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Expr is a CEL expression evaluated with the input set to the variable 'val'."
         },
         "filter": {
-          "type": "boolean",
+          "$ref": "#/$defs/BoolValue",
           "description": "When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept."
         },
         "invertFilter": {
-          "type": "boolean",
+          "$ref": "#/$defs/BoolValue",
           "description": "If Filter and InvertFilter is true, instead of keeping the result, it will be discarded."
         },
         "format": {
-          "type": "string",
-          "enum": [
-            "yaml",
-            "json"
-          ],
-          "description": "Format is the format the output should be returned as. If unspecified, it defaults to YAML.",
-          "default": "yaml"
+          "$ref": "#/$defs/StringValue",
+          "description": "Format is the format the output should be returned as. If unspecified, it defaults to YAML."
         }
       },
       "additionalProperties": false,

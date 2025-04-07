@@ -113,13 +113,13 @@ type CELGenerator struct {
 	// Input values are parsed then evaluated against the configure CEL expression.
 	Input ParsedValue `yaml:"input" json:"input"`
 	// Expr is a CEL expression evaluated with the input set to the variable 'val'.
-	Expr string `yaml:"expr" json:"expr"`
+	Expr StringValue `yaml:"expr" json:"expr"`
 	// When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept.
-	Filter bool `yaml:"filter,omitempty" json:"filter,omitempty"`
+	Filter BoolValue `yaml:"filter,omitempty" json:"filter,omitempty"`
 	// If Filter and InvertFilter is true, instead of keeping the result, it will be discarded.
-	InvertFilter bool `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
+	InvertFilter BoolValue `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
 	// Format is the format the output should be returned as. If unspecified, it defaults to YAML.
-	Format string `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=yaml,enum=json,default=yaml"`
+	Format StringValue `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=yaml,enum=json,default=yaml"`
 }
 
 // JSONPatchGenerator evaluates a JSONPatch against the input.

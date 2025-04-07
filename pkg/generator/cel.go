@@ -43,15 +43,32 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 		return nil, err
 	}
 
+	expr, err := c.refStore.GetStringValue(c.dir, c.cfg.Expr)
+	if err != nil {
+		return nil, fmt.Errorf("error getting expression: %w", err)
+	}
+	format, err := c.refStore.GetStringValue(c.dir, c.cfg.Format)
+	if err != nil {
+		return nil, fmt.Errorf("error getting format: %w", err)
+	}
+	filter, err := c.refStore.GetBoolValue(c.dir, c.cfg.Filter)
+	if err != nil {
+		return nil, fmt.Errorf("error getting filter: %w", err)
+	}
+	invertFilter, err := c.refStore.GetBoolValue(c.dir, c.cfg.InvertFilter)
+	if err != nil {
+		return nil, fmt.Errorf("error getting invertFilter: %w", err)
+	}
+
 	var buf bytes.Buffer
 	var enc encoder
-	switch c.cfg.Format {
+	switch format {
 	case "yaml", "":
 		enc = config.NewYAMLEncoder(&buf)
 	case "json":
 		enc = json.NewEncoder(&buf)
 	default:
-		return nil, fmt.Errorf("invalid output format specified: %q", c.cfg.Format)
+		return nil, fmt.Errorf("invalid output format specified: %q", format)
 	}
 
 	env, err := cel.NewEnv(
@@ -61,7 +78,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 		return nil, fmt.Errorf("error creating CEL environment: %w", err)
 	}
 
-	ast, iss := env.Compile(c.cfg.Expr)
+	ast, iss := env.Compile(expr)
 	if iss != nil && iss.Err() != nil {
 		return nil, fmt.Errorf("CEL compile error: %s", iss.Err())
 	}
@@ -70,7 +87,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 		return nil, fmt.Errorf("CEL type-check error: %s", iss.Err())
 	}
 
-	if c.cfg.Filter && checked.OutputType() != cel.BoolType {
+	if filter && checked.OutputType() != cel.BoolType {
 		return nil, fmt.Errorf("CEL expression has invalid result type: got %q, wanted %q", checked.OutputType(), cel.BoolType)
 	}
 
@@ -91,7 +108,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 		}
 
 		toEncode := out.Value()
-		if c.cfg.Filter {
+		if filter {
 			toEncode = val
 			v, err := out.ConvertToNative(goBoolType)
 			if err != nil {
@@ -99,14 +116,14 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 			}
 			matched := v.(bool)
 
-			if matched == c.cfg.InvertFilter {
+			if matched == invertFilter {
 				continue
 			}
 		}
 
 		err = enc.Encode(toEncode)
 		if err != nil {
-			return nil, fmt.Errorf("error encoding result as %q: %w", c.cfg.Format, err)
+			return nil, fmt.Errorf("error encoding result as %q: %w", format, err)
 		}
 	}
 
