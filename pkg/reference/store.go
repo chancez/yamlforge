@@ -58,12 +58,7 @@ func (store *Store) GetStringValue(dir string, val config.StringValue) (string, 
 		if err != nil {
 			return "", err
 		}
-		var s string
-		err = config.DecodeYAML(data, &s)
-		if err != nil {
-			return "", err
-		}
-		return s, err
+		return string(data), nil
 	}
 	panic("invalid StringValue")
 }
