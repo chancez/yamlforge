@@ -125,11 +125,11 @@ type CELGenerator struct {
 // JSONPatchGenerator evaluates a JSONPatch against the input.
 type JSONPatchGenerator struct {
 	// Input is the value to apply the patch to. It must be JSON.
-	Input Value `yaml:"input" json:"input"`
+	Input StringValue `yaml:"input" json:"input"`
 	// Patch is the JSON patch. If it is YAML, it will be automatically converted to JSON.
-	Patch string `yaml:"patch" json:"patch"`
+	Patch StringValue `yaml:"patch" json:"patch"`
 	// If merge is true, then patch is interpreted as a JSON merge patch.
-	Merge bool `yaml:"merge,omitempty" json:"merge,omitempty"`
+	Merge BoolValue `yaml:"merge,omitempty" json:"merge,omitempty"`
 }
 
 // YAMLGenerator returns it's inputs as YAML.

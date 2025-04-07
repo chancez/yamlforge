@@ -27,16 +27,26 @@ func NewJSONPatch(dir string, cfg config.JSONPatchGenerator, refStore *reference
 }
 
 func (jp *JSONPatch) Generate(context.Context) ([]byte, error) {
-	data, err := jp.refStore.GetValueBytes(jp.dir, jp.cfg.Input)
+	input, err := jp.refStore.GetStringValue(jp.dir, jp.cfg.Input)
 	if err != nil {
-		return nil, fmt.Errorf("error getting value: %w", err)
+		return nil, fmt.Errorf("error getting input: %w", err)
 	}
 
-	configPatch := []byte(jp.cfg.Patch)
+	patch, err := jp.refStore.GetStringValue(jp.dir, jp.cfg.Patch)
+	if err != nil {
+		return nil, fmt.Errorf("error getting patch: %w", err)
+	}
+
+	merge, err := jp.refStore.GetBoolValue(jp.dir, jp.cfg.Merge)
+	if err != nil {
+		return nil, fmt.Errorf("error getting merge: %w", err)
+	}
+
+	configPatch := []byte(patch)
 
 	// Try parsing the patch as YAML, and convert to JSON
 	var parsedPatch any
-	err = config.DecodeYAML([]byte(jp.cfg.Patch), &parsedPatch)
+	err = config.DecodeYAML([]byte(patch), &parsedPatch)
 	if err == nil {
 		configPatch, err = json.Marshal(parsedPatch)
 		if err != nil {
@@ -44,20 +54,22 @@ func (jp *JSONPatch) Generate(context.Context) ([]byte, error) {
 		}
 	}
 
-	if jp.cfg.Merge {
-		modified, err := jsonpatch.MergeMergePatches(data, configPatch)
+	inputBytes := []byte(input)
+
+	if merge {
+		modified, err := jsonpatch.MergeMergePatches(inputBytes, configPatch)
 		if err != nil {
 			return nil, fmt.Errorf("error applying patch: %w", err)
 		}
 		return modified, nil
 	}
 
-	patch, err := jsonpatch.DecodePatch(configPatch)
+	decodedPatch, err := jsonpatch.DecodePatch(configPatch)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing JSON patch: %w", err)
 	}
 
-	modified, err := patch.ApplyWithOptions(data, &jsonpatch.ApplyOptions{
+	modified, err := decodedPatch.ApplyWithOptions(inputBytes, &jsonpatch.ApplyOptions{
 		EnsurePathExistsOnAdd:  true,
 		SupportNegativeIndices: true,
 	})
