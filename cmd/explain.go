@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config/schema"
@@ -101,7 +102,8 @@ Examples:
 			io.WriteString(&buf, "\n")
 		}
 
-		logDescription := func(s string) {
+		logDescription := func(format string, a ...any) {
+			s := fmt.Sprintf(format, a...)
 			wrapLength := 79
 			//nolint:errcheck
 			io.WriteString(&buf, WrapAndIndent(s, wrapLength, 4))
@@ -118,13 +120,24 @@ Examples:
 			log("")
 		}
 
+		props := fieldSchema.Properties
 		if fieldSchema != nil && fieldSchema != typeSchema {
 			log("FIELD: %s <%s>", fieldName, fieldType)
 			logDescription(fieldDescription)
 			log("")
+
+			// Terminal field, no sub-fields, and the field is a non-basic type.
+			// Lookup the type of the field and print the description if it exists.
+			if !isBasicType(fieldType) && props.Len() == 0 {
+				log("FIELD TYPE:\t%s <%s>", fieldType, schemaTypeString(fieldSchema))
+				if fieldSchema.Description != "" {
+					logDescription(fieldSchema.Description)
+					log("")
+				}
+				logDescription("For details run 'yfg explain %s'", fieldType)
+			}
 		}
 
-		props := fieldSchema.Properties
 		if props.Len() != 0 {
 			log("FIELDS:")
 			for pair := props.Oldest(); pair != nil; pair = pair.Next() {
@@ -186,6 +199,12 @@ func schemaTypeString(schema *jsonschema.Schema) string {
 		ty = "[]" + ty
 	}
 	return ty
+}
+
+func isBasicType(typ string) bool {
+	return slices.Contains([]string{
+		"string", "number", "integer", "boolean", "null", "object", "array",
+	}, typ)
 }
 
 func getDefinition(definition string) (string, *jsonschema.Schema, error) {
