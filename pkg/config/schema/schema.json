@@ -3,7 +3,7 @@
   "$id": "https://github.com/chancez/yamlforge/pkg/config/config",
   "$ref": "#/$defs/Config",
   "$defs": {
-    "AnyValue": {
+    "AnyOrValue": {
       "oneOf": [
         {
           "type": "number"
@@ -26,9 +26,10 @@
         {
           "$ref": "#/$defs/Value"
         }
-      ]
+      ],
+      "description": "number, string, boolean, null, object, array or Value."
     },
-    "BoolValue": {
+    "BoolOrValue": {
       "oneOf": [
         {
           "type": "boolean"
@@ -36,7 +37,8 @@
         {
           "$ref": "#/$defs/Value"
         }
-      ]
+      ],
+      "description": "boolean or Value."
     },
     "CELGenerator": {
       "properties": {
@@ -45,19 +47,19 @@
           "description": "Input values are parsed then evaluated against the configure CEL expression."
         },
         "expr": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Expr is a CEL expression evaluated with the input set to the variable 'val'."
         },
         "filter": {
-          "$ref": "#/$defs/BoolValue",
+          "$ref": "#/$defs/BoolOrValue",
           "description": "When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept."
         },
         "invertFilter": {
-          "$ref": "#/$defs/BoolValue",
+          "$ref": "#/$defs/BoolOrValue",
           "description": "If Filter and InvertFilter is true, instead of keeping the result, it will be discarded."
         },
         "format": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Format is the format the output should be returned as. If unspecified, it defaults to YAML."
         }
       },
@@ -131,12 +133,12 @@
     "ExecGenerator": {
       "properties": {
         "command": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Command is the command to execute."
         },
         "args": {
           "items": {
-            "$ref": "#/$defs/StringValue"
+            "$ref": "#/$defs/StringOrValue"
           },
           "type": "array",
           "description": "Args are the arguments to the command."
@@ -257,7 +259,7 @@
           "description": "Name is the name of this generator which other generators can reference this generator's output by."
         },
         "value": {
-          "$ref": "#/$defs/AnyValue",
+          "$ref": "#/$defs/AnyOrValue",
           "description": "Value is a simple generator that takes a value and returns it unaltered."
         },
         "file": {
@@ -319,12 +321,12 @@
     "GoTemplateGenerator": {
       "properties": {
         "template": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Template is the template to render."
         },
         "vars": {
           "additionalProperties": {
-            "$ref": "#/$defs/AnyValue"
+            "$ref": "#/$defs/AnyOrValue"
           },
           "type": "object",
           "description": "Vars are input variables to the template."
@@ -340,39 +342,39 @@
     "HelmGenerator": {
       "properties": {
         "releaseName": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "ReleaseName is the release name."
         },
         "chart": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Chart is the Helm chart to install. Prefix with oci:// to use a chart stored in an OCI registry."
         },
         "version": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Version is the version of the helm chart to install."
         },
         "repo": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Repo is the repository to install the Helm chart from."
         },
         "namespace": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Namespace is the Kubernetes namespace to use when rendering resources."
         },
         "includeCRDs": {
-          "$ref": "#/$defs/BoolValue",
+          "$ref": "#/$defs/BoolOrValue",
           "description": "IncludeCRDs specifies if CRDs are included in the templated output"
         },
         "apiVersions": {
           "items": {
-            "$ref": "#/$defs/StringValue"
+            "$ref": "#/$defs/StringOrValue"
           },
           "type": "array",
           "description": "APIVersions are Kubernetes api versions used for Capabilities.APIVersions."
         },
         "values": {
           "items": {
-            "$ref": "#/$defs/StringValue"
+            "$ref": "#/$defs/StringOrValue"
           },
           "type": "array",
           "description": "Values are the Helm values used as configuration for the Helm chart."
@@ -389,15 +391,15 @@
     "JQGenerator": {
       "properties": {
         "expr": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Expr is the jq expression to evaluate."
         },
         "input": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Input is the JSON input for jq to execute the expression over."
         },
         "slurp": {
-          "$ref": "#/$defs/BoolValue",
+          "$ref": "#/$defs/BoolOrValue",
           "description": "Slurp configures jq to read all inputs into an array and use it as a single input value."
         }
       },
@@ -432,15 +434,15 @@
     "JSONPatchGenerator": {
       "properties": {
         "input": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Input is the value to apply the patch to. It must be JSON."
         },
         "patch": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Patch is the JSON patch. If it is YAML, it will be automatically converted to JSON."
         },
         "merge": {
-          "$ref": "#/$defs/BoolValue",
+          "$ref": "#/$defs/BoolOrValue",
           "description": "If merge is true, then patch is interpreted as a JSON merge patch."
         }
       },
@@ -469,15 +471,15 @@
       ],
       "properties": {
         "dir": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "Dir is the path to a directory containing 'kustomization.yaml' relative to the manifest."
         },
         "url": {
-          "$ref": "#/$defs/StringValue",
+          "$ref": "#/$defs/StringOrValue",
           "description": "URL is a git repository URL with a path suffix containing a 'kustomization.yaml'."
         },
         "enableHelm": {
-          "$ref": "#/$defs/BoolValue",
+          "$ref": "#/$defs/BoolOrValue",
           "description": "EnableHelm enables use of the Helm chart inflator generator."
         }
       },
@@ -485,7 +487,7 @@
       "type": "object",
       "description": "KustomizeGenerator runs 'kustomize build' to render a Kustomization and returns the output."
     },
-    "MapValue": {
+    "MapOrValue": {
       "oneOf": [
         {
           "type": "object"
@@ -493,13 +495,14 @@
         {
           "$ref": "#/$defs/Value"
         }
-      ]
+      ],
+      "description": "object or Value."
     },
     "MergeGenerator": {
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/MapValue"
+            "$ref": "#/$defs/MapOrValue"
           },
           "type": "array",
           "description": "Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs."
@@ -557,13 +560,47 @@
           "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
         },
         "value": {
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object)."
         },
         "ignoreMissing": {
           "type": "boolean",
           "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         },
         "default": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
           "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },
@@ -624,13 +661,47 @@
           "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
         },
         "value": {
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object)."
         },
         "ignoreMissing": {
           "type": "boolean",
           "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         },
         "default": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
           "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },
@@ -700,7 +771,7 @@
       "type": "object",
       "description": "PipelineGenerator executes other generators in a pipeline or singular context."
     },
-    "StringValue": {
+    "StringOrValue": {
       "oneOf": [
         {
           "type": "string"
@@ -708,7 +779,8 @@
         {
           "$ref": "#/$defs/Value"
         }
-      ]
+      ],
+      "description": "string or Value."
     },
     "Value": {
       "oneOf": [
@@ -751,13 +823,47 @@
           "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
         },
         "value": {
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object)."
         },
         "ignoreMissing": {
           "type": "boolean",
           "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         },
         "default": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ],
           "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },

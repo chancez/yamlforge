@@ -4,18 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/invopop/jsonschema"
 )
 
-type StringValue struct {
+type StringOrValue struct {
 	String *string
 	Value  *Value
 }
 
-var _ json.Unmarshaler = (*StringValue)(nil)
+var _ json.Unmarshaler = (*StringOrValue)(nil)
 
-func (sv *StringValue) UnmarshalJSON(data []byte) error {
+func (sv *StringOrValue) UnmarshalJSON(data []byte) error {
 	// Unmarshal into Value
 	ok, err := maybeUnmarshalValue(data, &sv.Value)
 	if err != nil {
@@ -35,18 +36,18 @@ func (sv *StringValue) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("StringValue: cannot unmarshal %s", data)
 }
 
-func (StringValue) JSONSchema() *jsonschema.Schema {
+func (StringOrValue) JSONSchema() *jsonschema.Schema {
 	return oneOfTypeOrValueSchema("string")
 }
 
-type BoolValue struct {
+type BoolOrValue struct {
 	Bool  *bool
 	Value *Value
 }
 
-var _ json.Unmarshaler = (*BoolValue)(nil)
+var _ json.Unmarshaler = (*BoolOrValue)(nil)
 
-func (bv *BoolValue) UnmarshalJSON(data []byte) error {
+func (bv *BoolOrValue) UnmarshalJSON(data []byte) error {
 	// Unmarshal into Value
 	ok, err := maybeUnmarshalValue(data, &bv.Value)
 	if err != nil {
@@ -66,7 +67,7 @@ func (bv *BoolValue) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("BoolValue: cannot unmarshal %s", data)
 }
 
-func (BoolValue) JSONSchema() *jsonschema.Schema {
+func (BoolOrValue) JSONSchema() *jsonschema.Schema {
 	return oneOfTypeOrValueSchema("boolean")
 }
 
@@ -108,14 +109,14 @@ func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
 	return false, nil
 }
 
-type MapValue struct {
+type MapOrValue struct {
 	Map   map[string]any
 	Value *Value
 }
 
-var _ json.Unmarshaler = (*MapValue)(nil)
+var _ json.Unmarshaler = (*MapOrValue)(nil)
 
-func (mv *MapValue) UnmarshalJSON(data []byte) error {
+func (mv *MapOrValue) UnmarshalJSON(data []byte) error {
 	// Unmarshal into Value
 	ok, err := maybeUnmarshalValue(data, &mv.Value)
 	if err != nil {
@@ -135,18 +136,18 @@ func (mv *MapValue) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("MapValue: cannot unmarshal %s", data)
 }
 
-func (MapValue) JSONSchema() *jsonschema.Schema {
+func (MapOrValue) JSONSchema() *jsonschema.Schema {
 	return oneOfTypeOrValueSchema("object")
 }
 
-type AnyValue struct {
+type AnyOrValue struct {
 	Any   *any
 	Value *Value
 }
 
-var _ json.Unmarshaler = (*AnyValue)(nil)
+var _ json.Unmarshaler = (*AnyOrValue)(nil)
 
-func (av *AnyValue) UnmarshalJSON(data []byte) error {
+func (av *AnyOrValue) UnmarshalJSON(data []byte) error {
 	// Unmarshal into Value
 	ok, err := maybeUnmarshalValue(data, &av.Value)
 	if err != nil {
@@ -164,7 +165,7 @@ func (av *AnyValue) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (AnyValue) JSONSchema() *jsonschema.Schema {
+func (AnyOrValue) JSONSchema() *jsonschema.Schema {
 	return oneOfTypeOrValueSchema("number", "string", "boolean", "null", "object", "array")
 }
 
@@ -176,10 +177,13 @@ func oneOfTypeOrValueSchema(typs ...string) *jsonschema.Schema {
 		})
 	}
 	schemas = append(schemas,
-		&jsonschema.Schema{Ref: "#/$defs/Value"},
+		&jsonschema.Schema{
+			Ref: "#/$defs/Value",
+		},
 	)
 	return &jsonschema.Schema{
-		OneOf: schemas,
+		OneOf:       schemas,
+		Description: fmt.Sprintf("%s or Value.", strings.Join(typs, ", ")),
 	}
 }
 
@@ -191,14 +195,14 @@ type Value struct {
 	Ref string `yaml:"ref,omitempty" json:"ref,omitempty" jsonschema:"oneof_required=ref"`
 	// File takes a path relative to this pipeline file to read and returns the content of the file specified.
 	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
-	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object).
-	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+	// Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object).
+	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value,oneof_type=string;boolean;number;array;object"`
 	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.
 	IgnoreMissing bool `yaml:"ignoreMissing,omitempty" json:"ignoreMissing,omitempty"`
 	// Default specifies the default value to use if a ref, variable, or file is
 	// missing. Has no effect unless ignoreMissing is true.
 	// It can be any valid YAML/JSON type ( string, boolean, number, array, object).
-	Default any `yaml:"default,omitempty" json:"default,omitempty"`
+	Default any `yaml:"default,omitempty" json:"default,omitempty" jsonschema:"oneof_type=string;boolean;number;array;object"`
 }
 
 // NamedValue is a Value with a name.

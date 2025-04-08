@@ -15,20 +15,20 @@ func TestDecodeStringValue(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    StringValue
+		want    StringOrValue
 		wantErr bool
 	}{
 		{
 			name:  "string input",
 			input: "foo",
-			want: StringValue{
+			want: StringOrValue{
 				String: strPtr("foo"),
 			},
 		},
 		{
 			name:  "ref input",
 			input: "ref: some-stage",
-			want: StringValue{
+			want: StringOrValue{
 				Value: &Value{
 					Ref: "some-stage",
 				},
@@ -43,7 +43,7 @@ func TestDecodeStringValue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var got StringValue
+			var got StringOrValue
 			err := DecodeYAML([]byte(tt.input), &got)
 			if tt.wantErr {
 				require.Error(t, err)
@@ -63,20 +63,20 @@ func TestDecodeBoolValue(t *testing.T) {
 	tests := []struct {
 		name    string
 		input   string
-		want    BoolValue
+		want    BoolOrValue
 		wantErr bool
 	}{
 		{
 			name:  "string input",
 			input: "true",
-			want: BoolValue{
+			want: BoolOrValue{
 				Bool: boolPtr(true),
 			},
 		},
 		{
 			name:  "ref input",
 			input: "ref: some-stage",
-			want: BoolValue{
+			want: BoolOrValue{
 				Value: &Value{
 					Ref: "some-stage",
 				},
@@ -91,7 +91,7 @@ func TestDecodeBoolValue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var got BoolValue
+			var got BoolOrValue
 			err := DecodeYAML([]byte(tt.input), &got)
 			if tt.wantErr {
 				require.Error(t, err)

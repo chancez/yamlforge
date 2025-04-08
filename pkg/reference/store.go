@@ -39,7 +39,7 @@ func (store *Store) GetValueBytes(dir string, ref config.Value) ([]byte, error) 
 	return store.getValue(dir, ref)
 }
 
-func (store *Store) GetAnyValue(dir string, val config.AnyValue) (any, error) {
+func (store *Store) GetAnyValue(dir string, val config.AnyOrValue) (any, error) {
 	if val.Any != nil {
 		return *val.Any, nil
 	}
@@ -49,7 +49,7 @@ func (store *Store) GetAnyValue(dir string, val config.AnyValue) (any, error) {
 	return nil, nil
 }
 
-func (store *Store) GetStringValue(dir string, val config.StringValue) (string, error) {
+func (store *Store) GetStringValue(dir string, val config.StringOrValue) (string, error) {
 	if val.String != nil {
 		return *val.String, nil
 	}
@@ -63,7 +63,7 @@ func (store *Store) GetStringValue(dir string, val config.StringValue) (string, 
 	return "", nil
 }
 
-func (store *Store) GetStringValueList(dir string, vals []config.StringValue) ([]string, error) {
+func (store *Store) GetStringValueList(dir string, vals []config.StringOrValue) ([]string, error) {
 	var ret []string
 	if len(vals) != 0 {
 		for _, apiVersion := range vals {
@@ -77,7 +77,7 @@ func (store *Store) GetStringValueList(dir string, vals []config.StringValue) ([
 	return ret, nil
 }
 
-func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error) {
+func (store *Store) GetBoolValue(dir string, val config.BoolOrValue) (bool, error) {
 	if val.Bool != nil {
 		return *val.Bool, nil
 	}
@@ -96,7 +96,7 @@ func (store *Store) GetBoolValue(dir string, val config.BoolValue) (bool, error)
 	return false, nil
 }
 
-func (store *Store) GetMapValue(dir string, val config.MapValue) (map[string]any, error) {
+func (store *Store) GetMapValue(dir string, val config.MapOrValue) (map[string]any, error) {
 	if val.Map != nil {
 		return val.Map, nil
 	}
