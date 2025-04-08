@@ -93,7 +93,7 @@ type MergeGenerator struct {
 // GoTemplateGenerator renders Go 'text/template' templates and returns the output.
 type GoTemplateGenerator struct {
 	// Template is the template to render.
-	Template AnyValue `yaml:"template" json:"template"`
+	Template StringValue `yaml:"template" json:"template"`
 	// Vars are input variables to the template.
 	Vars map[string]AnyValue `yaml:"vars,omitempty" json:"vars,omitempty"`
 }

@@ -319,7 +319,7 @@
     "GoTemplateGenerator": {
       "properties": {
         "template": {
-          "$ref": "#/$defs/AnyValue",
+          "$ref": "#/$defs/StringValue",
           "description": "Template is the template to render."
         },
         "vars": {
@@ -432,15 +432,15 @@
     "JSONPatchGenerator": {
       "properties": {
         "input": {
-          "$ref": "#/$defs/Value",
+          "$ref": "#/$defs/StringValue",
           "description": "Input is the value to apply the patch to. It must be JSON."
         },
         "patch": {
-          "type": "string",
+          "$ref": "#/$defs/StringValue",
           "description": "Patch is the JSON patch. If it is YAML, it will be automatically converted to JSON."
         },
         "merge": {
-          "type": "boolean",
+          "$ref": "#/$defs/BoolValue",
           "description": "If merge is true, then patch is interpreted as a JSON merge patch."
         }
       },

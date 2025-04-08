@@ -16,17 +16,19 @@ type StringValue struct {
 var _ json.Unmarshaler = (*StringValue)(nil)
 
 func (sv *StringValue) UnmarshalJSON(data []byte) error {
+	// Unmarshal into Value
+	ok, err := maybeUnmarshalValue(data, &sv.Value)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+
 	// Try to unmarshal as a string.
 	var s string
 	if err := json.Unmarshal(data, &s); err == nil {
 		sv.String = &s
-		return nil
-	}
-
-	// Try to unmarshal as a Value.
-	var v Value
-	if err := json.Unmarshal(data, &v); err == nil {
-		sv.Value = &v
 		return nil
 	}
 
@@ -45,17 +47,19 @@ type BoolValue struct {
 var _ json.Unmarshaler = (*BoolValue)(nil)
 
 func (bv *BoolValue) UnmarshalJSON(data []byte) error {
+	// Unmarshal into Value
+	ok, err := maybeUnmarshalValue(data, &bv.Value)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+
 	// Try to unmarshal as a bool.
 	var b bool
 	if err := json.Unmarshal(data, &b); err == nil {
 		bv.Bool = &b
-		return nil
-	}
-
-	// Try to unmarshal as a Value.
-	var v Value
-	if err := json.Unmarshal(data, &v); err == nil {
-		bv.Value = &v
 		return nil
 	}
 

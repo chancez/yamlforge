@@ -8,7 +8,7 @@ pipeline:
         var: annotation
       annotation_value:
         var: value
-    template:
+    template: |
       metadata:
         annotations:
           "{{ .annotation }}": "{{ .annotation_value }}"
