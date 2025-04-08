@@ -63,31 +63,14 @@ Examples:
 		}
 
 		var buf bytes.Buffer
-		log := func(format string, a ...any) {
-			if format != "" {
-				//nolint:errcheck
-				io.WriteString(&buf, fmt.Sprintf(format, a...))
-			}
-			//nolint:errcheck
-			io.WriteString(&buf, "\n")
-		}
 
-		logIndentWrapped := func(format string, a ...any) {
-			s := fmt.Sprintf(format, a...)
-			wrapLength := 79
-			//nolint:errcheck
-			io.WriteString(&buf, WrapAndIndent(s, wrapLength, 4))
-			//nolint:errcheck
-			io.WriteString(&buf, "\n")
-		}
-
-		log("TYPE:\t%s", typeName)
-		log("")
+		bufLog(&buf, "TYPE:\t%s", typeName)
+		bufLog(&buf, "")
 
 		if typeSchema.Description != "" {
-			log("DESCRIPTION:")
-			logIndentWrapped(typeSchema.Description)
-			log("")
+			bufLog(&buf, "DESCRIPTION:")
+			bufLogIndentWrapped(&buf, typeSchema.Description)
+			bufLog(&buf, "")
 		}
 
 		fieldSchema, err = getSubSchema(fieldSchema)
@@ -96,24 +79,24 @@ Examples:
 		}
 		props := fieldSchema.Properties
 		if fieldSchema != nil && fieldSchema != typeSchema {
-			log("FIELD: %s <%s>", fieldName, fieldType)
-			logIndentWrapped(fieldDescription)
-			log("")
+			bufLog(&buf, "FIELD: %s <%s>", fieldName, fieldType)
+			bufLogIndentWrapped(&buf, fieldDescription)
+			bufLog(&buf, "")
 
 			// Terminal field, no sub-fields, and the field is a non-basic type.
 			// Lookup the type of the field and print the description if it exists.
 			if !isBasicType(fieldType) && props.Len() == 0 {
-				log("FIELD TYPE:\t%s <%s>", fieldType, schemaTypeString(fieldSchema))
+				bufLog(&buf, "FIELD TYPE:\t%s <%s>", fieldType, schemaTypeString(fieldSchema))
 				if fieldSchema.Description != "" {
-					logIndentWrapped(fieldSchema.Description)
-					log("")
+					bufLogIndentWrapped(&buf, fieldSchema.Description)
+					bufLog(&buf, "")
 				}
-				logIndentWrapped("For details run 'yfg explain %s'", fieldType)
+				bufLogIndentWrapped(&buf, "For details run 'yfg explain %s'", fieldType)
 			}
 		}
 
 		if props.Len() != 0 {
-			log("FIELDS:")
+			bufLog(&buf, "FIELDS:")
 			for pair := props.Oldest(); pair != nil; pair = pair.Next() {
 				name := pair.Key
 				schema := pair.Value
@@ -128,14 +111,14 @@ Examples:
 					break
 				}
 				if required {
-					log("  %s\t<%s> -required-", name, ty)
+					bufLog(&buf, "  %s\t<%s> -required-", name, ty)
 				} else {
-					log("  %s\t<%s>", name, ty)
+					bufLog(&buf, "  %s\t<%s>", name, ty)
 				}
 				if desc != "" {
-					logIndentWrapped(desc)
+					bufLogIndentWrapped(&buf, desc)
 				}
-				log("")
+				bufLog(&buf, "")
 			}
 		}
 
@@ -263,4 +246,22 @@ func getSubSchema(schema *jsonschema.Schema) (*jsonschema.Schema, error) {
 		}
 	}
 	return schema, nil
+}
+
+func bufLog(buf *bytes.Buffer, format string, a ...any) {
+	if format != "" {
+		//nolint:errcheck
+		io.WriteString(buf, fmt.Sprintf(format, a...))
+	}
+	//nolint:errcheck
+	io.WriteString(buf, "\n")
+}
+
+func bufLogIndentWrapped(buf *bytes.Buffer, format string, a ...any) {
+	s := fmt.Sprintf(format, a...)
+	wrapLength := 79
+	//nolint:errcheck
+	io.WriteString(buf, WrapAndIndent(s, wrapLength, 4))
+	//nolint:errcheck
+	io.WriteString(buf, "\n")
 }
