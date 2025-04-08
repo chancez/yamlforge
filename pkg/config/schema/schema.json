@@ -27,7 +27,7 @@
           "$ref": "#/$defs/Value"
         }
       ],
-      "description": "number, string, boolean, null, object, array or Value."
+      "description": "AnyOrValue can be either a number, string, boolean, null, object, array, or Value type."
     },
     "BoolOrValue": {
       "oneOf": [
@@ -38,7 +38,7 @@
           "$ref": "#/$defs/Value"
         }
       ],
-      "description": "boolean or Value."
+      "description": "BoolOrValue can be either a boolean, or Value type."
     },
     "CELGenerator": {
       "properties": {
@@ -496,7 +496,7 @@
           "$ref": "#/$defs/Value"
         }
       ],
-      "description": "object or Value."
+      "description": "MapOrValue can be either a object, or Value type."
     },
     "MergeGenerator": {
       "properties": {
@@ -780,7 +780,7 @@
           "$ref": "#/$defs/Value"
         }
       ],
-      "description": "string or Value."
+      "description": "StringOrValue can be either a string, or Value type."
     },
     "Value": {
       "oneOf": [

@@ -37,7 +37,7 @@ func (sv *StringOrValue) UnmarshalJSON(data []byte) error {
 }
 
 func (StringOrValue) JSONSchema() *jsonschema.Schema {
-	return oneOfTypeOrValueSchema("string")
+	return oneOfTypeOrValueSchema("StringOrValue", "string")
 }
 
 type BoolOrValue struct {
@@ -68,7 +68,7 @@ func (bv *BoolOrValue) UnmarshalJSON(data []byte) error {
 }
 
 func (BoolOrValue) JSONSchema() *jsonschema.Schema {
-	return oneOfTypeOrValueSchema("boolean")
+	return oneOfTypeOrValueSchema("BoolOrValue", "boolean")
 }
 
 func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
@@ -137,7 +137,7 @@ func (mv *MapOrValue) UnmarshalJSON(data []byte) error {
 }
 
 func (MapOrValue) JSONSchema() *jsonschema.Schema {
-	return oneOfTypeOrValueSchema("object")
+	return oneOfTypeOrValueSchema("MapOrValue", "object")
 }
 
 type AnyOrValue struct {
@@ -166,10 +166,10 @@ func (av *AnyOrValue) UnmarshalJSON(data []byte) error {
 }
 
 func (AnyOrValue) JSONSchema() *jsonschema.Schema {
-	return oneOfTypeOrValueSchema("number", "string", "boolean", "null", "object", "array")
+	return oneOfTypeOrValueSchema("AnyOrValue", "number", "string", "boolean", "null", "object", "array")
 }
 
-func oneOfTypeOrValueSchema(typs ...string) *jsonschema.Schema {
+func oneOfTypeOrValueSchema(typeName string, typs ...string) *jsonschema.Schema {
 	var schemas []*jsonschema.Schema
 	for _, typ := range typs {
 		schemas = append(schemas, &jsonschema.Schema{
@@ -183,7 +183,7 @@ func oneOfTypeOrValueSchema(typs ...string) *jsonschema.Schema {
 	)
 	return &jsonschema.Schema{
 		OneOf:       schemas,
-		Description: fmt.Sprintf("%s or Value.", strings.Join(typs, ", ")),
+		Description: fmt.Sprintf("%s can be either a %s, or Value type.", typeName, strings.Join(typs, ", ")),
 	}
 }
 
