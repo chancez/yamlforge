@@ -31,65 +31,35 @@ Examples:
 `,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		input := strings.Split(args[0], ".")
+		input := strings.SplitN(args[0], ".", 2)
 		ty := input[0]
-		fields := input[1:]
 
-		var typeSchema *jsonschema.Schema
-		var typeName string
-		for defName, defValue := range schema.Schema.Definitions {
-			if strings.EqualFold(defName, ty) {
-				typeSchema = defValue
-				typeName = defName
-				break
-			}
-		}
-		if typeSchema == nil {
-			return fmt.Errorf("invalid type: %s", ty)
+		typeSchema, typeName, err := getTypeSchema(ty)
+		if err != nil {
+			return err
 		}
 
 		fieldSchema := typeSchema
 		var fieldName string
+		if len(input) == 2 {
+			field := input[1]
+			if field == "" {
+				return fmt.Errorf("error: field name is empty")
+			}
+			// Lookup the field the user specified
+			fieldSchema, fieldName, err = getFieldSchema(field, typeSchema)
+			if err != nil {
+				return err
+			}
+
+		}
+
 		var fieldDescription string
 		var fieldType string
-		if len(fields) != 0 {
-			// Lookup the field the user specified
-			for _, field := range fields {
-				foundField := false
-				for pair := fieldSchema.Properties.Oldest(); pair != nil; pair = pair.Next() {
-					if !strings.EqualFold(pair.Key, field) {
-						continue
-					}
-
-					foundField = true
-					fieldName = pair.Key
-					fieldSchema = pair.Value
-					fieldDescription = fieldSchema.Description
-					fieldType = schemaTypeString(fieldSchema)
-
-					// Now lookup the definition for this field if needed.
-					// Resolve refs if they exist
-					for fieldSchema.Ref != "" || fieldSchema.Items != nil {
-						if fieldSchema.Ref != "" {
-							var err error
-							_, fieldSchema, err = getDefinition(fieldSchema.Ref)
-							if err != nil {
-								return err
-							}
-						}
-
-						// If it's a list then lookup the inner type of the list is what we
-						// need to lookup the fields.
-						if fieldSchema.Items != nil {
-							fieldSchema = fieldSchema.Items
-						}
-					}
-					break
-				}
-				if !foundField {
-					return fmt.Errorf("error: field %q does not exist", field)
-				}
-			}
+		if fieldSchema != nil {
+			// Store the description and type of the field
+			fieldDescription = fieldSchema.Description
+			fieldType = schemaTypeString(fieldSchema)
 		}
 
 		var buf bytes.Buffer
@@ -120,6 +90,10 @@ Examples:
 			log("")
 		}
 
+		fieldSchema, err = getSubSchema(fieldSchema)
+		if err != nil {
+			return err
+		}
 		props := fieldSchema.Properties
 		if fieldSchema != nil && fieldSchema != typeSchema {
 			log("FIELD: %s <%s>", fieldName, fieldType)
@@ -207,17 +181,6 @@ func isBasicType(typ string) bool {
 	}, typ)
 }
 
-func getDefinition(definition string) (string, *jsonschema.Schema, error) {
-	shortDefName := strings.TrimPrefix(definition, "#/$defs/")
-	for defName, defValue := range schema.Schema.Definitions {
-		if defName != shortDefName {
-			continue
-		}
-		return defName, defValue, nil
-	}
-	return "", nil, fmt.Errorf("unable to find definition for %s", shortDefName)
-}
-
 // WrapAndIndent wraps the input text at the specified line length and indents each line with the specified number of spaces.
 func WrapAndIndent(text string, lineLength int, indentSpaces int) string {
 	var result strings.Builder
@@ -239,4 +202,65 @@ func WrapAndIndent(text string, lineLength int, indentSpaces int) string {
 	}
 
 	return indent + result.String()
+}
+
+func getTypeSchema(typeName string) (*jsonschema.Schema, string, error) {
+	for defName, defValue := range schema.Schema.Definitions {
+		if strings.EqualFold(defName, typeName) {
+			return defValue, defName, nil
+		}
+	}
+	return nil, "", fmt.Errorf("unable to find definition for %s", typeName)
+}
+
+func getFieldSchema(field string, typeSchema *jsonschema.Schema) (*jsonschema.Schema, string, error) {
+	fieldSchema := typeSchema
+	subSchema := fieldSchema
+	fields := strings.Split(field, ".")
+	var fieldName string
+
+	for _, field := range fields {
+		foundField := false
+		for pair := subSchema.Properties.Oldest(); pair != nil; pair = pair.Next() {
+			if !strings.EqualFold(pair.Key, field) {
+				continue
+			}
+			foundField = true
+			fieldName = pair.Key
+			fieldSchema = pair.Value
+			// Still having troublehere because it returns the sub type and we need both the parent and the sub-type.
+			var err error
+			subSchema, err = getSubSchema(fieldSchema)
+			if err != nil {
+				return nil, "", err
+			}
+			break
+		}
+		if !foundField {
+			return nil, "", fmt.Errorf("error: field %q does not exist", field)
+		}
+	}
+	return fieldSchema, fieldName, nil
+}
+
+func getSubSchema(schema *jsonschema.Schema) (*jsonschema.Schema, error) {
+	// Now lookup the definition for this field if needed.
+	// Resolve refs if they exist
+	for schema.Ref != "" || schema.Items != nil {
+		if schema.Ref != "" {
+			var err error
+			ref := strings.TrimPrefix(schema.Ref, "#/$defs/")
+			schema, _, err = getTypeSchema(ref)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		// If it's a list then lookup the inner type of the list is what we
+		// need to lookup the fields.
+		if schema.Items != nil {
+			schema = schema.Items
+		}
+	}
+	return schema, nil
 }
