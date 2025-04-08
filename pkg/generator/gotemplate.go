@@ -44,15 +44,11 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *referen
 func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap()).Funcs(extraTemplateFuncs)
-	val, err := gt.refStore.GetAnyValue(gt.dir, gt.cfg.Template)
+	val, err := gt.refStore.GetStringValue(gt.dir, gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value for 'template': %w", err)
 	}
-	data, err := reference.ConvertToBytes(val)
-	if err != nil {
-		return nil, fmt.Errorf("error converting value to string: %w", err)
-	}
-	tpl, err = tpl.Parse(string(data))
+	tpl, err = tpl.Parse(val)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing template: %w", err)
 	}
