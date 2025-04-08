@@ -11,7 +11,7 @@ type Generator struct {
 	// Name is the name of this generator which other generators can reference this generator's output by.
 	Name string `yaml:"name" json:"name"`
 	// Value is a simple generator that takes a value and returns it unaltered.
-	Value *AnyValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
+	Value *AnyOrValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
 	// File is a generator which reads files at the specified path and returns their output.
 	File *FileGenerator `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Exec is a generator which execs the command specified and returns the stdout of the program.
@@ -47,9 +47,9 @@ type FileGenerator struct {
 // ExecGenerator execs the command specified and returns the stdout of the program.
 type ExecGenerator struct {
 	// Command is the command to execute.
-	Command StringValue `yaml:"command" json:"command"`
+	Command StringOrValue `yaml:"command" json:"command"`
 	// Args are the arguments to the command.
-	Args []StringValue `yaml:"args,omitempty" json:"args,omitempty"`
+	Args []StringOrValue `yaml:"args,omitempty" json:"args,omitempty"`
 	// Env is a list of environment variables to set for the command.
 	Env []NamedValue `yaml:"env,omitempty" json:"env,omitempty"`
 }
@@ -57,55 +57,55 @@ type ExecGenerator struct {
 // HelmGenerator runs 'helm template' to render a Helm chart and returns the output.
 type HelmGenerator struct {
 	// ReleaseName is the release name.
-	ReleaseName StringValue `yaml:"releaseName" json:"releaseName"`
+	ReleaseName StringOrValue `yaml:"releaseName" json:"releaseName"`
 	// Chart is the Helm chart to install. Prefix with oci:// to use a chart stored in an OCI registry.
-	Chart StringValue `yaml:"chart" json:"chart"`
+	Chart StringOrValue `yaml:"chart" json:"chart"`
 	// Version is the version of the helm chart to install.
-	Version StringValue `yaml:"version,omitempty" json:"version,omitempty"`
+	Version StringOrValue `yaml:"version,omitempty" json:"version,omitempty"`
 	// Repo is the repository to install the Helm chart from.
-	Repo StringValue `yaml:"repo,omitempty" json:"repo,omitempty"`
+	Repo StringOrValue `yaml:"repo,omitempty" json:"repo,omitempty"`
 	// Namespace is the Kubernetes namespace to use when rendering resources.
-	Namespace StringValue `yaml:"namespace,omitempty" json:"namespace,omitempty"`
+	Namespace StringOrValue `yaml:"namespace,omitempty" json:"namespace,omitempty"`
 	// IncludeCRDs specifies if CRDs are included in the templated output
-	IncludeCRDs BoolValue `yaml:"includeCRDs,omitempty" json:"includeCRDs,omitempty"`
+	IncludeCRDs BoolOrValue `yaml:"includeCRDs,omitempty" json:"includeCRDs,omitempty"`
 	// APIVersions are Kubernetes api versions used for Capabilities.APIVersions.
-	APIVersions []StringValue `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
+	APIVersions []StringOrValue `yaml:"apiVersions,omitempty" json:"apiVersions,omitempty"`
 	// Values are the Helm values used as configuration for the Helm chart.
-	Values []StringValue `yaml:"values,omitempty" json:"values,omitempty"`
+	Values []StringOrValue `yaml:"values,omitempty" json:"values,omitempty"`
 }
 
 // KustomizeGenerator runs 'kustomize build' to render a Kustomization and returns the output.
 type KustomizeGenerator struct {
 	// Dir is the path to a directory containing 'kustomization.yaml' relative to the manifest.
-	Dir StringValue `yaml:"dir,omitempty" json:"dir,omitempty" jsonschema:"oneof_required=dir"`
+	Dir StringOrValue `yaml:"dir,omitempty" json:"dir,omitempty" jsonschema:"oneof_required=dir"`
 	// URL is a git repository URL with a path suffix containing a 'kustomization.yaml'.
-	URL StringValue `yaml:"url,omitempty" json:"url,omitempty"  jsonschema:"oneof_required=url"`
+	URL StringOrValue `yaml:"url,omitempty" json:"url,omitempty"  jsonschema:"oneof_required=url"`
 	// EnableHelm enables use of the Helm chart inflator generator.
-	EnableHelm BoolValue `yaml:"enableHelm,omitempty" json:"enableHelm,omitempty"`
+	EnableHelm BoolOrValue `yaml:"enableHelm,omitempty" json:"enableHelm,omitempty"`
 }
 
 // MergeGenerator takes multiple inputs containing object-like data and deeply merges them together and returns the merged output.
 type MergeGenerator struct {
 	// Inputs are the inputs to merge. Inputs specified later in the list take precedence, overwriting values in earlier inputs.
-	Input []MapValue `yaml:"input" json:"input"`
+	Input []MapOrValue `yaml:"input" json:"input"`
 }
 
 // GoTemplateGenerator renders Go 'text/template' templates and returns the output.
 type GoTemplateGenerator struct {
 	// Template is the template to render.
-	Template StringValue `yaml:"template" json:"template"`
+	Template StringOrValue `yaml:"template" json:"template"`
 	// Vars are input variables to the template.
-	Vars map[string]AnyValue `yaml:"vars,omitempty" json:"vars,omitempty"`
+	Vars map[string]AnyOrValue `yaml:"vars,omitempty" json:"vars,omitempty"`
 }
 
 // JQGenerator executes 'jq' and returns the output.
 type JQGenerator struct {
 	// Expr is the jq expression to evaluate.
-	Expr StringValue `yaml:"expr,omitempty" json:"expr,omitempty"`
+	Expr StringOrValue `yaml:"expr,omitempty" json:"expr,omitempty"`
 	// Input is the JSON input for jq to execute the expression over.
-	Input StringValue `yaml:"input" json:"input"`
+	Input StringOrValue `yaml:"input" json:"input"`
 	// Slurp configures jq to read all inputs into an array and use it as a single input value.
-	Slurp BoolValue `yaml:"slurp,omitempty" json:"slurp,omitempty"`
+	Slurp BoolOrValue `yaml:"slurp,omitempty" json:"slurp,omitempty"`
 }
 
 // CELGenerator evaluates a CEL expression and returns the result of the expression.
@@ -113,23 +113,23 @@ type CELGenerator struct {
 	// Input values are parsed then evaluated against the configure CEL expression.
 	Input ParsedValue `yaml:"input" json:"input"`
 	// Expr is a CEL expression evaluated with the input set to the variable 'val'.
-	Expr StringValue `yaml:"expr" json:"expr"`
+	Expr StringOrValue `yaml:"expr" json:"expr"`
 	// When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept.
-	Filter BoolValue `yaml:"filter,omitempty" json:"filter,omitempty"`
+	Filter BoolOrValue `yaml:"filter,omitempty" json:"filter,omitempty"`
 	// If Filter and InvertFilter is true, instead of keeping the result, it will be discarded.
-	InvertFilter BoolValue `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
+	InvertFilter BoolOrValue `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
 	// Format is the format the output should be returned as. If unspecified, it defaults to YAML.
-	Format StringValue `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=yaml,enum=json,default=yaml"`
+	Format StringOrValue `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=yaml,enum=json,default=yaml"`
 }
 
 // JSONPatchGenerator evaluates a JSONPatch against the input.
 type JSONPatchGenerator struct {
 	// Input is the value to apply the patch to. It must be JSON.
-	Input StringValue `yaml:"input" json:"input"`
+	Input StringOrValue `yaml:"input" json:"input"`
 	// Patch is the JSON patch. If it is YAML, it will be automatically converted to JSON.
-	Patch StringValue `yaml:"patch" json:"patch"`
+	Patch StringOrValue `yaml:"patch" json:"patch"`
 	// If merge is true, then patch is interpreted as a JSON merge patch.
-	Merge BoolValue `yaml:"merge,omitempty" json:"merge,omitempty"`
+	Merge BoolOrValue `yaml:"merge,omitempty" json:"merge,omitempty"`
 }
 
 // YAMLGenerator returns it's inputs as YAML.

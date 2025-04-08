@@ -11,11 +11,11 @@ var _ Generator = (*Value)(nil)
 
 type Value struct {
 	dir      string
-	val      config.AnyValue
+	val      config.AnyOrValue
 	refStore *reference.Store
 }
 
-func NewValue(dir string, val config.AnyValue, refStore *reference.Store) *Value {
+func NewValue(dir string, val config.AnyOrValue, refStore *reference.Store) *Value {
 	return &Value{
 		dir:      dir,
 		val:      val,
