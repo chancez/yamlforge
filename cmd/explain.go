@@ -163,6 +163,13 @@ func init() {
 }
 
 func schemaTypeString(schema *jsonschema.Schema) string {
+	if schema.OneOf != nil {
+		var tys []string
+		for _, s := range schema.OneOf {
+			tys = append(tys, schemaTypeString(s))
+		}
+		return "oneOf(" + strings.Join(tys, ", ") + ")"
+	}
 	ty := schema.Type
 	array := false
 	if schema.Type == "array" {
@@ -175,7 +182,7 @@ func schemaTypeString(schema *jsonschema.Schema) string {
 	if schema.Ref != "" {
 		ty = strings.TrimPrefix(schema.Ref, "#/$defs/")
 	}
-	if array {
+	if array && ty != "array" {
 		ty = "[]" + ty
 	}
 	return ty
