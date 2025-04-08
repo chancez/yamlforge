@@ -102,7 +102,7 @@ Examples:
 			io.WriteString(&buf, "\n")
 		}
 
-		logDescription := func(format string, a ...any) {
+		logIndentWrapped := func(format string, a ...any) {
 			s := fmt.Sprintf(format, a...)
 			wrapLength := 79
 			//nolint:errcheck
@@ -116,14 +116,14 @@ Examples:
 
 		if typeSchema.Description != "" {
 			log("DESCRIPTION:")
-			logDescription(typeSchema.Description)
+			logIndentWrapped(typeSchema.Description)
 			log("")
 		}
 
 		props := fieldSchema.Properties
 		if fieldSchema != nil && fieldSchema != typeSchema {
 			log("FIELD: %s <%s>", fieldName, fieldType)
-			logDescription(fieldDescription)
+			logIndentWrapped(fieldDescription)
 			log("")
 
 			// Terminal field, no sub-fields, and the field is a non-basic type.
@@ -131,10 +131,10 @@ Examples:
 			if !isBasicType(fieldType) && props.Len() == 0 {
 				log("FIELD TYPE:\t%s <%s>", fieldType, schemaTypeString(fieldSchema))
 				if fieldSchema.Description != "" {
-					logDescription(fieldSchema.Description)
+					logIndentWrapped(fieldSchema.Description)
 					log("")
 				}
-				logDescription("For details run 'yfg explain %s'", fieldType)
+				logIndentWrapped("For details run 'yfg explain %s'", fieldType)
 			}
 		}
 
@@ -159,7 +159,7 @@ Examples:
 					log("  %s\t<%s>", name, ty)
 				}
 				if desc != "" {
-					logDescription(desc)
+					logIndentWrapped(desc)
 				}
 				log("")
 			}
