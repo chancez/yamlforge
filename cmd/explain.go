@@ -113,6 +113,24 @@ Examples:
 		if fieldSchema.Properties.Len() != 0 {
 			bufLog(&buf, "FIELDS:")
 			logSchemaProperties(&buf, fieldSchema)
+			if explainFlags.verbose {
+				var subTypes []*jsonschema.Schema
+				seen := make(map[string]struct{})
+				for pair := fieldSchema.Properties.Oldest(); pair != nil; pair = pair.Next() {
+					schema := pair.Value
+					var err error
+					var subTypeName string
+					schema, subTypeName, err = getSubSchema(schema)
+					if err != nil {
+						return err
+					}
+					if _, ok := seen[subTypeName]; !ok {
+						seen[subTypeName] = struct{}{}
+						subTypes = append(subTypes, schema)
+					}
+				}
+				logSubTypes(&buf, subTypes)
+			}
 		}
 
 		fmt.Println(buf.String())
