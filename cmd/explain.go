@@ -16,6 +16,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type ExplainFlags struct {
+	verbose bool
+}
+
+var explainFlags ExplainFlags
+
 var explainCmd = &cobra.Command{
 	Use:   "explain",
 	Short: "Describe fields and structure of forge configurations.",
@@ -33,6 +39,13 @@ Examples:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		input := strings.SplitN(args[0], ".", 2)
 		ty := input[0]
+		var field string
+		if len(input) == 2 {
+			field = input[1]
+			if field == "" {
+				return fmt.Errorf("error: field name is empty")
+			}
+		}
 
 		typeSchema, typeName, err := getTypeSchema(ty)
 		if err != nil {
@@ -41,11 +54,7 @@ Examples:
 
 		fieldSchema := typeSchema
 		var fieldName string
-		if len(input) == 2 {
-			field := input[1]
-			if field == "" {
-				return fmt.Errorf("error: field name is empty")
-			}
+		if field != "" {
 			// Lookup the field the user specified
 			fieldSchema, fieldName, err = getFieldSchema(field, typeSchema)
 			if err != nil {
@@ -73,11 +82,10 @@ Examples:
 			bufLog(&buf, "")
 		}
 
-		fieldSchema, err = getSubSchema(fieldSchema)
+		fieldSchema, _, err = getSubSchema(fieldSchema)
 		if err != nil {
 			return err
 		}
-		props := fieldSchema.Properties
 		if fieldSchema != nil && fieldSchema != typeSchema {
 			bufLog(&buf, "FIELD: %s <%s>", fieldName, fieldType)
 			bufLogIndentWrapped(&buf, fieldDescription)
@@ -85,41 +93,26 @@ Examples:
 
 			// Terminal field, no sub-fields, and the field is a non-basic type.
 			// Lookup the type of the field and print the description if it exists.
-			if !isBasicType(fieldType) && props.Len() == 0 {
+			if !isBasicType(fieldType) && fieldSchema.Properties.Len() == 0 {
 				bufLog(&buf, "FIELD TYPE:\t%s <%s>", fieldType, schemaTypeString(fieldSchema))
 				if fieldSchema.Description != "" {
 					bufLogIndentWrapped(&buf, fieldSchema.Description)
 					bufLog(&buf, "")
 				}
-				bufLogIndentWrapped(&buf, "For details run 'yfg explain %s'", fieldType)
+				if explainFlags.verbose && len(fieldSchema.OneOf) != 0 {
+					err := logSubTypes(&buf, fieldSchema.OneOf)
+					if err != nil {
+						return err
+					}
+				} else {
+					bufLogIndentWrapped(&buf, "For details run 'yfg explain %s' or re-run the previous command with --verbose.", fieldType)
+				}
 			}
 		}
 
-		if props.Len() != 0 {
+		if fieldSchema.Properties.Len() != 0 {
 			bufLog(&buf, "FIELDS:")
-			for pair := props.Oldest(); pair != nil; pair = pair.Next() {
-				name := pair.Key
-				schema := pair.Value
-				desc := schema.Description
-				ty := schemaTypeString(schema)
-				required := false
-				for _, req := range fieldSchema.Required {
-					if req != name {
-						continue
-					}
-					required = true
-					break
-				}
-				if required {
-					bufLog(&buf, "  %s\t<%s> -required-", name, ty)
-				} else {
-					bufLog(&buf, "  %s\t<%s>", name, ty)
-				}
-				if desc != "" {
-					bufLogIndentWrapped(&buf, desc)
-				}
-				bufLog(&buf, "")
-			}
+			logSchemaProperties(&buf, fieldSchema)
 		}
 
 		fmt.Println(buf.String())
@@ -129,6 +122,7 @@ Examples:
 }
 
 func init() {
+	explainCmd.Flags().BoolVar(&explainFlags.verbose, "verbose", false, "Enable verbose output")
 	RootCmd.AddCommand(explainCmd)
 }
 
@@ -213,7 +207,7 @@ func getFieldSchema(field string, typeSchema *jsonschema.Schema) (*jsonschema.Sc
 			fieldSchema = pair.Value
 			// Still having troublehere because it returns the sub type and we need both the parent and the sub-type.
 			var err error
-			subSchema, err = getSubSchema(fieldSchema)
+			subSchema, _, err = getSubSchema(fieldSchema)
 			if err != nil {
 				return nil, "", err
 			}
@@ -226,16 +220,17 @@ func getFieldSchema(field string, typeSchema *jsonschema.Schema) (*jsonschema.Sc
 	return fieldSchema, fieldName, nil
 }
 
-func getSubSchema(schema *jsonschema.Schema) (*jsonschema.Schema, error) {
+func getSubSchema(schema *jsonschema.Schema) (*jsonschema.Schema, string, error) {
 	// Now lookup the definition for this field if needed.
 	// Resolve refs if they exist
+	var typeName string
 	for schema.Ref != "" || schema.Items != nil {
 		if schema.Ref != "" {
 			var err error
-			ref := strings.TrimPrefix(schema.Ref, "#/$defs/")
-			schema, _, err = getTypeSchema(ref)
+			typeName = strings.TrimPrefix(schema.Ref, "#/$defs/")
+			schema, _, err = getTypeSchema(typeName)
 			if err != nil {
-				return nil, err
+				return nil, "", err
 			}
 		}
 
@@ -245,7 +240,7 @@ func getSubSchema(schema *jsonschema.Schema) (*jsonschema.Schema, error) {
 			schema = schema.Items
 		}
 	}
-	return schema, nil
+	return schema, typeName, nil
 }
 
 func bufLog(buf *bytes.Buffer, format string, a ...any) {
@@ -264,4 +259,55 @@ func bufLogIndentWrapped(buf *bytes.Buffer, format string, a ...any) {
 	io.WriteString(buf, WrapAndIndent(s, wrapLength, 4))
 	//nolint:errcheck
 	io.WriteString(buf, "\n")
+}
+
+func logSchemaProperties(buf *bytes.Buffer, schema *jsonschema.Schema) {
+	for pair := schema.Properties.Oldest(); pair != nil; pair = pair.Next() {
+		name := pair.Key
+		schema := pair.Value
+		desc := schema.Description
+		ty := schemaTypeString(schema)
+		required := false
+		for _, req := range schema.Required {
+			if req != name {
+				continue
+			}
+			required = true
+			break
+		}
+		if required {
+			bufLog(buf, "  %s\t<%s> -required-", name, ty)
+		} else {
+			bufLog(buf, "  %s\t<%s>", name, ty)
+		}
+		if desc != "" {
+			bufLogIndentWrapped(buf, desc)
+		}
+		bufLog(buf, "")
+	}
+}
+
+func logSubTypes(buf *bytes.Buffer, schemas []*jsonschema.Schema) error {
+	for _, schema := range schemas {
+		if schema.Required != nil || isBasicType(schema.Type) {
+			continue
+		}
+		var subType string
+		subSchema, subType, err := getSubSchema(schema)
+		if err != nil {
+			return err
+		}
+		bufLog(buf, "")
+		bufLog(buf, "SUB TYPE:\t%s", subType)
+		if subSchema.Description != "" {
+			bufLogIndentWrapped(buf, subSchema.Description)
+		}
+		bufLog(buf, "")
+		if subSchema.Properties.Len() != 0 {
+			bufLog(buf, "SUB TYPE FIELDS:")
+			bufLog(buf, "")
+			logSchemaProperties(buf, subSchema)
+		}
+	}
+	return nil
 }
