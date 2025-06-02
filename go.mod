@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/evanphx/json-patch/v5 v5.9.0
-	github.com/goccy/go-yaml v1.17.1
+	github.com/goccy/go-yaml v1.18.0
 	github.com/google/cel-go v0.22.1
 	github.com/invopop/jsonschema v0.12.0
 	github.com/spf13/cobra v1.8.1
