@@ -58,7 +58,14 @@ func (store *Store) GetStringValue(dir string, val config.StringOrValue) (string
 		return *val.String, nil
 	}
 	if val.Value != nil {
-		data, err := store.GetValueBytes(dir, *val.Value)
+		v, err := store.GetValue(dir, *val.Value)
+		if err != nil {
+			return "", err
+		}
+		if s, ok := v.(string); ok {
+			return s, nil
+		}
+		data, err := ConvertToBytes(v)
 		if err != nil {
 			return "", err
 		}
@@ -86,7 +93,14 @@ func (store *Store) GetBoolValue(dir string, val config.BoolOrValue) (bool, erro
 		return *val.Bool, nil
 	}
 	if val.Value != nil {
-		data, err := store.GetValueBytes(dir, *val.Value)
+		v, err := store.GetValue(dir, *val.Value)
+		if err != nil {
+			return false, err
+		}
+		if b, ok := v.(bool); ok {
+			return b, nil
+		}
+		data, err := ConvertToBytes(v)
 		if err != nil {
 			return false, err
 		}
@@ -105,7 +119,15 @@ func (store *Store) GetMapValue(dir string, val config.MapOrValue) (map[string]a
 		return val.Map, nil
 	}
 	if val.Value != nil {
-		data, err := store.GetValueBytes(dir, *val.Value)
+		v, err := store.GetValue(dir, *val.Value)
+		if err != nil {
+			return nil, err
+		}
+		if mapVal, ok := v.(map[string]any); ok {
+			return mapVal, nil
+		}
+
+		data, err := ConvertToBytes(v)
 		if err != nil {
 			return nil, err
 		}
