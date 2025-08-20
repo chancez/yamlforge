@@ -111,7 +111,7 @@ type JQGenerator struct {
 // CELGenerator evaluates a CEL expression and returns the result of the expression.
 type CELGenerator struct {
 	// Input values are parsed then evaluated against the configure CEL expression.
-	Input ParsedValue `yaml:"input" json:"input"`
+	Input *ParsedValue `yaml:"input" json:"input"`
 	// Expr is a CEL expression evaluated with the input set to the variable 'val'.
 	Expr StringOrValue `yaml:"expr" json:"expr"`
 	// When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept.
