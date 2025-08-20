@@ -556,6 +556,30 @@
             "values"
           ],
           "title": "values"
+        },
+        {
+          "required": [
+            "pipeline"
+          ],
+          "title": "pipeline"
+        },
+        {
+          "required": [
+            "generator"
+          ],
+          "title": "generator"
+        },
+        {
+          "required": [
+            "import"
+          ],
+          "title": "import"
+        },
+        {
+          "required": [
+            "include"
+          ],
+          "title": "include"
         }
       ],
       "properties": {
@@ -610,9 +634,35 @@
           "type": "array",
           "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
         },
+        "pipeline": {
+          "items": {
+            "$ref": "#/$defs/Generator"
+          },
+          "type": "array",
+          "description": "Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs."
+        },
+        "generator": {
+          "$ref": "#/$defs/Generator",
+          "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
+        },
+        "import": {
+          "$ref": "#/$defs/Value",
+          "description": "Import is a value containing a pipeline to import. Imported pipelines\nshare no references or variables with their parent pipeline."
+        },
+        "include": {
+          "$ref": "#/$defs/Value",
+          "description": "Include is a value containing a pipeline to include. Included pipelines\nshare the same context as their parent, meaning variables and references\nin the parent pipeline are available within the included pipeline,\nbehaving as if the included pipeline was directly written in the parent\npipeline.\nIf a included pipeline includes a generator with the same name as it's\nparent it will result in an error."
+        },
+        "vars": {
+          "items": {
+            "$ref": "#/$defs/NamedValue"
+          },
+          "type": "array",
+          "description": "Vars defines variables that the pipeline is providing to the sub-pipeline."
+        },
         "ignoreMissing": {
           "type": "boolean",
-          "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.\nIgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         },
         "default": {
           "oneOf": [
@@ -679,6 +729,30 @@
             "values"
           ],
           "title": "values"
+        },
+        {
+          "required": [
+            "pipeline"
+          ],
+          "title": "pipeline"
+        },
+        {
+          "required": [
+            "generator"
+          ],
+          "title": "generator"
+        },
+        {
+          "required": [
+            "import"
+          ],
+          "title": "import"
+        },
+        {
+          "required": [
+            "include"
+          ],
+          "title": "include"
         }
       ],
       "properties": {
@@ -738,9 +812,35 @@
           "type": "array",
           "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
         },
+        "pipeline": {
+          "items": {
+            "$ref": "#/$defs/Generator"
+          },
+          "type": "array",
+          "description": "Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs."
+        },
+        "generator": {
+          "$ref": "#/$defs/Generator",
+          "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
+        },
+        "import": {
+          "$ref": "#/$defs/Value",
+          "description": "Import is a value containing a pipeline to import. Imported pipelines\nshare no references or variables with their parent pipeline."
+        },
+        "include": {
+          "$ref": "#/$defs/Value",
+          "description": "Include is a value containing a pipeline to include. Included pipelines\nshare the same context as their parent, meaning variables and references\nin the parent pipeline are available within the included pipeline,\nbehaving as if the included pipeline was directly written in the parent\npipeline.\nIf a included pipeline includes a generator with the same name as it's\nparent it will result in an error."
+        },
+        "vars": {
+          "items": {
+            "$ref": "#/$defs/NamedValue"
+          },
+          "type": "array",
+          "description": "Vars defines variables that the pipeline is providing to the sub-pipeline."
+        },
         "ignoreMissing": {
           "type": "boolean",
-          "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.\nIgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         },
         "default": {
           "oneOf": [
@@ -877,6 +977,30 @@
             "values"
           ],
           "title": "values"
+        },
+        {
+          "required": [
+            "pipeline"
+          ],
+          "title": "pipeline"
+        },
+        {
+          "required": [
+            "generator"
+          ],
+          "title": "generator"
+        },
+        {
+          "required": [
+            "import"
+          ],
+          "title": "import"
+        },
+        {
+          "required": [
+            "include"
+          ],
+          "title": "include"
         }
       ],
       "properties": {
@@ -927,9 +1051,35 @@
           "type": "array",
           "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
         },
+        "pipeline": {
+          "items": {
+            "$ref": "#/$defs/Generator"
+          },
+          "type": "array",
+          "description": "Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs."
+        },
+        "generator": {
+          "$ref": "#/$defs/Generator",
+          "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
+        },
+        "import": {
+          "$ref": "#/$defs/Value",
+          "description": "Import is a value containing a pipeline to import. Imported pipelines\nshare no references or variables with their parent pipeline."
+        },
+        "include": {
+          "$ref": "#/$defs/Value",
+          "description": "Include is a value containing a pipeline to include. Included pipelines\nshare the same context as their parent, meaning variables and references\nin the parent pipeline are available within the included pipeline,\nbehaving as if the included pipeline was directly written in the parent\npipeline.\nIf a included pipeline includes a generator with the same name as it's\nparent it will result in an error."
+        },
+        "vars": {
+          "items": {
+            "$ref": "#/$defs/NamedValue"
+          },
+          "type": "array",
+          "description": "Vars defines variables that the pipeline is providing to the sub-pipeline."
+        },
         "ignoreMissing": {
           "type": "boolean",
-          "description": "IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.\nIgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
         },
         "default": {
           "oneOf": [

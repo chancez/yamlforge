@@ -2,6 +2,7 @@ package generator
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -190,6 +191,17 @@ func (store *Store) GetValue(dir string, ref config.Value) (any, error) {
 			vals = append(vals, ret)
 		}
 		return vals, nil
+	case ref.PipelineGenerator != nil:
+		err := config.ValidatePipelineGenerators(*ref.PipelineGenerator)
+		if err != nil {
+			return nil, fmt.Errorf("error getting value: %w", err)
+		}
+		subPipeline := NewPipeline(dir, *ref.PipelineGenerator, store, false)
+		res, err := subPipeline.Generate(context.TODO())
+		if err != nil {
+			return nil, fmt.Errorf("error getting value: %w", err)
+		}
+		return res, nil
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}

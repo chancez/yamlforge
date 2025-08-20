@@ -92,23 +92,14 @@ func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
 		if err := json.Unmarshal(data, &obj); err != nil {
 			return false, err
 		}
-		if _, hasVar := obj["var"]; hasVar {
-			return true, unmarshalValue()
+		valueKeys := []string{
+			"var", "ref", "file", "env", "value", "values",
+			"pipeline", "generator", "import", "include",
 		}
-		if _, hasRef := obj["ref"]; hasRef {
-			return true, unmarshalValue()
-		}
-		if _, hasFile := obj["file"]; hasFile {
-			return true, unmarshalValue()
-		}
-		if _, hasEnv := obj["env"]; hasEnv {
-			return true, unmarshalValue()
-		}
-		if _, hasValue := obj["value"]; hasValue {
-			return true, unmarshalValue()
-		}
-		if _, hasValues := obj["values"]; hasValues {
-			return true, unmarshalValue()
+		for _, key := range valueKeys {
+			if _, hasKey := obj[key]; hasKey {
+				return true, unmarshalValue()
+			}
 		}
 		// If none of the specific keys exist, then it's not a "Value" type, so return false without decoding anything
 	}
@@ -206,7 +197,9 @@ type Value struct {
 	// Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value
 	Value *AnyOrValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value,oneof_type=string;boolean;number;array;object;Value"`
 	// Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.
-	Values []AnyOrValue `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"oneof_required=values"`
+	Values             []AnyOrValue `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"oneof_required=values"`
+	*PipelineGenerator `yaml:",inline" json:",inline"`
+	// Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.
 	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.
 	IgnoreMissing bool `yaml:"ignoreMissing,omitempty" json:"ignoreMissing,omitempty"`
 	// Default specifies the default value to use if a ref, variable, or file is
