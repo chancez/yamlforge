@@ -158,6 +158,16 @@ func (store *Store) GetValue(dir string, ref config.Value) (any, error) {
 			return nil, fmt.Errorf("error getting value: %w", err)
 		}
 		return ret, nil
+	case ref.Values != nil:
+		var vals []any
+		for _, v := range ref.Values {
+			ret, err := store.GetAnyValue(dir, v)
+			if err != nil {
+				return nil, fmt.Errorf("error getting value: %w", err)
+			}
+			vals = append(vals, ret)
+		}
+		return vals, nil
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
@@ -189,28 +199,47 @@ func (store *Store) getParsedValueDecoder(data []byte, format string) (Decoder, 
 }
 
 func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (iter.Seq2[ParsedValue, error], error) {
-	valBytes, err := store.GetValueBytes(dir, parsedVal.Value)
+	val, err := store.GetValue(dir, parsedVal.Value)
 	if err != nil {
 		return nil, err
 	}
-	dec, err := store.getParsedValueDecoder(valBytes, parsedVal.Format)
-	if err != nil {
-		return nil, err
-	}
-	return func(yield func(ParsedValue, error) bool) {
-		for {
-			pv := ParsedValue{
-				data: valBytes,
-			}
-			err := dec.Decode(&pv.parsed)
-			if err == io.EOF {
-				return
-			}
-			if !yield(pv, err) {
-				return
-			}
+	if valBytes, ok := val.([]byte); ok {
+		dec, err := store.getParsedValueDecoder(valBytes, parsedVal.Format)
+		if err != nil {
+			return nil, err
 		}
-	}, nil
+		return func(yield func(ParsedValue, error) bool) {
+			for {
+				pv := ParsedValue{
+					data: valBytes,
+				}
+				err := dec.Decode(&pv.parsed)
+				if err == io.EOF {
+					return
+				}
+				if !yield(pv, err) {
+					return
+				}
+			}
+		}, nil
+	} else {
+		return func(yield func(ParsedValue, error) bool) {
+			var items []any
+			if vals, ok := val.([]any); ok {
+				items = vals
+			} else {
+				items = []any{val}
+			}
+			for _, val := range items {
+				pv := ParsedValue{
+					parsed: val,
+				}
+				if !yield(pv, err) {
+					return
+				}
+			}
+		}, nil
+	}
 }
 
 type Decoder interface {

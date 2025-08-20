@@ -107,6 +107,9 @@ func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
 		if _, hasValue := obj["value"]; hasValue {
 			return true, unmarshalValue()
 		}
+		if _, hasValues := obj["values"]; hasValues {
+			return true, unmarshalValue()
+		}
 		// If none of the specific keys exist, then it's not a "Value" type, so return false without decoding anything
 	}
 	return false, nil
@@ -201,7 +204,9 @@ type Value struct {
 	// Env takes the name of an environment variable and returns its value.
 	Env string `yaml:"env,omitempty" json:"env,omitempty" jsonschema:"oneof_required=env"`
 	// Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value
-	Value *AnyOrValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value,oneof_type=string;boolean;number;array;object"`
+	Value *AnyOrValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value,oneof_type=string;boolean;number;array;object;Value"`
+	// Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.
+	Values []AnyOrValue `yaml:"values,omitempty" json:"values,omitempty" jsonschema:"oneof_required=values"`
 	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.
 	IgnoreMissing bool `yaml:"ignoreMissing,omitempty" json:"ignoreMissing,omitempty"`
 	// Default specifies the default value to use if a ref, variable, or file is

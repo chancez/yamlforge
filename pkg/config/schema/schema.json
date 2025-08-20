@@ -546,6 +546,12 @@
             "value"
           ],
           "title": "value"
+        },
+        {
+          "required": [
+            "values"
+          ],
+          "title": "values"
         }
       ],
       "properties": {
@@ -586,9 +592,19 @@
             },
             {
               "type": "object"
+            },
+            {
+              "type": "Value"
             }
           ],
           "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/AnyOrValue"
+          },
+          "type": "array",
+          "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
         },
         "ignoreMissing": {
           "type": "boolean",
@@ -653,6 +669,12 @@
             "value"
           ],
           "title": "value"
+        },
+        {
+          "required": [
+            "values"
+          ],
+          "title": "values"
         }
       ],
       "properties": {
@@ -698,9 +720,19 @@
             },
             {
               "type": "object"
+            },
+            {
+              "type": "Value"
             }
           ],
           "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/AnyOrValue"
+          },
+          "type": "array",
+          "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
         },
         "ignoreMissing": {
           "type": "boolean",
@@ -835,6 +867,12 @@
             "value"
           ],
           "title": "value"
+        },
+        {
+          "required": [
+            "values"
+          ],
+          "title": "values"
         }
       ],
       "properties": {
@@ -871,9 +909,19 @@
             },
             {
               "type": "object"
+            },
+            {
+              "type": "Value"
             }
           ],
           "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
+        },
+        "values": {
+          "items": {
+            "$ref": "#/$defs/AnyOrValue"
+          },
+          "type": "array",
+          "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
         },
         "ignoreMissing": {
           "type": "boolean",

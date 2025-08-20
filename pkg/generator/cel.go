@@ -58,7 +58,6 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting invertFilter: %w", err)
 	}
-
 	var buf bytes.Buffer
 	var enc encoder
 	switch format {
