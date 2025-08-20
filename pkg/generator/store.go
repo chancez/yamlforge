@@ -70,12 +70,12 @@ func (store *Store) GetStringValue(dir string, val config.StringOrValue) (string
 func (store *Store) GetStringValueList(dir string, vals []config.StringOrValue) ([]string, error) {
 	var ret []string
 	if len(vals) != 0 {
-		for _, apiVersion := range vals {
-			apiV, err := store.GetStringValue(dir, apiVersion)
+		for _, val := range vals {
+			sv, err := store.GetStringValue(dir, val)
 			if err != nil {
 				return nil, err
 			}
-			ret = append(ret, apiV)
+			ret = append(ret, sv)
 		}
 	}
 	return ret, nil
