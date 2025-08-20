@@ -61,6 +61,10 @@
         "format": {
           "$ref": "#/$defs/StringOrValue",
           "description": "Format is the format the output should be returned as. If unspecified, it defaults to YAML."
+        },
+        "collect": {
+          "$ref": "#/$defs/BoolOrValue",
+          "description": "Collect configures the generator to read all inputs into an array and use it as a single input value."
         }
       },
       "additionalProperties": false,

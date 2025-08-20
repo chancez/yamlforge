@@ -58,6 +58,11 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error getting invertFilter: %w", err)
 	}
+	collect, err := c.refStore.GetBoolValue(c.dir, c.cfg.Collect)
+	if err != nil {
+		return nil, fmt.Errorf("error getting collect: %w", err)
+	}
+
 	var buf bytes.Buffer
 	var enc encoder
 	switch format {
@@ -71,6 +76,7 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 
 	env, err := cel.NewEnv(
 		cel.Variable("val", cel.DynType),
+		cel.OptionalTypes(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating CEL environment: %w", err)
@@ -92,6 +98,19 @@ func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
 	prg, err := env.Program(ast)
 	if err != nil {
 		return nil, fmt.Errorf("CEL program construction error: %s", err)
+	}
+
+	if collect {
+		var allVals []any
+		for val, err := range vals {
+			if err != nil {
+				return nil, fmt.Errorf("error while processing input: %w", err)
+			}
+			allVals = append(allVals, val.Parsed())
+		}
+		vals = func(yield func(ParsedValue, error) bool) {
+			yield(ParsedValue{parsed: allVals}, nil)
+		}
 	}
 
 	for val, err := range vals {
