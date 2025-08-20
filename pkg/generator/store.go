@@ -1,4 +1,4 @@
-package reference
+package generator
 
 import (
 	"bytes"

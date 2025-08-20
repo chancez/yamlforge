@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*JQ)(nil)
@@ -17,10 +16,10 @@ var _ Generator = (*JQ)(nil)
 type JQ struct {
 	dir      string
 	cfg      config.JQGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewJQ(dir string, cfg config.JQGenerator, refStore *reference.Store) *JQ {
+func NewJQ(dir string, cfg config.JQGenerator, refStore *Store) *JQ {
 	return &JQ{
 		dir:      dir,
 		cfg:      cfg,

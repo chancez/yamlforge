@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Value)(nil)
@@ -12,10 +11,10 @@ var _ Generator = (*Value)(nil)
 type Value struct {
 	dir      string
 	val      config.AnyOrValue
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewValue(dir string, val config.AnyOrValue, refStore *reference.Store) *Value {
+func NewValue(dir string, val config.AnyOrValue, refStore *Store) *Value {
 	return &Value{
 		dir:      dir,
 		val:      val,
@@ -28,5 +27,5 @@ func (v *Value) Generate(context.Context) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return reference.ConvertToBytes(val)
+	return ConvertToBytes(val)
 }

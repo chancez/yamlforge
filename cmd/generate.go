@@ -9,7 +9,6 @@ import (
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/generator"
-	"github.com/chancez/yamlforge/pkg/reference"
 	"github.com/spf13/cobra"
 )
 
@@ -39,7 +38,7 @@ var generateCmd = &cobra.Command{
 			return fmt.Errorf("error parsing pipeline %s: %w", forgeFile, err)
 		}
 
-		refStore := reference.NewStore(vars)
+		refStore := generator.NewStore(vars)
 		state := generator.NewPipeline(filepath.Dir(forgeFile), cfg.PipelineGenerator, refStore, genFlags.debug)
 		result, err := state.Generate(cmd.Context())
 		if err != nil {

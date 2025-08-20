@@ -9,7 +9,6 @@ import (
 	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Kustomize)(nil)
@@ -17,10 +16,10 @@ var _ Generator = (*Kustomize)(nil)
 type Kustomize struct {
 	dir      string
 	cfg      config.KustomizeGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewKustomize(dir string, cfg config.KustomizeGenerator, refStore *reference.Store) *Kustomize {
+func NewKustomize(dir string, cfg config.KustomizeGenerator, refStore *Store) *Kustomize {
 	return &Kustomize{
 		dir:      dir,
 		cfg:      cfg,

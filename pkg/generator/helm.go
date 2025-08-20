@@ -9,7 +9,6 @@ import (
 	"path"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Helm)(nil)
@@ -17,10 +16,10 @@ var _ Generator = (*Helm)(nil)
 type Helm struct {
 	dir      string
 	cfg      config.HelmGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewHelm(dir string, cfg config.HelmGenerator, refStore *reference.Store) *Helm {
+func NewHelm(dir string, cfg config.HelmGenerator, refStore *Store) *Helm {
 	return &Helm{
 		dir:      dir,
 		cfg:      cfg,

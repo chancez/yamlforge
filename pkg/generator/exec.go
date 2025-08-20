@@ -8,7 +8,6 @@ import (
 	"os/exec"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Exec)(nil)
@@ -16,11 +15,11 @@ var _ Generator = (*Exec)(nil)
 type Exec struct {
 	dir      string
 	cfg      config.ExecGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
 // TODO: Use directory as PWD
-func NewExec(dir string, cfg config.ExecGenerator, refStore *reference.Store) *Exec {
+func NewExec(dir string, cfg config.ExecGenerator, refStore *Store) *Exec {
 	return &Exec{
 		dir:      dir,
 		cfg:      cfg,

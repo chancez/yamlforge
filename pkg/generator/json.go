@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*JSON)(nil)
@@ -16,10 +15,10 @@ var _ Generator = (*JSON)(nil)
 type JSON struct {
 	dir      string
 	cfg      config.JSONGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewJSON(dir string, cfg config.JSONGenerator, refStore *reference.Store) *JSON {
+func NewJSON(dir string, cfg config.JSONGenerator, refStore *Store) *JSON {
 	return &JSON{
 		dir:      dir,
 		cfg:      cfg,

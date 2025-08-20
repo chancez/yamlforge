@@ -9,7 +9,6 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var extraTemplateFuncs = template.FuncMap{
@@ -30,10 +29,10 @@ var _ Generator = (*GoTemplate)(nil)
 type GoTemplate struct {
 	dir      string
 	cfg      config.GoTemplateGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *reference.Store) *GoTemplate {
+func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *Store) *GoTemplate {
 	return &GoTemplate{
 		dir:      dir,
 		cfg:      cfg,

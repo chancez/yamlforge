@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Pipeline)(nil)
@@ -16,11 +15,11 @@ var _ Generator = (*Pipeline)(nil)
 type Pipeline struct {
 	dir      string
 	cfg      config.PipelineGenerator
-	refStore *reference.Store
+	refStore *Store
 	debug    bool
 }
 
-func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *reference.Store, debug bool) *Pipeline {
+func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *Store, debug bool) *Pipeline {
 	return &Pipeline{
 		dir:      dir,
 		cfg:      cfg,
@@ -117,7 +116,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 			subPipelineDir = filepath.Dir(pipeline.cfg.Import.File)
 		}
 	}
-	newStore := reference.NewStore(pipelineVars)
+	newStore := NewStore(pipelineVars)
 	subPipeline := NewPipeline(subPipelineDir, subPipelineCfg.PipelineGenerator, newStore, pipeline.debug)
 	return subPipeline.Generate(ctx)
 }

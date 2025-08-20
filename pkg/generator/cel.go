@@ -9,7 +9,6 @@ import (
 	"reflect"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 	"github.com/google/cel-go/cel"
 )
 
@@ -22,10 +21,10 @@ var (
 type CEL struct {
 	dir      string
 	cfg      config.CELGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewCEL(dir string, cfg config.CELGenerator, refStore *reference.Store) *CEL {
+func NewCEL(dir string, cfg config.CELGenerator, refStore *Store) *CEL {
 	return &CEL{
 		dir:      dir,
 		cfg:      cfg,

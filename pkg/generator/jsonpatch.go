@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 	jsonpatch "github.com/evanphx/json-patch/v5"
 )
 
@@ -15,10 +14,10 @@ var _ Generator = (*JSONPatch)(nil)
 type JSONPatch struct {
 	dir      string
 	cfg      config.JSONPatchGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewJSONPatch(dir string, cfg config.JSONPatchGenerator, refStore *reference.Store) *JSONPatch {
+func NewJSONPatch(dir string, cfg config.JSONPatchGenerator, refStore *Store) *JSONPatch {
 	return &JSONPatch{
 		dir:      dir,
 		cfg:      cfg,

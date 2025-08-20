@@ -6,7 +6,6 @@ import (
 
 	"github.com/chancez/yamlforge/pkg/config"
 	"github.com/chancez/yamlforge/pkg/mapmerge"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*Merge)(nil)
@@ -14,10 +13,10 @@ var _ Generator = (*Merge)(nil)
 type Merge struct {
 	dir      string
 	cfg      config.MergeGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewMerge(dir string, cfg config.MergeGenerator, refStore *reference.Store) *Merge {
+func NewMerge(dir string, cfg config.MergeGenerator, refStore *Store) *Merge {
 	return &Merge{
 		dir:      dir,
 		cfg:      cfg,

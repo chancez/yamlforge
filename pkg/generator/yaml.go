@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/chancez/yamlforge/pkg/config"
-	"github.com/chancez/yamlforge/pkg/reference"
 )
 
 var _ Generator = (*YAML)(nil)
@@ -14,10 +13,10 @@ var _ Generator = (*YAML)(nil)
 type YAML struct {
 	dir      string
 	cfg      config.YAMLGenerator
-	refStore *reference.Store
+	refStore *Store
 }
 
-func NewYAML(dir string, cfg config.YAMLGenerator, refStore *reference.Store) *YAML {
+func NewYAML(dir string, cfg config.YAMLGenerator, refStore *Store) *YAML {
 	return &YAML{
 		dir:      dir,
 		cfg:      cfg,
