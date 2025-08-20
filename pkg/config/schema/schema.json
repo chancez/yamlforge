@@ -570,6 +570,7 @@
           "description": "Env takes the name of an environment variable and returns its value."
         },
         "value": {
+          "$ref": "#/$defs/AnyOrValue",
           "oneOf": [
             {
               "type": "string"
@@ -587,7 +588,7 @@
               "type": "object"
             }
           ],
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object)."
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
         },
         "ignoreMissing": {
           "type": "boolean",
@@ -681,6 +682,7 @@
           "description": "Env takes the name of an environment variable and returns its value."
         },
         "value": {
+          "$ref": "#/$defs/AnyOrValue",
           "oneOf": [
             {
               "type": "string"
@@ -698,7 +700,7 @@
               "type": "object"
             }
           ],
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object)."
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
         },
         "ignoreMissing": {
           "type": "boolean",
@@ -853,6 +855,7 @@
           "description": "Env takes the name of an environment variable and returns its value."
         },
         "value": {
+          "$ref": "#/$defs/AnyOrValue",
           "oneOf": [
             {
               "type": "string"
@@ -870,7 +873,7 @@
               "type": "object"
             }
           ],
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object)."
+          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
         },
         "ignoreMissing": {
           "type": "boolean",

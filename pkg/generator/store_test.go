@@ -49,14 +49,16 @@ func TestStore(t *testing.T) {
 	require.Error(t, err)
 
 	// Values should be returned as their YAML encoded value
+	strVal := any("string-val")
 	valData, err := store.GetValueBytes("", config.Value{
-		Value: "string-val",
+		Value: &config.AnyOrValue{Any: &strVal},
 	})
 	require.NoError(t, err)
 	assert.Equal(t, []byte(`string-val`), valData)
 
+	boolVal := any(true)
 	valData2, err := store.GetValueBytes("", config.Value{
-		Value: true,
+		Value: &config.AnyOrValue{Any: &boolVal},
 	})
 	require.NoError(t, err)
 	trueBytes, err := config.EncodeYAML(true)

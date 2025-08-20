@@ -149,7 +149,11 @@ func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
 		}
 		return res, nil
 	case ref.Value != nil:
-		return ConvertToBytes(ref.Value)
+		ret, err := store.GetAnyValue(dir, *ref.Value)
+		if err != nil {
+			return nil, fmt.Errorf("error getting value: %w", err)
+		}
+		return ConvertToBytes(ret)
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
