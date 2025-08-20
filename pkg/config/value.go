@@ -101,6 +101,9 @@ func maybeUnmarshalValue(data []byte, val **Value) (bool, error) {
 		if _, hasFile := obj["file"]; hasFile {
 			return true, unmarshalValue()
 		}
+		if _, hasEnv := obj["env"]; hasEnv {
+			return true, unmarshalValue()
+		}
 		if _, hasValue := obj["value"]; hasValue {
 			return true, unmarshalValue()
 		}
@@ -195,6 +198,8 @@ type Value struct {
 	Ref string `yaml:"ref,omitempty" json:"ref,omitempty" jsonschema:"oneof_required=ref"`
 	// File takes a path relative to this pipeline file to read and returns the content of the file specified.
 	File string `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
+	// Env takes the name of an environment variable and returns its value.
+	Env string `yaml:"env,omitempty" json:"env,omitempty" jsonschema:"oneof_required=env"`
 	// Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object).
 	Value any `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value,oneof_type=string;boolean;number;array;object"`
 	// IgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error.

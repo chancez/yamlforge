@@ -537,6 +537,12 @@
         },
         {
           "required": [
+            "env"
+          ],
+          "title": "env"
+        },
+        {
+          "required": [
             "value"
           ],
           "title": "value"
@@ -558,6 +564,10 @@
         "file": {
           "type": "string",
           "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
+        },
+        "env": {
+          "type": "string",
+          "description": "Env takes the name of an environment variable and returns its value."
         },
         "value": {
           "oneOf": [
@@ -633,6 +643,12 @@
         },
         {
           "required": [
+            "env"
+          ],
+          "title": "env"
+        },
+        {
+          "required": [
             "value"
           ],
           "title": "value"
@@ -659,6 +675,10 @@
         "file": {
           "type": "string",
           "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
+        },
+        "env": {
+          "type": "string",
+          "description": "Env takes the name of an environment variable and returns its value."
         },
         "value": {
           "oneOf": [
@@ -804,6 +824,12 @@
         },
         {
           "required": [
+            "env"
+          ],
+          "title": "env"
+        },
+        {
+          "required": [
             "value"
           ],
           "title": "value"
@@ -821,6 +847,10 @@
         "file": {
           "type": "string",
           "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
+        },
+        "env": {
+          "type": "string",
+          "description": "Env takes the name of an environment variable and returns its value."
         },
         "value": {
           "oneOf": [

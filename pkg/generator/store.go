@@ -127,6 +127,8 @@ func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
 			return nil, fmt.Errorf("could not find variable %q", varName)
 		}
 		return []byte(res), nil
+	case ref.Env != "":
+		return []byte(os.Getenv(ref.Env)), nil
 	case ref.Ref != "":
 		refName := ref.Ref
 		res, ok := store.references[refName]
