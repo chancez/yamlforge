@@ -9,7 +9,7 @@ import (
 func ParseFile(forgeFile string) (Config, error) {
 	data, err := os.ReadFile(forgeFile)
 	if err != nil {
-		return Config{}, fmt.Errorf("error parsing config: %w", err)
+		return Config{}, fmt.Errorf("error reading config: %w", err)
 	}
 	return Parse(data)
 }
