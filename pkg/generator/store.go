@@ -17,10 +17,10 @@ type Store struct {
 	// map from an generator.Name to it's results
 	references map[string][]byte
 	// map a variable name to it's value
-	vars map[string][]byte
+	vars map[string]any
 }
 
-func NewStore(vars map[string][]byte) *Store {
+func NewStore(vars map[string]any) *Store {
 	return &Store{
 		references: make(map[string][]byte),
 		vars:       vars,
@@ -36,7 +36,11 @@ func (store *Store) AddReference(name string, data []byte) error {
 }
 
 func (store *Store) GetValueBytes(dir string, ref config.Value) ([]byte, error) {
-	return store.getValue(dir, ref)
+	ret, err := store.GetValue(dir, ref)
+	if err != nil {
+		return nil, err
+	}
+	return ConvertToBytes(ret)
 }
 
 func (store *Store) GetAnyValue(dir string, val config.AnyOrValue) (any, error) {
@@ -44,7 +48,7 @@ func (store *Store) GetAnyValue(dir string, val config.AnyOrValue) (any, error) 
 		return *val.Any, nil
 	}
 	if val.Value != nil {
-		return store.getValue(dir, *val.Value)
+		return store.GetValue(dir, *val.Value)
 	}
 	return nil, nil
 }
@@ -54,7 +58,7 @@ func (store *Store) GetStringValue(dir string, val config.StringOrValue) (string
 		return *val.String, nil
 	}
 	if val.Value != nil {
-		data, err := store.getValue(dir, *val.Value)
+		data, err := store.GetValueBytes(dir, *val.Value)
 		if err != nil {
 			return "", err
 		}
@@ -82,7 +86,7 @@ func (store *Store) GetBoolValue(dir string, val config.BoolOrValue) (bool, erro
 		return *val.Bool, nil
 	}
 	if val.Value != nil {
-		data, err := store.getValue(dir, *val.Value)
+		data, err := store.GetValueBytes(dir, *val.Value)
 		if err != nil {
 			return false, err
 		}
@@ -101,7 +105,7 @@ func (store *Store) GetMapValue(dir string, val config.MapOrValue) (map[string]a
 		return val.Map, nil
 	}
 	if val.Value != nil {
-		data, err := store.getValue(dir, *val.Value)
+		data, err := store.GetValueBytes(dir, *val.Value)
 		if err != nil {
 			return nil, err
 		}
@@ -115,26 +119,26 @@ func (store *Store) GetMapValue(dir string, val config.MapOrValue) (map[string]a
 	return nil, nil
 }
 
-func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
+func (store *Store) GetValue(dir string, ref config.Value) (any, error) {
 	switch {
 	case ref.Var != "":
 		varName := ref.Var
 		res, ok := store.vars[varName]
 		if !ok {
 			if ref.IgnoreMissing {
-				return ConvertToBytes(ref.Default)
+				return ref.Default, nil
 			}
 			return nil, fmt.Errorf("could not find variable %q", varName)
 		}
-		return []byte(res), nil
+		return res, nil
 	case ref.Env != "":
-		return []byte(os.Getenv(ref.Env)), nil
+		return os.Getenv(ref.Env), nil
 	case ref.Ref != "":
 		refName := ref.Ref
 		res, ok := store.references[refName]
 		if !ok {
 			if ref.IgnoreMissing {
-				return ConvertToBytes(ref.Default)
+				return ref.Default, nil
 			}
 			return nil, fmt.Errorf("could not find reference %q", refName)
 		}
@@ -143,7 +147,7 @@ func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
 		res, err := os.ReadFile(path.Join(dir, ref.File))
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) && ref.IgnoreMissing {
-				return ConvertToBytes(ref.Default)
+				return ref.Default, nil
 			}
 			return nil, fmt.Errorf("error opening file %q", ref.File)
 		}
@@ -153,7 +157,7 @@ func (store *Store) getValue(dir string, ref config.Value) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		return ConvertToBytes(ret)
+		return ret, nil
 	default:
 		return nil, errors.New("invalid reference, must specify a reference type")
 	}
@@ -173,39 +177,30 @@ func (pv ParsedValue) Parsed() any {
 	return pv.parsed
 }
 
-func (store *Store) getParsedValueDecoder(dir string, parsedVal config.ParsedValue) (Decoder, []byte, error) {
-	data, err := store.getValue(dir, parsedVal.Value)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error getting reference: %w", err)
-	}
-	format := parsedVal.Format
-	if format == "" && parsedVal.File != "" {
-		switch path.Ext(parsedVal.File) {
-		case "yaml":
-			format = "yaml"
-		case "json":
-			format = "json"
-		}
-	}
+func (store *Store) getParsedValueDecoder(data []byte, format string) (Decoder, error) {
 	if format == "" {
 		format = "yaml"
 	}
 	dec, err := NewDecoder(format, data)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error creating decoder: %w", err)
+		return nil, fmt.Errorf("error creating decoder: %w", err)
 	}
-	return dec, data, nil
+	return dec, nil
 }
 
 func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (iter.Seq2[ParsedValue, error], error) {
-	dec, data, err := store.getParsedValueDecoder(dir, parsedVal)
+	valBytes, err := store.GetValueBytes(dir, parsedVal.Value)
+	if err != nil {
+		return nil, err
+	}
+	dec, err := store.getParsedValueDecoder(valBytes, parsedVal.Format)
 	if err != nil {
 		return nil, err
 	}
 	return func(yield func(ParsedValue, error) bool) {
 		for {
 			pv := ParsedValue{
-				data: data,
+				data: valBytes,
 			}
 			err := dec.Decode(&pv.parsed)
 			if err == io.EOF {
@@ -216,31 +211,6 @@ func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (i
 			}
 		}
 	}, nil
-}
-
-func (store *Store) GetParsedValue(dir string, parsedVal config.ParsedValue) (ParsedValue, error) {
-	dec, data, err := store.getParsedValueDecoder(dir, parsedVal)
-	if err != nil {
-		return ParsedValue{}, err
-	}
-	var vals []any
-	pv := ParsedValue{
-		data: data,
-	}
-	for {
-		var tmp any
-		err := dec.Decode(&tmp)
-		if err == io.EOF {
-			break
-		}
-		vals = append(vals, tmp)
-	}
-	if len(vals) == 1 {
-		pv.parsed = vals[0]
-	} else {
-		pv.parsed = vals
-	}
-	return pv, nil
 }
 
 type Decoder interface {

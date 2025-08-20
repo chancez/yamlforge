@@ -220,9 +220,7 @@ type NamedValue struct {
 // ParsedValue provides parsed values to generators.
 type ParsedValue struct {
 	// Format defines the format to parse the retrieved value as. Valid options
-	// are yaml or json. Defaults to yaml if unspecified, or if the value
-	// references a file, it will attempt to use the file extension to determine
-	// the correct format.
+	// are yaml or json. Defaults to yaml if unspecified.
 	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json,default=yaml"`
 	Value  `yaml:",inline" json:",inline"`
 }

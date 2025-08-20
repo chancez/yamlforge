@@ -11,8 +11,8 @@ import (
 )
 
 func TestStore(t *testing.T) {
-	store := NewStore(map[string][]byte{
-		"some-var": []byte(`var-data`),
+	store := NewStore(map[string]any{
+		"some-var": "var-data",
 	})
 
 	err := store.AddReference("example", []byte(`ref-data`))

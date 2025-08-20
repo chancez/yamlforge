@@ -89,12 +89,12 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 		return nil, fmt.Errorf("error parsing pipeline: %w", err)
 	}
 
-	pipelineVars := make(map[string][]byte)
+	pipelineVars := make(map[string]any)
 	for i, pipelineVar := range pipeline.cfg.Vars {
 		if pipelineVar.Name == "" {
 			return nil, fmt.Errorf("vars[%d]: pipeline variable name cannot be empty", i)
 		}
-		ref, err := pipeline.refStore.GetValueBytes(pipeline.dir, pipelineVar.Value)
+		ref, err := pipeline.refStore.GetValue(pipeline.dir, pipelineVar.Value)
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting pipeline variable reference: %w", pipelineVar.Name, err)
 		}

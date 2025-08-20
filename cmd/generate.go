@@ -28,9 +28,9 @@ var generateCmd = &cobra.Command{
 		if len(args) == 1 {
 			forgeFile = args[0]
 		}
-		vars := make(map[string][]byte)
+		vars := make(map[string]any)
 		for varName, varVal := range genFlags.vars {
-			vars[varName] = []byte(varVal)
+			vars[varName] = varVal
 		}
 
 		cfg, err := config.ParseFile(forgeFile)
