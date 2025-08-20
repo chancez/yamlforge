@@ -27,7 +27,7 @@ func NewHelm(dir string, cfg config.HelmGenerator, refStore *Store) *Helm {
 	}
 }
 
-func (h *Helm) Generate(context.Context) ([]byte, error) {
+func (h *Helm) Generate(context.Context) (any, error) {
 	var buf bytes.Buffer
 	releaseName, err := h.refStore.GetStringValue(h.dir, h.cfg.ReleaseName)
 	if err != nil {

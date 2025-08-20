@@ -28,7 +28,7 @@ func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *Store, debu
 	}
 }
 
-func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
+func (pipeline *Pipeline) Generate(ctx context.Context) (any, error) {
 	var valuesSet []string
 	if pipeline.cfg.Generator != nil {
 		valuesSet = append(valuesSet, "generator")
@@ -61,7 +61,7 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 		return pipeline.executeGenerator(ctx, *pipeline.cfg.Generator)
 	}
 
-	var output []byte
+	var output any
 	for _, gen := range pipeline.cfg.Pipeline {
 		result, err := pipeline.executeGenerator(ctx, gen)
 		if err != nil {
@@ -78,7 +78,7 @@ func (pipeline *Pipeline) Generate(ctx context.Context) ([]byte, error) {
 	return output, nil
 }
 
-func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
+func (pipeline *Pipeline) executeImport(ctx context.Context) (any, error) {
 	data, err := pipeline.refStore.GetValueBytes(pipeline.dir, *pipeline.cfg.Import)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value to import: %w", err)
@@ -121,7 +121,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) ([]byte, error) {
 	return subPipeline.Generate(ctx)
 }
 
-func (pipeline *Pipeline) executeInclude(ctx context.Context) ([]byte, error) {
+func (pipeline *Pipeline) executeInclude(ctx context.Context) (any, error) {
 	data, err := pipeline.refStore.GetValueBytes(pipeline.dir, *pipeline.cfg.Include)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value to import: %w", err)
@@ -137,7 +137,7 @@ func (pipeline *Pipeline) executeInclude(ctx context.Context) ([]byte, error) {
 
 }
 
-func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) ([]byte, error) {
+func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) (any, error) {
 	kind, gen, err := pipeline.getGenerator(generatorCfg)
 	if err != nil {
 		return nil, fmt.Errorf("error getting generator: %w", err)
@@ -147,7 +147,7 @@ func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg con
 		return nil, fmt.Errorf("error executing %q generator: %w", kind, err)
 	}
 	if pipeline.debug {
-		fmt.Printf("[DEBUG (generator: %q) - name: %q]:\n%s\n\n", kind, generatorCfg.Name, string(result))
+		fmt.Printf("[DEBUG (generator: %q) - name: %q]:\n%s\n\n", kind, generatorCfg.Name, result)
 	}
 	return result, nil
 }

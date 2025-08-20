@@ -38,14 +38,20 @@ var generateCmd = &cobra.Command{
 			return fmt.Errorf("error parsing pipeline %s: %w", forgeFile, err)
 		}
 
+		dir := filepath.Dir(forgeFile)
 		refStore := generator.NewStore(vars)
-		state := generator.NewPipeline(filepath.Dir(forgeFile), cfg.PipelineGenerator, refStore, genFlags.debug)
+		state := generator.NewPipeline(dir, cfg.PipelineGenerator, refStore, genFlags.debug)
 		result, err := state.Generate(cmd.Context())
 		if err != nil {
 			return err
 		}
 
-		_, err = cmd.OutOrStdout().Write(result)
+		resultBytes, err := generator.ConvertToBytes(result)
+		if err != nil {
+			return err
+		}
+
+		_, err = cmd.OutOrStdout().Write(resultBytes)
 		if err != nil {
 			return fmt.Errorf("error writing output: %w", err)
 		}

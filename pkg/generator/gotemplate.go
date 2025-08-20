@@ -40,7 +40,7 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *Store) 
 	}
 }
 
-func (gt *GoTemplate) Generate(_ context.Context) ([]byte, error) {
+func (gt *GoTemplate) Generate(_ context.Context) (any, error) {
 	var buf bytes.Buffer
 	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap()).Funcs(extraTemplateFuncs)
 	val, err := gt.refStore.GetStringValue(gt.dir, gt.cfg.Template)

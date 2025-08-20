@@ -27,7 +27,7 @@ func NewKustomize(dir string, cfg config.KustomizeGenerator, refStore *Store) *K
 	}
 }
 
-func (h *Kustomize) Generate(context.Context) ([]byte, error) {
+func (h *Kustomize) Generate(context.Context) (any, error) {
 	var buf bytes.Buffer
 	kustomizeArgs := []string{
 		"build",

@@ -36,7 +36,7 @@ type encoder interface {
 	Encode(any) error
 }
 
-func (c *CEL) Generate(ctx context.Context) ([]byte, error) {
+func (c *CEL) Generate(ctx context.Context) (any, error) {
 	expr, err := c.refStore.GetStringValue(c.dir, c.cfg.Expr)
 	if err != nil {
 		return nil, fmt.Errorf("error getting expression: %w", err)

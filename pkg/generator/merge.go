@@ -24,7 +24,7 @@ func NewMerge(dir string, cfg config.MergeGenerator, refStore *Store) *Merge {
 	}
 }
 
-func (m *Merge) Generate(_ context.Context) ([]byte, error) {
+func (m *Merge) Generate(_ context.Context) (any, error) {
 	merged := make(map[string]any)
 	for _, input := range m.cfg.Input {
 		val, err := m.refStore.GetMapValue(m.dir, input)

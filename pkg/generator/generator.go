@@ -5,5 +5,5 @@ import (
 )
 
 type Generator interface {
-	Generate(context.Context) ([]byte, error)
+	Generate(context.Context) (any, error)
 }

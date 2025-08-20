@@ -27,7 +27,7 @@ func NewExec(dir string, cfg config.ExecGenerator, refStore *Store) *Exec {
 	}
 }
 
-func (e *Exec) Generate(context.Context) ([]byte, error) {
+func (e *Exec) Generate(context.Context) (any, error) {
 	var env []string
 	for _, envVar := range e.cfg.Env {
 		data, err := e.refStore.GetValueBytes(e.dir, envVar.Value)

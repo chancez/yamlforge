@@ -25,7 +25,7 @@ func NewJSONPatch(dir string, cfg config.JSONPatchGenerator, refStore *Store) *J
 	}
 }
 
-func (jp *JSONPatch) Generate(context.Context) ([]byte, error) {
+func (jp *JSONPatch) Generate(context.Context) (any, error) {
 	input, err := jp.refStore.GetStringValue(jp.dir, jp.cfg.Input)
 	if err != nil {
 		return nil, fmt.Errorf("error getting input: %w", err)

@@ -27,7 +27,7 @@ func NewJQ(dir string, cfg config.JQGenerator, refStore *Store) *JQ {
 	}
 }
 
-func (jq *JQ) Generate(context.Context) ([]byte, error) {
+func (jq *JQ) Generate(context.Context) (any, error) {
 	expr, err := jq.refStore.GetStringValue(jq.dir, jq.cfg.Expr)
 	if err != nil {
 		return nil, fmt.Errorf("error getting expression: %w", err)

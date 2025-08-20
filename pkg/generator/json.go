@@ -26,7 +26,7 @@ func NewJSON(dir string, cfg config.JSONGenerator, refStore *Store) *JSON {
 	}
 }
 
-func (j *JSON) Generate(context.Context) ([]byte, error) {
+func (j *JSON) Generate(context.Context) (any, error) {
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
 	if j.cfg.Indent != 0 {

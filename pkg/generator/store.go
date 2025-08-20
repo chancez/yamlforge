@@ -15,23 +15,23 @@ import (
 
 type Store struct {
 	// map from an generator.Name to it's results
-	references map[string][]byte
+	references map[string]any
 	// map a variable name to it's value
 	vars map[string]any
 }
 
 func NewStore(vars map[string]any) *Store {
 	return &Store{
-		references: make(map[string][]byte),
+		references: make(map[string]any),
 		vars:       vars,
 	}
 }
 
-func (store *Store) AddReference(name string, data []byte) error {
+func (store *Store) AddReference(name string, result any) error {
 	if _, exists := store.references[name]; exists {
 		return fmt.Errorf("reference %q already exists", name)
 	}
-	store.references[name] = data
+	store.references[name] = result
 	return nil
 }
 
