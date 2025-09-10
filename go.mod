@@ -7,7 +7,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.0
 	github.com/goccy/go-yaml v1.17.1
 	github.com/google/cel-go v0.22.1
-	github.com/invopop/jsonschema v0.12.0
+	github.com/invopop/jsonschema v0.13.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
 )
