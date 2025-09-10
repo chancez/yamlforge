@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/evanphx/json-patch/v5 v5.9.0
+	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/goccy/go-yaml v1.18.0
 	github.com/google/cel-go v0.22.1
 	github.com/invopop/jsonschema v0.13.0
@@ -27,7 +27,6 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/spf13/cast v1.7.0 // indirect
