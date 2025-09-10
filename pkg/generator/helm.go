@@ -93,6 +93,7 @@ func (h *Helm) Generate(context.Context) (any, error) {
 		return nil, fmt.Errorf("error creating temporary directory: %w", err)
 	}
 	defer func() {
+		// nolint:errcheck
 		os.RemoveAll(tmpDir)
 	}()
 

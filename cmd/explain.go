@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"slices"
@@ -62,6 +63,8 @@ Examples:
 			}
 
 		}
+
+		var errs []error
 
 		var fieldDescription string
 		var fieldType string
@@ -129,13 +132,16 @@ Examples:
 						subTypes = append(subTypes, schema)
 					}
 				}
-				logSubTypes(&buf, subTypes)
+				err := logSubTypes(&buf, subTypes)
+				if err != nil {
+					errs = append(errs, err)
+				}
 			}
 		}
 
 		fmt.Println(buf.String())
 
-		return nil
+		return errors.Join(errs...)
 	},
 }
 
