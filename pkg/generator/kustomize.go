@@ -27,7 +27,7 @@ func NewKustomize(dir string, cfg config.KustomizeGenerator, refStore *Store) *K
 	}
 }
 
-func (h *Kustomize) Generate(context.Context) (any, error) {
+func (h *Kustomize) Generate(context.Context) (*Result, error) {
 	var buf bytes.Buffer
 	kustomizeArgs := []string{
 		"build",
@@ -64,5 +64,5 @@ func (h *Kustomize) Generate(context.Context) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	return &Result{Output: buf.Bytes(), Format: "yaml"}, nil
 }

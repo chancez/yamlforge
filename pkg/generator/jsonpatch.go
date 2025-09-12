@@ -25,7 +25,7 @@ func NewJSONPatch(dir string, cfg config.JSONPatchGenerator, refStore *Store) *J
 	}
 }
 
-func (jp *JSONPatch) Generate(context.Context) (any, error) {
+func (jp *JSONPatch) Generate(context.Context) (*Result, error) {
 	input, err := jp.refStore.GetStringValue(jp.dir, jp.cfg.Input)
 	if err != nil {
 		return nil, fmt.Errorf("error getting input: %w", err)
@@ -60,7 +60,7 @@ func (jp *JSONPatch) Generate(context.Context) (any, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error applying patch: %w", err)
 		}
-		return modified, nil
+		return &Result{Output: modified, Format: "json"}, nil
 	}
 
 	decodedPatch, err := jsonpatch.DecodePatch(configPatch)
@@ -76,5 +76,5 @@ func (jp *JSONPatch) Generate(context.Context) (any, error) {
 		return nil, fmt.Errorf("error applying patch: %w", err)
 	}
 
-	return modified, nil
+	return &Result{Output: modified, Format: "json"}, nil
 }

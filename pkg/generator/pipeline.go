@@ -28,7 +28,7 @@ func NewPipeline(dir string, cfg config.PipelineGenerator, refStore *Store, debu
 	}
 }
 
-func (pipeline *Pipeline) Generate(ctx context.Context) (any, error) {
+func (pipeline *Pipeline) Generate(ctx context.Context) (*Result, error) {
 	var valuesSet []string
 	if pipeline.cfg.Generator != nil {
 		valuesSet = append(valuesSet, "generator")
@@ -61,9 +61,10 @@ func (pipeline *Pipeline) Generate(ctx context.Context) (any, error) {
 		return pipeline.executeGenerator(ctx, *pipeline.cfg.Generator)
 	}
 
-	var output any
+	var result *Result
 	for _, gen := range pipeline.cfg.Pipeline {
-		result, err := pipeline.executeGenerator(ctx, gen)
+		var err error
+		result, err = pipeline.executeGenerator(ctx, gen)
 		if err != nil {
 			return nil, fmt.Errorf("error running stage %q: %w", gen.Name, err)
 		}
@@ -71,14 +72,12 @@ func (pipeline *Pipeline) Generate(ctx context.Context) (any, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error storing reference for stage %q: %w", gen.Name, err)
 		}
-		// The last stage is the output of a pipeline
-		output = result
 	}
 
-	return output, nil
+	return result, nil
 }
 
-func (pipeline *Pipeline) executeImport(ctx context.Context) (any, error) {
+func (pipeline *Pipeline) executeImport(ctx context.Context) (*Result, error) {
 	data, err := pipeline.refStore.GetValueBytes(pipeline.dir, *pipeline.cfg.Import)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value to import: %w", err)
@@ -99,7 +98,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) (any, error) {
 			return nil, fmt.Errorf("variable %q: error getting pipeline variable reference: %w", pipelineVar.Name, err)
 		}
 		varName := pipelineVar.Name
-		pipelineVars[varName] = ref
+		pipelineVars[varName] = ref.Output
 	}
 
 	// FIXME: We need to know if the sub-pipeline being referenced is a file, and
@@ -121,7 +120,7 @@ func (pipeline *Pipeline) executeImport(ctx context.Context) (any, error) {
 	return subPipeline.Generate(ctx)
 }
 
-func (pipeline *Pipeline) executeInclude(ctx context.Context) (any, error) {
+func (pipeline *Pipeline) executeInclude(ctx context.Context) (*Result, error) {
 	data, err := pipeline.refStore.GetValueBytes(pipeline.dir, *pipeline.cfg.Include)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value to import: %w", err)
@@ -137,7 +136,7 @@ func (pipeline *Pipeline) executeInclude(ctx context.Context) (any, error) {
 
 }
 
-func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) (any, error) {
+func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg config.Generator) (*Result, error) {
 	kind, gen, err := pipeline.getGenerator(generatorCfg)
 	if err != nil {
 		return nil, fmt.Errorf("error getting generator: %w", err)
@@ -147,7 +146,7 @@ func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg con
 		return nil, fmt.Errorf("error executing %q generator: %w", kind, err)
 	}
 	if pipeline.debug {
-		fmt.Printf("[DEBUG (generator: %q) - name: %q]:\n%s\n\n", kind, generatorCfg.Name, result)
+		fmt.Printf("[DEBUG (generator: %q) - name: %q]:\n%s\n\n", kind, generatorCfg.Name, result.Output)
 	}
 	return result, nil
 }

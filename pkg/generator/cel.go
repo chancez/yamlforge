@@ -1,11 +1,8 @@
 package generator
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"io"
 	"reflect"
 
 	"github.com/chancez/yamlforge/pkg/config"
@@ -32,33 +29,14 @@ func NewCEL(dir string, cfg config.CELGenerator, refStore *Store) *CEL {
 	}
 }
 
-type encoder interface {
-	Encode(any) error
-}
-
-func (c *CEL) Generate(ctx context.Context) (any, error) {
+func (c *CEL) Generate(ctx context.Context) (*Result, error) {
 	expr, err := c.refStore.GetStringValue(c.dir, c.cfg.Expr)
 	if err != nil {
 		return nil, fmt.Errorf("error getting expression: %w", err)
 	}
-	format, err := c.refStore.GetStringValue(c.dir, c.cfg.Format)
-	if err != nil {
-		return nil, fmt.Errorf("error getting format: %w", err)
-	}
 	filter, err := c.refStore.GetBoolValue(c.dir, c.cfg.Filter)
 	if err != nil {
 		return nil, fmt.Errorf("error getting filter: %w", err)
-	}
-
-	var buf bytes.Buffer
-	var enc encoder
-	switch format {
-	case "yaml", "":
-		enc = config.NewYAMLEncoder(&buf)
-	case "json":
-		enc = json.NewEncoder(&buf)
-	default:
-		return nil, fmt.Errorf("invalid output format specified: %q", format)
 	}
 
 	prg, err := c.newProgram(expr, filter)
@@ -66,6 +44,7 @@ func (c *CEL) Generate(ctx context.Context) (any, error) {
 		return nil, fmt.Errorf("error creating CEL program: %w", err)
 	}
 
+	var results []any
 	if c.cfg.Input != nil {
 		vals, err := c.refStore.GetParsedValues(c.dir, *c.cfg.Input)
 		if err != nil {
@@ -97,18 +76,14 @@ func (c *CEL) Generate(ctx context.Context) (any, error) {
 			if err != nil {
 				return nil, fmt.Errorf("error while processing input: %w", err)
 			}
-			toEncode, skip, err := c.evalProgram(ctx, prg, val.Parsed(), filter, invertFilter)
+			result, skip, err := c.evalProgram(ctx, prg, val.Parsed(), filter, invertFilter)
 			if err != nil {
 				return nil, err
 			}
 			if filter && skip {
 				continue
 			}
-
-			err = enc.Encode(toEncode)
-			if err != nil {
-				return nil, fmt.Errorf("error encoding result as %q: %w", format, err)
-			}
+			results = append(results, result)
 		}
 	} else {
 		// No input, just evaluate once with no variables
@@ -116,20 +91,17 @@ func (c *CEL) Generate(ctx context.Context) (any, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error evaluating CEL program: %s", err)
 		}
-		toEncode := out.Value()
-		err = enc.Encode(toEncode)
-		if err != nil {
-			return nil, fmt.Errorf("error encoding result as %q: %w", format, err)
-		}
+		result := out.Value()
+		results = append(results, result)
 	}
 
-	if closer, ok := enc.(io.Closer); ok {
-		if err := closer.Close(); err != nil {
-			return nil, fmt.Errorf("error closing encoder: %w", err)
-		}
+	var output any
+	if len(results) == 1 {
+		output = results[0]
+	} else {
+		output = results
 	}
-
-	return buf.Bytes(), nil
+	return &Result{Output: output}, nil
 }
 
 func (c *CEL) newProgram(expr string, filter bool) (cel.Program, error) {

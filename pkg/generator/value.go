@@ -22,10 +22,10 @@ func NewValue(dir string, val config.AnyOrValue, refStore *Store) *Value {
 	}
 }
 
-func (v *Value) Generate(context.Context) (any, error) {
+func (v *Value) Generate(context.Context) (*Result, error) {
 	val, err := v.refStore.GetAnyValue(v.dir, v.val)
 	if err != nil {
 		return nil, err
 	}
-	return ConvertToBytes(val)
+	return &Result{Output: val}, nil
 }

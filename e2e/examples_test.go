@@ -51,8 +51,7 @@ metricsPort: 9999
 		{
 			file: "cel.yfg.yaml",
 			expected: trim(`
-MyApp
-`),
+MyApp`),
 		},
 		{
 			file: "jsonpatch.yfg.yaml",

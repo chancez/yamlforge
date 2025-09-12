@@ -27,7 +27,7 @@ func NewHelm(dir string, cfg config.HelmGenerator, refStore *Store) *Helm {
 	}
 }
 
-func (h *Helm) Generate(context.Context) (any, error) {
+func (h *Helm) Generate(context.Context) (*Result, error) {
 	var buf bytes.Buffer
 	releaseName, err := h.refStore.GetStringValue(h.dir, h.cfg.ReleaseName)
 	if err != nil {
@@ -113,5 +113,5 @@ func (h *Helm) Generate(context.Context) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	return &Result{Output: buf.Bytes(), Format: "yaml"}, nil
 }

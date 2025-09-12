@@ -118,8 +118,6 @@ type CELGenerator struct {
 	Filter BoolOrValue `yaml:"filter,omitempty" json:"filter,omitempty"`
 	// If Filter and InvertFilter is true, instead of keeping the result, it will be discarded.
 	InvertFilter BoolOrValue `yaml:"invertFilter,omitempty" json:"invertFilter,omitempty"`
-	// Format is the format the output should be returned as. If unspecified, it defaults to YAML.
-	Format StringOrValue `yaml:"format,omitempty" json:"format,omitempty" jsonschema:"enum=yaml,enum=json,default=yaml"`
 	// Collect configures the generator to read all inputs into an array and use it as a single input value.
 	Collect BoolOrValue `yaml:"collect,omitempty" json:"collect,omitempty"`
 }

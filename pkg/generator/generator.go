@@ -5,5 +5,11 @@ import (
 )
 
 type Generator interface {
-	Generate(context.Context) (any, error)
+	Generate(context.Context) (*Result, error)
+}
+
+type Result struct {
+	Output any
+	// TODO: Indicate if the output is expected to be a stream
+	Format string
 }

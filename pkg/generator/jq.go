@@ -27,7 +27,7 @@ func NewJQ(dir string, cfg config.JQGenerator, refStore *Store) *JQ {
 	}
 }
 
-func (jq *JQ) Generate(context.Context) (any, error) {
+func (jq *JQ) Generate(context.Context) (*Result, error) {
 	expr, err := jq.refStore.GetStringValue(jq.dir, jq.cfg.Expr)
 	if err != nil {
 		return nil, fmt.Errorf("error getting expression: %w", err)
@@ -64,5 +64,5 @@ func (jq *JQ) Generate(context.Context) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	return buf.Bytes(), nil
+	return &Result{Output: buf.Bytes(), Format: "json"}, nil
 }

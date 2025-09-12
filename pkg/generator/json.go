@@ -26,7 +26,7 @@ func NewJSON(dir string, cfg config.JSONGenerator, refStore *Store) *JSON {
 	}
 }
 
-func (j *JSON) Generate(context.Context) (any, error) {
+func (j *JSON) Generate(context.Context) (*Result, error) {
 	var out bytes.Buffer
 	enc := json.NewEncoder(&out)
 	if j.cfg.Indent != 0 {
@@ -47,5 +47,5 @@ func (j *JSON) Generate(context.Context) (any, error) {
 			}
 		}
 	}
-	return out.Bytes(), nil
+	return &Result{Output: out.Bytes(), Format: "json"}, nil
 }

@@ -24,7 +24,7 @@ func NewYAML(dir string, cfg config.YAMLGenerator, refStore *Store) *YAML {
 	}
 }
 
-func (y *YAML) Generate(context.Context) (any, error) {
+func (y *YAML) Generate(context.Context) (*Result, error) {
 	var out bytes.Buffer
 	enc := config.NewYAMLEncoderWithIndent(&out, y.cfg.Indent)
 	for _, input := range y.cfg.Input {
@@ -46,5 +46,5 @@ func (y *YAML) Generate(context.Context) (any, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error writing YAML: %w", err)
 	}
-	return out.Bytes(), nil
+	return &Result{Output: out.Bytes(), Format: "yaml"}, nil
 }

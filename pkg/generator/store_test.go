@@ -15,11 +15,11 @@ func TestStore(t *testing.T) {
 		"some-var": "var-data",
 	})
 
-	err := store.AddReference("example", []byte(`ref-data`))
+	err := store.AddReference("example", &Result{Output: []byte(`ref-data`)})
 	require.NoError(t, err)
 
 	// Duplicates are not allowed
-	err = store.AddReference("example", []byte(``))
+	err = store.AddReference("example", &Result{Output: []byte(``)})
 	require.Error(t, err)
 
 	// Looking up references
@@ -93,7 +93,7 @@ func TestStore(t *testing.T) {
 	assert.Equal(t, exampleStr, strData2)
 
 	// Store a boolean as a ref
-	err = store.AddReference("bool-ref", []byte(`true`))
+	err = store.AddReference("bool-ref", &Result{Output: []byte(`true`)})
 	require.NoError(t, err)
 
 	// Look up an existing ref as a bool

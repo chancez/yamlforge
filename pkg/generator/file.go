@@ -24,10 +24,10 @@ func NewFile(dir string, cfg config.FileGenerator) *File {
 	}
 }
 
-func (f *File) Generate(context.Context) (any, error) {
+func (f *File) Generate(context.Context) (*Result, error) {
 	data, err := os.ReadFile(path.Join(f.dir, f.cfg.Path))
 	if err != nil {
 		return nil, fmt.Errorf("error reading %q: %w", f.cfg.Path, err)
 	}
-	return data, nil
+	return &Result{Output: data}, nil
 }
