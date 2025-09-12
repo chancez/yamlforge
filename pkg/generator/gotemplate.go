@@ -42,7 +42,7 @@ func NewGoTemplate(dir string, cfg config.GoTemplateGenerator, refStore *Store) 
 
 func (gt *GoTemplate) Generate(_ context.Context) (*Result, error) {
 	var buf bytes.Buffer
-	tpl := template.New("go-template-generator").Funcs(sprig.FuncMap()).Funcs(extraTemplateFuncs)
+	tpl := template.New("go-template-generator").Option("missingkey=error").Funcs(sprig.FuncMap()).Funcs(extraTemplateFuncs)
 	val, err := gt.refStore.GetStringValue(gt.dir, gt.cfg.Template)
 	if err != nil {
 		return nil, fmt.Errorf("error getting value for 'template': %w", err)
