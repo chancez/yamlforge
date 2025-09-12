@@ -1,0 +1,28 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+    name: default
+spec:
+    template:
+        spec:
+            nodeClassRef:
+                group: karpenter.k8s.aws
+                kind: EC2NodeClass
+                name: default
+---
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+    name: default
+spec:
+    amiSelectorTerms:
+        - id: ami-09ea311630482acd7
+    role: karpenter-node-my-eks-cluster
+    securityGroupSelectorTerms:
+        - tags:
+              karpenter.sh/discovery: my-eks-cluster
+    subnetSelectorTerms:
+        - tags:
+              karpenter.sh/discovery: my-eks-cluster
+    tags:
+        managed-by: karpenter

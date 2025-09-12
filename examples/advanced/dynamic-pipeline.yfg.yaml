@@ -14,9 +14,7 @@ pipeline:
       {{ if eq .config.amiID.method "static" }}
       # Return the AMI ID specified in the configuration directly
       generator:
-        value:
-          input:
-            value: '{{ .config.amiID.static }}'
+        value: '{{ .config.amiID.static }}'
       {{ else if eq .config.amiID.method "ssmParameter" }}
       # dynamically fetch the AMI ID from an ssm parameter
       pipeline:
