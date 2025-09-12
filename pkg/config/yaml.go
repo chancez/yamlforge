@@ -22,6 +22,7 @@ func NewYAMLEncodeOptions(indent int) []yaml.EncodeOption {
 		yaml.Indent(indent),
 		yaml.IndentSequence(true),
 		yaml.UseJSONMarshaler(),
+		yaml.AutoInt(),
 	}
 }
 
