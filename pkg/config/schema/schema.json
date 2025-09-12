@@ -264,7 +264,7 @@
         },
         "file": {
           "$ref": "#/$defs/FileGenerator",
-          "description": "File is a generator which reads files at the specified path and returns their output."
+          "description": "File is a generator which reads files at the specified path and returns their output.\nThis is primarily useful if reading the same file across multiple pipeline\nstages, otherwise you can use the file field of a Value instead."
         },
         "exec": {
           "$ref": "#/$defs/ExecGenerator",

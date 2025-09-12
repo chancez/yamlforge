@@ -1,12 +1,9 @@
 pipeline:
-- name: service
-  file:
-    path: files/service.yaml
 # convert to JSON for JSON patch
 - name: json
   json:
     input:
-      - ref: service
+      - file: files/service.yaml
 - name: patch
   jsonpatch:
     patch: |

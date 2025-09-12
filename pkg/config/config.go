@@ -13,6 +13,8 @@ type Generator struct {
 	// Value is a simple generator that takes a value and returns it unaltered.
 	Value *AnyOrValue `yaml:"value,omitempty" json:"value,omitempty" jsonschema:"oneof_required=value"`
 	// File is a generator which reads files at the specified path and returns their output.
+	// This is primarily useful if reading the same file across multiple pipeline
+	// stages, otherwise you can use the file field of a Value instead.
 	File *FileGenerator `yaml:"file,omitempty" json:"file,omitempty" jsonschema:"oneof_required=file"`
 	// Exec is a generator which execs the command specified and returns the stdout of the program.
 	Exec *ExecGenerator `yaml:"exec,omitempty" json:"exec,omitempty" jsonschema:"oneof_required=exec"`

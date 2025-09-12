@@ -2,10 +2,6 @@
 # The generator defined in transformers/add-field will add the new field based
 # on vars provided.
 pipeline:
-- name: service
-  file:
-    path: ../files/service.yaml
-
 # You can import other generators for re-use.
 - name: add-field
   pipeline:
@@ -15,7 +11,7 @@ pipeline:
       # We're passing the output of the -file stage as the
       # transformer-input var in the add-field transformer
       - name: input-object
-        ref: service
+        file: ../files/service.yaml
       # The add-field generator takes an input variable "field" as the field to
       # add
       - name: annotation
