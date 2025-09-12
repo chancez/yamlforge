@@ -276,7 +276,7 @@ func (store *Store) GetParsedValues(dir string, val config.Value) (iter.Seq2[Par
 		format = val.Format
 	}
 	if format == "" {
-		return nil, fmt.Errorf("cannot handle value of type %T without format set", res.Output)
+		return nil, fmt.Errorf("unknown format, cannot parse without format set")
 	}
 	dec, err := store.getParsedValueDecoder(data, format)
 	if err != nil {
