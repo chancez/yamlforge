@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/chancez/yamlforge/pkg/config"
 )
@@ -29,5 +30,18 @@ func (f *File) Generate(context.Context) (*Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error reading %q: %w", f.cfg.Path, err)
 	}
-	return &Result{Output: data}, nil
+	format := formatFromFileName(f.cfg.Path)
+	return &Result{Output: data, Format: format}, nil
+}
+
+func formatFromFileName(f string) string {
+	ext := filepath.Ext(f)
+	switch ext {
+	case ".yml", ".yaml":
+		return "yaml"
+	case ".json":
+		return "json"
+	default:
+		return ""
+	}
 }

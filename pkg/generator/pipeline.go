@@ -146,7 +146,7 @@ func (pipeline *Pipeline) executeGenerator(ctx context.Context, generatorCfg con
 		return nil, fmt.Errorf("error executing %q generator: %w", kind, err)
 	}
 	if pipeline.debug {
-		fmt.Printf("[DEBUG (generator: %q) - name: %q]:\n%s\n\n", kind, generatorCfg.Name, result.Output)
+		fmt.Printf("[DEBUG (generator: %q) - name: %q format: %q]:\n%s\n\n", kind, generatorCfg.Name, result.Format, result.Output)
 	}
 	return result, nil
 }

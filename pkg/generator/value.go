@@ -27,5 +27,5 @@ func (v *Value) Generate(context.Context) (*Result, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Result{Output: val}, nil
+	return val, nil
 }

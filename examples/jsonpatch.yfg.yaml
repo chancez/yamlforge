@@ -7,7 +7,6 @@ pipeline:
   json:
     input:
       - ref: service
-        format: yaml
 - name: patch
   jsonpatch:
     patch: |
@@ -20,4 +19,3 @@ pipeline:
   yaml:
     input:
       - ref: patch
-        format: json

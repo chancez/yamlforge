@@ -44,16 +44,16 @@ func (store *Store) GetValueBytes(dir string, ref config.Value) ([]byte, error) 
 	return ConvertToBytes(ret)
 }
 
-func (store *Store) GetAnyValue(dir string, val config.AnyOrValue) (any, error) {
+func (store *Store) GetAnyValue(dir string, val config.AnyOrValue) (*Result, error) {
 	if val.Any != nil {
-		return *val.Any, nil
+		return &Result{Output: *val.Any}, nil
 	}
 	if val.Value != nil {
 		res, err := store.GetValue(dir, *val.Value)
 		if err != nil {
 			return nil, err
 		}
-		return res.Output, nil
+		return res, nil
 	}
 	return nil, nil
 }
@@ -199,13 +199,14 @@ func (store *Store) getValue(dir string, ref config.Value) (*Result, error) {
 			}
 			return nil, fmt.Errorf("error opening file %q", ref.File)
 		}
-		return &Result{Output: res}, nil
+		format := formatFromFileName(ref.File)
+		return &Result{Output: res, Format: format}, nil
 	case ref.Value != nil:
 		ret, err := store.GetAnyValue(dir, *ref.Value)
 		if err != nil {
 			return nil, fmt.Errorf("error getting value: %w", err)
 		}
-		return &Result{Output: ret}, nil
+		return ret, nil
 	case ref.Values != nil:
 		var vals []any
 		for _, v := range ref.Values {

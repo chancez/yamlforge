@@ -61,11 +61,12 @@ func (gt *GoTemplate) Generate(_ context.Context) (*Result, error) {
 		if err != nil {
 			return nil, fmt.Errorf("variable %q: error getting value: %w", name, err)
 		}
+		varVal := v.Output
 		// Convert bytes to string when using with templates.
-		if bv, ok := v.([]byte); ok {
-			v = string(bv)
+		if bv, ok := varVal.([]byte); ok {
+			varVal = string(bv)
 		}
-		vars[name] = v
+		vars[name] = varVal
 	}
 
 	err = tpl.Execute(&buf, vars)

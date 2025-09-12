@@ -107,6 +107,5 @@ pipeline:
   yaml:
     input:
       - ref: helm
-        format: yaml
       - ref: karpenter-node-pool
         format: yaml

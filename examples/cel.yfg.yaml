@@ -2,7 +2,6 @@ pipeline:
 - name: simple-cel-extractor
   cel:
     input:
-      format: yaml
       file: files/service.yaml
     expr: 'val.spec.selector["app.kubernetes.io/name"]'
 
