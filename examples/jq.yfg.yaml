@@ -7,6 +7,7 @@ pipeline:
   json:
     input:
       - ref: service
+        format: yaml
 - name: jq
   jq:
     expr: '{metricsPort: (.spec.ports[] | select(.name=="metrics") | .port)}'
@@ -16,3 +17,4 @@ pipeline:
   yaml:
     input:
       - ref: jq
+        format: json

@@ -43,8 +43,8 @@
     "CELGenerator": {
       "properties": {
         "input": {
-          "$ref": "#/$defs/ParsedValue",
-          "description": "Input values are parsed then evaluated against the configure CEL expression."
+          "$ref": "#/$defs/Value",
+          "description": "Input values then evaluated against the configure CEL expression."
         },
         "expr": {
           "$ref": "#/$defs/StringOrValue",
@@ -418,7 +418,7 @@
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/ParsedValue"
+            "$ref": "#/$defs/Value"
           },
           "type": "array",
           "description": "Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned."
@@ -683,192 +683,24 @@
             }
           ],
           "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "description": "NamedValue is a Value with a name."
-    },
-    "ParsedValue": {
-      "oneOf": [
-        {
-          "required": [
-            "var"
-          ],
-          "title": "var"
         },
-        {
-          "required": [
-            "ref"
-          ],
-          "title": "ref"
-        },
-        {
-          "required": [
-            "file"
-          ],
-          "title": "file"
-        },
-        {
-          "required": [
-            "env"
-          ],
-          "title": "env"
-        },
-        {
-          "required": [
-            "value"
-          ],
-          "title": "value"
-        },
-        {
-          "required": [
-            "values"
-          ],
-          "title": "values"
-        },
-        {
-          "required": [
-            "pipeline"
-          ],
-          "title": "pipeline"
-        },
-        {
-          "required": [
-            "generator"
-          ],
-          "title": "generator"
-        },
-        {
-          "required": [
-            "import"
-          ],
-          "title": "import"
-        },
-        {
-          "required": [
-            "include"
-          ],
-          "title": "include"
-        }
-      ],
-      "properties": {
         "format": {
           "type": "string",
           "enum": [
             "yaml",
             "json"
           ],
-          "description": "Format defines the format to parse the retrieved value as. Valid options\nare yaml or json. Defaults to yaml if unspecified.",
+          "description": "Format defines the format to parse the retrieved value as. Valid options\nare yaml or json.",
           "default": "yaml"
-        },
-        "var": {
-          "type": "string",
-          "description": "Var allows defining variables that can be externally provided to a pipeline."
-        },
-        "ref": {
-          "type": "string",
-          "description": "Ref takes the name of a previous stage in the pipeline and returns the output of that stage."
-        },
-        "file": {
-          "type": "string",
-          "description": "File takes a path relative to this pipeline file to read and returns the content of the file specified."
-        },
-        "env": {
-          "type": "string",
-          "description": "Env takes the name of an environment variable and returns its value."
-        },
-        "value": {
-          "$ref": "#/$defs/AnyOrValue",
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "array"
-            },
-            {
-              "type": "object"
-            },
-            {
-              "type": "Value"
-            }
-          ],
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type (string, boolean, number, array, object), or another Value"
-        },
-        "values": {
-          "items": {
-            "$ref": "#/$defs/AnyOrValue"
-          },
-          "type": "array",
-          "description": "Values returns the array of values specified. Each item can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value."
-        },
-        "pipeline": {
-          "items": {
-            "$ref": "#/$defs/Generator"
-          },
-          "type": "array",
-          "description": "Pipeline is a list of generators to run. Generators can reference the output of previous generators using their name in any Value refs."
-        },
-        "generator": {
-          "$ref": "#/$defs/Generator",
-          "description": "Generator is a single generator, for simple use-cases that do not require a full pipeline."
-        },
-        "import": {
-          "$ref": "#/$defs/Value",
-          "description": "Import is a value containing a pipeline to import. Imported pipelines\nshare no references or variables with their parent pipeline."
-        },
-        "include": {
-          "$ref": "#/$defs/Value",
-          "description": "Include is a value containing a pipeline to include. Included pipelines\nshare the same context as their parent, meaning variables and references\nin the parent pipeline are available within the included pipeline,\nbehaving as if the included pipeline was directly written in the parent\npipeline.\nIf a included pipeline includes a generator with the same name as it's\nparent it will result in an error."
-        },
-        "vars": {
-          "items": {
-            "$ref": "#/$defs/NamedValue"
-          },
-          "type": "array",
-          "description": "Vars defines variables that the pipeline is providing to the sub-pipeline."
-        },
-        "ignoreMissing": {
-          "type": "boolean",
-          "description": "Value simply returns the value specified. It can be any valid YAML/JSON type ( string, boolean, number, array, object), or another Value.\nIgnoreMissing specifies if the generator should ignore missing references or files. If set to true, the generator will return an empty string instead of an error."
-        },
-        "default": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "number"
-            },
-            {
-              "type": "array"
-            },
-            {
-              "type": "object"
-            }
-          ],
-          "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
+        "name",
         "format"
       ],
-      "description": "ParsedValue provides parsed values to generators."
+      "description": "NamedValue is a Value with a name."
     },
     "PipelineGenerator": {
       "oneOf": [
@@ -1100,17 +932,29 @@
             }
           ],
           "description": "Default specifies the default value to use if a ref, variable, or file is\nmissing. Has no effect unless ignoreMissing is true.\nIt can be any valid YAML/JSON type ( string, boolean, number, array, object)."
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "yaml",
+            "json"
+          ],
+          "description": "Format defines the format to parse the retrieved value as. Valid options\nare yaml or json.",
+          "default": "yaml"
         }
       },
       "additionalProperties": false,
       "type": "object",
+      "required": [
+        "format"
+      ],
       "description": "Value provides inputs to generators."
     },
     "YAMLGenerator": {
       "properties": {
         "input": {
           "items": {
-            "$ref": "#/$defs/ParsedValue"
+            "$ref": "#/$defs/Value"
           },
           "type": "array",
           "description": "Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned."

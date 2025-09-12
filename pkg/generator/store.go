@@ -143,6 +143,27 @@ func (store *Store) GetMapValue(dir string, val config.MapOrValue) (map[string]a
 }
 
 func (store *Store) GetValue(dir string, ref config.Value) (any, error) {
+	if ref.Format != "" {
+		items, err := store.GetParsedValues(dir, ref)
+		if err != nil {
+			return nil, err
+		}
+		var res []any
+		for item, err := range items {
+			if err != nil {
+				return nil, err
+			}
+			res = append(res, item.Parsed())
+		}
+		if len(res) == 1 {
+			return res[0], nil
+		}
+		return res, nil
+	}
+	return store.getValue(dir, ref)
+}
+
+func (store *Store) getValue(dir string, ref config.Value) (any, error) {
 	switch {
 	case ref.Var != "":
 		varName := ref.Var
@@ -222,9 +243,6 @@ func (pv ParsedValue) Parsed() any {
 }
 
 func (store *Store) getParsedValueDecoder(data []byte, format string) (Decoder, error) {
-	if format == "" {
-		format = "yaml"
-	}
 	dec, err := NewDecoder(format, data)
 	if err != nil {
 		return nil, fmt.Errorf("error creating decoder: %w", err)
@@ -232,48 +250,62 @@ func (store *Store) getParsedValueDecoder(data []byte, format string) (Decoder, 
 	return dec, nil
 }
 
-func (store *Store) GetParsedValues(dir string, parsedVal config.ParsedValue) (iter.Seq2[ParsedValue, error], error) {
-	val, err := store.GetValue(dir, parsedVal.Value)
+func (store *Store) GetParsedValues(dir string, parsedVal config.Value) (iter.Seq2[ParsedValue, error], error) {
+	val, err := store.getValue(dir, parsedVal)
 	if err != nil {
 		return nil, err
 	}
-	if valBytes, ok := val.([]byte); ok {
-		dec, err := store.getParsedValueDecoder(valBytes, parsedVal.Format)
-		if err != nil {
-			return nil, err
-		}
-		return func(yield func(ParsedValue, error) bool) {
-			for {
-				pv := ParsedValue{
-					data: valBytes,
-				}
-				err := dec.Decode(&pv.parsed)
-				if err == io.EOF {
-					return
-				}
-				if !yield(pv, err) {
-					return
-				}
-			}
-		}, nil
-	} else {
-		return func(yield func(ParsedValue, error) bool) {
-			var items []any
-			if vals, ok := val.([]any); ok {
-				items = vals
-			} else {
-				items = []any{val}
-			}
-			for _, val := range items {
-				pv := ParsedValue{
-					parsed: val,
-				}
-				if !yield(pv, err) {
-					return
-				}
-			}
-		}, nil
+
+	var data []byte
+	switch v := val.(type) {
+	case string:
+		data = []byte(v)
+	case []byte:
+		data = v
+	default:
+		return store.convertToParsedValueIter(val)
 	}
+
+	if parsedVal.Format == "" {
+		return nil, fmt.Errorf("cannot handle value of type %T without format set", val)
+	}
+	dec, err := store.getParsedValueDecoder(data, parsedVal.Format)
+	if err != nil {
+		return nil, err
+	}
+	return func(yield func(ParsedValue, error) bool) {
+		for {
+			pv := ParsedValue{
+				data: data,
+			}
+			err := dec.Decode(&pv.parsed)
+			if err == io.EOF {
+				return
+			}
+			if !yield(pv, err) {
+				return
+			}
+		}
+	}, nil
+}
+
+func (store *Store) convertToParsedValueIter(val any) (iter.Seq2[ParsedValue, error], error) {
+	return func(yield func(ParsedValue, error) bool) {
+		var items []any
+		if vals, ok := val.([]any); ok {
+			items = vals
+		} else {
+			items = []any{val}
+		}
+		for _, val := range items {
+			pv := ParsedValue{
+				parsed: val,
+			}
+			if !yield(pv, nil) {
+				return
+			}
+		}
+	}, nil
 }
 
 type Decoder interface {

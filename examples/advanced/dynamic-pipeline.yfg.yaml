@@ -9,6 +9,7 @@ pipeline:
     vars:
       config:
         file: files/dynamic-config.yaml
+        format: yaml
     template: |
       {{ if eq .config.amiID.method "static" }}
       # Return the AMI ID specified in the configuration directly
@@ -46,7 +47,8 @@ pipeline:
     vars:
       eks:
         file: ../files/eks-vars.yaml
-    template:
+        format: yaml
+    template: |
       serviceAccount:
         annotations:
           eks.amazonaws.com/role-arn: "{{ .eks.roleARN }}"
@@ -70,6 +72,7 @@ pipeline:
     vars:
       eks:
         file: ../files/eks-vars.yaml
+        format: yaml
       amiID:
         ref: ami-id
     template: |
@@ -106,4 +109,6 @@ pipeline:
   yaml:
     input:
       - ref: helm
+        format: yaml
       - ref: karpenter-node-pool
+        format: yaml

@@ -4,6 +4,7 @@ pipeline:
     vars:
       eks:
         file: ../files/eks-vars.yaml
+        format: yaml
     template:
       value:
         serviceAccount:

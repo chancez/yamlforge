@@ -110,8 +110,8 @@ type JQGenerator struct {
 
 // CELGenerator evaluates a CEL expression and returns the result of the expression.
 type CELGenerator struct {
-	// Input values are parsed then evaluated against the configure CEL expression.
-	Input *ParsedValue `yaml:"input" json:"input"`
+	// Input values then evaluated against the configure CEL expression.
+	Input *Value `yaml:"input" json:"input"`
 	// Expr is a CEL expression evaluated with the input set to the variable 'val'.
 	Expr StringOrValue `yaml:"expr" json:"expr"`
 	// When filter is true, the CEL expression becomes a filter returning a boolean indicating if the input should be kept.
@@ -137,7 +137,7 @@ type JSONPatchGenerator struct {
 // YAMLGenerator returns it's inputs as YAML.
 type YAMLGenerator struct {
 	// Inputs are the inputs to convert to YAML. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML documents is returned.
-	Input []ParsedValue `yaml:"input" json:"input"`
+	Input []Value `yaml:"input" json:"input"`
 	// Indent defines the indent level to use for the output.
 	Indent int `yaml:"indent,omitempty" json:"indent,omitempty"`
 }
@@ -145,7 +145,7 @@ type YAMLGenerator struct {
 // JSONGenerator returns it's inputs as JSON.
 type JSONGenerator struct {
 	// Inputs are the inputs to convert to JSON. If a single input produces multiple objects or multiple inputs are provided, a stream of YAML objects is returned.
-	Input []ParsedValue `yaml:"input" json:"input"`
+	Input []Value `yaml:"input" json:"input"`
 	// Indent defines the indent level to use for the output.
 	Indent int `yaml:"indent,omitempty" json:"indent,omitempty"`
 }

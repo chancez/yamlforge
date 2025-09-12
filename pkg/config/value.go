@@ -206,6 +206,9 @@ type Value struct {
 	// missing. Has no effect unless ignoreMissing is true.
 	// It can be any valid YAML/JSON type ( string, boolean, number, array, object).
 	Default any `yaml:"default,omitempty" json:"default,omitempty" jsonschema:"oneof_type=string;boolean;number;array;object"`
+	// Format defines the format to parse the retrieved value as. Valid options
+	// are yaml or json.
+	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json,default=yaml"`
 }
 
 // NamedValue is a Value with a name.
@@ -213,17 +216,4 @@ type NamedValue struct {
 	// Name is the name of this variable.
 	Name  string `yaml:"name" json:"name"`
 	Value `yaml:",inline" json:",inline"`
-}
-
-// ParsedValue provides parsed values to generators.
-type ParsedValue struct {
-	// Format defines the format to parse the retrieved value as. Valid options
-	// are yaml or json. Defaults to yaml if unspecified.
-	Format string `yaml:"format" json:"format" jsonschema:"enum=yaml,enum=json,default=yaml"`
-	Value  `yaml:",inline" json:",inline"`
-}
-
-func (pv ParsedValue) String() string {
-	b, _ := json.Marshal(pv)
-	return string(b)
 }
