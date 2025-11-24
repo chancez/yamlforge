@@ -21,7 +21,7 @@ jobs:
       with:
         go-version-file: 'go.mod'
     - name: Run static checks
-      uses: golangci/golangci-lint-action@v8.0.0
+      uses: golangci/golangci-lint-action@v9.1.0
     - name: Check module vendoring
       run: |
         go mod tidy
