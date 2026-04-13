@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/goccy/go-yaml v1.19.2
-	github.com/google/cel-go v0.27.0
+	github.com/google/cel-go v0.28.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.10.0
